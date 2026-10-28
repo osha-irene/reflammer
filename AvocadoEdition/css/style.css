@@ -1,4 +1,5 @@
 @charset "utf-8";
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,500;1,600;1,700&family=Caveat:wght@500;600&display=swap');
 /* -----------------------------------------------
 	* 사이트 전체 기본 스타일 정의
 --------------------------------------------------
@@ -224,8 +225,9 @@ body {
 #no_design_gnb li {display:block; margin-bottom:20px;}
 
 /** 금장 테두리 메뉴 패널 (img/menu.png) — PC 전용
-	  779:1401 비율의 세로 캡슐형 테두리라 세로로 쌓이는
-	  #no_design_gnb 구조를 그대로 살려 프레임 안에 넣는 방식.
+	  779x1401 캡슐형 테두리 이미지를 9-slice(border-image)로 잘라서
+	  위/아래 곡선 캡(330px)은 고정 크기로, 좌우 직선(40px)은 세로로
+	  반복시켜 메뉴 항목 수에 맞춰 테두리가 자연스럽게 늘어나게 함.
 	  (모바일 슬라이드 메뉴는 기존 레이아웃 유지) */
 @media all and (min-width: 1025px) {
 	#gnb {
@@ -236,30 +238,59 @@ body {
 	}
 
 	#gnb #no_design_gnb {
-		width: min(100%, 220px);
-		aspect-ratio: 779 / 1401;
+		width: min(100%, 240px);
 		margin: 10px 0 20px;
-		padding: 22% 12%;
 		box-sizing: border-box;
-		background: url('../img/menu.png') center / contain no-repeat;
+		border-style: solid;
+		border-color: transparent;
+		border-width: 102px 12px;
+		border-image-source: url('../img/menu_small.png');
+		border-image-slice: 110 13 110 13;
+		border-image-width: 102px 12px;
+		border-image-repeat: stretch;
+		padding: 16px 16px;
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
-		gap: 10px;
+		gap: 20px;
 		text-align: center;
 		line-height: 1.3;
 	}
-	#gnb #no_design_gnb li { margin: 0; }
+	#gnb #no_design_gnb li { margin: 0; position: relative; }
 	#gnb #no_design_gnb li a {
+		position: relative;
+		z-index: 1;
 		display: block;
-		color: #f3dfa0;
-		font-size: 13px;
-		letter-spacing: .04em;
-		text-shadow: 0 0 6px rgba(243, 223, 160, .35);
+		color: #ffd84d;
+		font-family: 'Playfair Display', 'Noto Serif KR', serif;
+		font-style: italic;
+		font-weight: 600;
+		font-size: 26px;
+		letter-spacing: .01em;
+		text-shadow: 0 0 8px rgba(255, 216, 77, .4);
 	}
 	#gnb #no_design_gnb li a:hover {
 		color: #ffffff;
 		text-shadow: 0 0 10px rgba(255, 255, 255, .6);
+	}
+
+	/* 메뉴 이름 뒤에 겹쳐 보이는 어두운 필기체 레이어 */
+	#gnb #no_design_gnb li a::before {
+		content: attr(data-text);
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		transform: translate(-50%, -50%);
+		z-index: -1;
+		width: max-content;
+		font-family: 'Caveat', cursive;
+		font-style: normal;
+		font-weight: 600;
+		font-size: 1.05em;
+		letter-spacing: 0;
+		color: rgba(138, 102, 24, .6);
+		white-space: nowrap;
+		pointer-events: none;
 	}
 }
 
