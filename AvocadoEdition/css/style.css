@@ -197,19 +197,24 @@ html.single .bgm-player {display:none !important;}
 
 
 /*******************************************
-	사이트 배경 (야간 하늘) — 전 페이지 공통
+	사이트 배경 (야간 하늘, 기본값) — 전 페이지 공통
 	  body(실제 태그)에 걸어서 헤더 사이드바/본문 구분 없이
 	  모든 페이지에서 동일한 배경이 유지되도록 함.
+	  페이지 디자인 설정(adm/design_form.php)의 "배경" 필드는 원래
+	  html.single:before 에 입혀지는데(css/_design.config.css), 여기서
+	  body 에 이미지를 하드코딩해버리면 그 위에 덮여 관리자가 올린 배경이
+	  화면에 전혀 반영되지 않는다. var()로 받아 관리자가 배경을 올리면
+	  그 이미지를, 안 올리면 기본 야간 하늘(bg.jpg)을 쓰도록 한다.
 ********************************************/
 body {
-	background-color: #05070f;
+	background-color: var(--d-background-1, #05070f);
 	background-image:
 		linear-gradient(180deg, rgba(5, 9, 20, .45) 0%, rgba(5, 9, 20, .55) 45%, rgba(5, 9, 20, .85) 100%),
-		url('../img/bg.jpg');
-	background-repeat: no-repeat;
-	background-position: center bottom;
-	background-size: cover;
-	background-attachment: fixed;
+		var(--d-background-img, url('../img/bg.jpg'));
+	background-repeat: var(--d-background-2, no-repeat);
+	background-position: var(--d-background-3, center bottom);
+	background-size: var(--d-background-4, cover);
+	background-attachment: var(--d-background-5, fixed);
 }
 @media all and (max-width: 1024px) {
 	body { background-attachment: scroll; }

@@ -86,26 +86,6 @@ for($i=0; $i < count($cs_name); $i++) {
 	}
 }
 
-// 임시 진단 — 업로드가 "미등록"으로 조용히 실패하는 원인 확인용. 확인 끝나면 이 블록과
-// design_form.php의 ?debug=1 을 되돌려주세요.
-if (isset($_GET['debug'])) {
-    echo '<pre style="font-size:13px;line-height:1.6;">';
-    echo "pd_id = {$pd_id}\n\n";
-    echo "FILES['cs_value_file'] raw:\n";
-    echo htmlspecialchars(print_r($_FILES['cs_value_file'] ?? 'NOT SET', true), ENT_QUOTES, 'UTF-8');
-    echo "\n인덱스별 상태 (파일명 또는 최종 cs_value 둘 중 하나라도 있는 행만):\n";
-    for ($j = 0; $j < count($cs_name); $j++) {
-        $fname = isset($_FILES['cs_value_file']['name'][$j]) ? $_FILES['cs_value_file']['name'][$j] : '(파일input 없음)';
-        $ferr  = isset($_FILES['cs_value_file']['error'][$j]) ? $_FILES['cs_value_file']['error'][$j] : '-';
-        $fval  = isset($cs_value[$j]) ? $cs_value[$j] : '(없음)';
-        if ($fname === '' && $fname !== '(파일input 없음)' && $fval === '') continue;
-        echo "[{$j}] cs_name={$cs_name[$j]}  file_name={$fname}  file_error={$ferr}  final_cs_value={$fval}\n";
-    }
-    echo '</pre>';
-    echo '<a href="./design_form.php?pd_id='.(int)$pd_id.'">계속 (실제 저장 페이지로)</a>';
-    exit;
-}
-
 // 2026-04-27: data/css/_design.config*.css 레거시 파일 생성 모두 제거.
 // (신규 시스템은 css/root.php?pd_id=N + css/_design.config.css 로 일원화)
 
