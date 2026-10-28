@@ -235,7 +235,7 @@ body {
 	#gnb {
 		display: flex;
 		justify-content: flex-start;
-		padding-left: 20px;
+		padding-left: 45px;
 		box-sizing: border-box;
 	}
 
