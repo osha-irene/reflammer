@@ -226,35 +226,37 @@ body {
 
 /** 금장 테두리 메뉴 패널 (img/menu.png) — PC 전용
 	  779x1401 캡슐형 테두리 이미지를 9-slice(border-image)로 잘라서
-	  위/아래 곡선 캡(330px)은 고정 크기로, 좌우 직선(40px)은 세로로
-	  반복시켜 메뉴 항목 수에 맞춰 테두리가 자연스럽게 늘어나게 함.
+	  위/아래 곡선 캡은 고정 크기로, 좌우 직선은 세로로 반복시켜
+	  메뉴 항목 수에 맞춰 테두리가 자연스럽게 늘어나게 함.
+	  주의: #header 사이드바 실제 폭은 css/root.php의 menu_width 기본값인
+	  200px (관리자 레이아웃 설정 안 했을 때) — 그 안에서 맞춰야 함.
 	  (모바일 슬라이드 메뉴는 기존 레이아웃 유지) */
 @media all and (min-width: 1025px) {
 	#gnb {
 		display: flex;
 		justify-content: flex-start;
-		padding-left: 100px;
+		padding-left: 20px;
 		box-sizing: border-box;
 	}
 
 	#gnb #no_design_gnb {
-		width: min(100%, 240px);
+		width: 100%;
 		margin: 10px 0 20px;
 		box-sizing: border-box;
 		border-style: solid;
 		border-color: transparent;
-		border-width: 102px 12px;
+		border-width: 76px 9px;
 		border-image-source: url('../img/menu_small.png');
 		border-image-slice: 110 13 110 13;
-		border-image-width: 102px 12px;
+		border-image-width: 76px 9px;
 		border-image-repeat: stretch;
-		padding: 16px 16px;
+		padding: 10px 8px;
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
-		gap: 20px;
+		gap: 14px;
 		text-align: center;
-		line-height: 1.3;
+		line-height: 1.25;
 	}
 	#gnb #no_design_gnb li { margin: 0; position: relative; }
 	#gnb #no_design_gnb li a {
@@ -265,7 +267,7 @@ body {
 		font-family: 'Playfair Display', 'Noto Serif KR', serif;
 		font-style: italic;
 		font-weight: 600;
-		font-size: 26px;
+		font-size: 20px;
 		letter-spacing: .01em;
 		text-shadow: 0 0 8px rgba(255, 216, 77, .4);
 	}
