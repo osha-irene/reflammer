@@ -1,9 +1,9 @@
 <?php
-$sub_menu = "100290";
+$sub_menu = "100200";
 include_once('./_common.php');
 
-if ($is_admin != 'super')
-    alert_close('최고관리자만 접근 가능합니다.');
+if (!$is_admin)
+    alert_close('관리자만 접근 가능합니다.');
 
 $g5['title'] = '메뉴 추가';
 include_once(G5_PATH.'/head.sub.php');

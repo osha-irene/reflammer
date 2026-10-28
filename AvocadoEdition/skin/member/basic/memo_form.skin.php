@@ -39,7 +39,6 @@ add_stylesheet('<link rel="stylesheet" href="'.$member_skin_url.'/style.css">', 
 <script>
 function fmemoform_submit(f)
 {
-	<?php echo chk_captcha_js();  ?>
 
 	return true;
 }

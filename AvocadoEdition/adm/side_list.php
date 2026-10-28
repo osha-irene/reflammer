@@ -44,15 +44,44 @@ $colspan = 7;
 
 
 
+$side_label = $config['cf_side_title'] ? $config['cf_side_title'] : '진영';
+$is_unused = !$config['cf_side_title'];
+
 $pg_anchor = '<ul class="anchor">
-	<li><a href="#anc_001">'.$config['cf_side_title'].' 목록</a></li>
-	<li><a href="#anc_002">'.$config['cf_side_title'].' 등록</a></li>
+	<li><a href="#anc_000">분류명 설정</a></li>
+	<li><a href="#anc_001">'.$side_label.' 목록</a></li>
+	<li><a href="#anc_002">'.$side_label.' 등록</a></li>
+	<li><a href="#anc_003">시기별 활성 설정</a></li>
 </ul>';
 
 ?>
 
+<section id="anc_000">
+	<h2 class="h2_frm">분류명 설정</h2>
+	<?php echo $pg_anchor ?>
+	<form method="post" action="./side_update.php" autocomplete="off">
+		<input type="hidden" name="token" value="<?php echo $token ?>">
+		<input type="hidden" name="only_title" value="1">
+		<div class="tbl_frm01 tbl_wrap">
+			<table>
+			<colgroup><col style="width:150px;"><col></colgroup>
+			<tbody>
+			<tr>
+				<th scope="row"><label for="cf_side_title">분류 이름</label></th>
+				<td>
+					<input type="text" name="cf_side_title" id="cf_side_title" value="<?php echo htmlspecialchars($config['cf_side_title']) ?>" placeholder="예: 진영, 소속, 종족 (비워두면 미사용)" class="frm_input" style="width:240px;">
+					<button type="submit" class="btn_03">이름 저장</button>
+					<?php if($is_unused): ?><span style="color:#888;margin-left:8px;">현재 미사용 상태입니다. 분류 이름을 입력하면 사용이 시작됩니다.</span><?php endif; ?>
+				</td>
+			</tr>
+			</tbody>
+			</table>
+		</div>
+	</form>
+</section>
+
 <section id="anc_001">
-	<h2 class="h2_frm"><?=$config['cf_side_title']?> 목록</h2>
+	<h2 class="h2_frm"><?php echo $side_label?> 목록</h2>
 	<?php echo $pg_anchor ?>
 
 	<div class="local_ov01 local_ov">
@@ -83,12 +112,12 @@ $pg_anchor = '<ul class="anchor">
 			<thead>
 			<tr>
 				<th scope="col">
-					<label for="chkall" class="sound_only"><?=$config['cf_side_title']?> 내역 전체</label>
+					<label for="chkall" class="sound_only"><?php echo $config['cf_side_title']?> 내역 전체</label>
 					<input type="checkbox" name="chkall" value="1" id="chkall" onclick="check_all(this.form)">
 				</th>
 				<th scope="col">IDX</th>
 				<th scope="col" colspan="2">이미지</th>
-				<th scope="col"><?=$config['cf_side_title']?>명</th>
+				<th scope="col"><?php echo $config['cf_side_title']?>명</th>
 				<th scope="col">선택권한</th>
 				<th scope="col">보기</th>
 			</tr>
@@ -108,12 +137,12 @@ $pg_anchor = '<ul class="anchor">
 				</td>
 				<td style="text-align: center">
 					<?php if($row['si_img']) { ?>
-						<img src='<?=$row['si_img']?>' alt='<?=$row['si_name']?>'>
-						<input type="hidden" name="old_si_img[<?=$i?>]" value="<?=$row['si_img']?>" />
-					<? } ?>
+						<img src='<?php echo $row['si_img']?>' alt='<?php echo $row['si_name']?>'>
+						<input type="hidden" name="old_si_img[<?php echo $i?>]" value="<?php echo $row['si_img']?>" />
+					<?php  } ?>
 				</td>
 				<td>
-					<input type="file" name="si_img[<?=$i?>]" id="si_img<?=$i?>" />
+					<input type="file" name="si_img[<?php echo $i?>]" id="si_img<?php echo $i?>" />
 				</td>
 				<td>
 					<input type="text" name="si_name[<?php echo $i ?>]" value="<?php echo $row['si_name'] ?>" class="frm_input" style="width: 98%;">
@@ -122,7 +151,7 @@ $pg_anchor = '<ul class="anchor">
 					<?php echo get_member_level_select("si_auth[$i]", 2, $member['mb_level'], $row['si_auth']) ?>
 				</td>
 				<td>
-					<a href="<?=G5_URL?>/member/index.php?side=<?=$row['si_id']?>" target="_blank">
+					<a href="<?php echo G5_URL?>/member/index.php?side=<?php echo $row['si_id']?>" target="_blank">
 						멤버목록보기
 					</a>
 				</td>
@@ -149,7 +178,7 @@ $pg_anchor = '<ul class="anchor">
 </section>
 
 <section id="anc_002">
-	<h2 class="h2_frm"><?=$config['cf_side_title']?>정보 등록</h2>
+	<h2 class="h2_frm"><?php echo $config['cf_side_title']?>정보 등록</h2>
 	<?php echo $pg_anchor ?>
 
 	<form name="fsideform" method="post" id="fsideform" action="./side_update.php" autocomplete="off" enctype="multipart/form-data">
@@ -168,7 +197,7 @@ $pg_anchor = '<ul class="anchor">
 		</colgroup>
 		<tbody>
 		<tr>
-			<th scope="row"><label for="si_name"><?=$config['cf_side_title']?>명<strong class="sound_only">필수</strong></label></th>
+			<th scope="row"><label for="si_name"><?php echo $config['cf_side_title']?>명<strong class="sound_only">필수</strong></label></th>
 			<td><input type="text" name="si_name" id="si_name" class="required frm_input" required></td>
 		</tr>
 		<tr>
@@ -177,7 +206,7 @@ $pg_anchor = '<ul class="anchor">
 		</tr>
 		<tr>
 			<th scope="row"><label for="si_auth">선택권한</label></th>
-			<td><?php echo get_member_level_select('si_auth', 2, $member['mb_level'], $mb['mb_level']) ?></td>
+			<td><?php echo get_member_level_select('si_auth', 2, 10) ?></td>
 		</tr>
 		</tbody>
 		</table>
@@ -208,6 +237,82 @@ function fsidelist_submit(f)
 	return true;
 }
 </script>
+
+<?php
+// =====================================================================
+// 시기별 활성 매트릭스 (Wave 10) — renewal/au 시기만 표시.
+//   매트릭스가 비어있는 시기는 폴백 정책상 "전체 활성" 으로 간주됨.
+//   하나라도 체크되면 그 시기의 활성 set 가 명시됨.
+// =====================================================================
+$_all_sides = sql_query("SELECT si_id, si_name FROM `{$g5['side_table']}` ORDER BY si_id ASC", false);
+$_sides_arr = array();
+while ($_r = sql_fetch_array($_all_sides)) $_sides_arr[] = $_r;
+
+$_time_rows = function_exists('get_time_list') ? get_time_list(false, true, true) : array();
+$_time_rows = array_values(array_filter($_time_rows, function($r){
+	$t = isset($r['ti_type']) ? (string)$r['ti_type'] : 'renewal';
+	return $t === 'renewal' || $t === 'au';
+}));
+
+// 현재 매핑 로딩
+$_mapping = array(); // [si_id][ti_id] = 1
+$_rs = sql_query("SELECT si_id, ti_id FROM `{$g5['side_time_table']}`", false);
+while ($_r = sql_fetch_array($_rs)) $_mapping[(int)$_r['si_id']][(int)$_r['ti_id']] = 1;
+?>
+
+<section id="anc_003">
+	<h2 class="h2_frm">시기별 활성 설정</h2>
+	<?php echo $pg_anchor ?>
+
+	<p style="color:#666;font-size:13px;margin:0 0 8px;">
+		ⓘ 시기마다 어떤 <?php echo h($side_label); ?> 을 활성화할지 체크합니다. 리뉴얼/AU 시기만 표시.
+		<br>특정 시기의 체크가 <strong>0개</strong> 이면 폴백 정책에 따라 처리됩니다 (renewal: 직전 renewal 폴백 / au: 빈 값).
+		<br>매핑 테이블 자체가 완전히 비어있으면 "전체 활성" 으로 간주됩니다 (마이그레이션 직후 안전장치).
+	</p>
+
+<?php if (empty($_time_rows) || empty($_sides_arr)): ?>
+	<p style="color:#888;">표시할 시기 또는 <?php echo h($side_label); ?> 이 없습니다.</p>
+<?php else: ?>
+	<form method="post" action="./side_time_update.php" autocomplete="off">
+		<input type="hidden" name="token" value="<?php echo $token ?>">
+		<div class="tbl_head01 tbl_wrap">
+			<table>
+				<thead>
+				<tr>
+					<th scope="col" style="width:80px;">IDX</th>
+					<th scope="col"><?php echo h($side_label); ?>명</th>
+<?php foreach ($_time_rows as $_t): ?>
+					<th scope="col" style="text-align:center;">
+						<?php echo h($_t['ti_name']); ?>
+						<br><small style="color:#888;font-weight:normal;">[<?php echo h(time_type_label($_t['ti_type'])); ?>]</small>
+					</th>
+<?php endforeach; ?>
+				</tr>
+				</thead>
+				<tbody>
+<?php foreach ($_sides_arr as $_s):
+	$_si_id = (int)$_s['si_id']; ?>
+				<tr>
+					<td><?php echo $_si_id; ?></td>
+					<td><?php echo h($_s['si_name']); ?></td>
+<?php foreach ($_time_rows as $_t):
+		$_ti_id = (int)$_t['ti_id'];
+		$_chk = !empty($_mapping[$_si_id][$_ti_id]); ?>
+					<td style="text-align:center;">
+						<input type="checkbox" name="map[<?php echo $_si_id; ?>][<?php echo $_ti_id; ?>]" value="1" <?php echo $_chk ? 'checked' : ''; ?>>
+					</td>
+<?php endforeach; ?>
+				</tr>
+<?php endforeach; ?>
+				</tbody>
+			</table>
+		</div>
+		<div class="btn_confirm01 btn_confirm">
+			<input type="submit" value="시기별 활성 저장" class="btn_submit">
+		</div>
+	</form>
+<?php endif; ?>
+</section>
 
 <?php
 include_once ('./admin.tail.php');

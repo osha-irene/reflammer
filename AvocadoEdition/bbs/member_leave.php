@@ -4,8 +4,8 @@ include_once('./_common.php');
 if (!$member['mb_id'])
     alert('회원만 접근하실 수 있습니다.');
 
-if ($is_admin == 'super')
-    alert('최고 관리자는 탈퇴할 수 없습니다');
+if ($is_admin)
+    alert('관리자는 탈퇴할 수 없습니다');
 
 if (!($_POST['mb_password'] && check_password($_POST['mb_password'], $member['mb_password'])))
     alert('비밀번호가 틀립니다.');
@@ -14,6 +14,8 @@ if (!($_POST['mb_password'] && check_password($_POST['mb_password'], $member['mb
 $date = date("Ymd");
 $sql = " update {$g5['member_table']} set mb_leave_date = '{$date}' where mb_id = '{$member['mb_id']}' ";
 sql_query($sql);
+
+if (function_exists('mdl_do_action')) mdl_do_action('member_leave_after', $member['mb_id']);
 
 // 3.09 수정 (로그아웃)
 unset($_SESSION['ss_mb_id']);

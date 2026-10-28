@@ -1,10 +1,10 @@
 <?php
-$sub_menu = "300200";
+$sub_menu = "300010";
 include_once('./_common.php');
 
 auth_check($auth[$sub_menu], 'w');
 
-if ($is_admin != 'super' && $w == '') alert('최고관리자만 접근 가능합니다.');
+if (!$is_admin && $w == '') alert('관리자만 접근 가능합니다.');
 
 $html_title = '게시판그룹';
 $gr_id_attr = '';
@@ -21,11 +21,6 @@ if ($w == '') {
 }
 else
     alert('제대로 된 값이 넘어오지 않았습니다.');
-
-if (!isset($group['gr_device'])) {
-    sql_query(" ALTER TABLE `{$g5['group_table']}` ADD `gr_device` ENUM('both','pc','mobile') NOT NULL DEFAULT 'both' AFTER `gr_subject` ", false);
-}
-
 
 $g5['title'] = $html_title;
 include_once('./admin.head.php');
@@ -79,10 +74,10 @@ include_once('./admin.head.php');
         </td>
     </tr>
     <tr>
-        <th scope="row"><?php if ($is_admin == 'super') { ?><label for="gr_admin"><?php } ?>그룹 관리자<?php if ($is_admin == 'super') { ?></label><?php } ?></th>
+        <th scope="row"><?php if ($is_admin) { ?><label for="gr_admin"><?php } ?>그룹 관리자<?php if ($is_admin) { ?></label><?php } ?></th>
         <td>
             <?php
-            if ($is_admin == 'super')
+            if ($is_admin)
                 echo '<input type="text" id="gr_admin" name="gr_admin" class="frm_input" value="'.$gr['gr_admin'].'" maxlength="20">';
             else
                 echo '<input type="hidden" id="gr_admin" name="gr_admin" value="'.$gr['gr_admin'].'">'.$gr['gr_admin'];

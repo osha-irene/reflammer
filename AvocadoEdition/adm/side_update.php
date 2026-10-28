@@ -5,6 +5,13 @@ include_once('./_common.php');
 auth_check($auth[$sub_menu], 'w');
 check_token();
 
+// 분류 이름만 저장 (목록 페이지 상단 폼)
+if (!empty($_POST['only_title'])) {
+	$new_title = trim($_POST['cf_side_title']);
+	sql_query("update {$g5['config_table']} set cf_side_title = '".addslashes($new_title)."'");
+	goto_url('./side_list.php');
+}
+
 $side_path = G5_DATA_PATH."/side";
 $side_url = G5_DATA_URL."/side";
 

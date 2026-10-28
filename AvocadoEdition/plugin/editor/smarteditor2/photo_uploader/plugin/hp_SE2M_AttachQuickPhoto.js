@@ -50,6 +50,19 @@ nhn.husky.SE2M_AttachQuickPhoto = jindo.$Class({
 	makePopupURL : function(){
 		//var sPopupUrl = "./photo_uploader/popup/photo_uploader.html";
 		var sPopupUrl = "./photo_uploader/popup/index.html";
+		var nonce = '';
+		try {
+			if (nhn.husky.SE2M_Configuration
+				&& nhn.husky.SE2M_Configuration.SE2M_Accessibility
+				&& nhn.husky.SE2M_Configuration.SE2M_Accessibility.ed_nonce) {
+				nonce = nhn.husky.SE2M_Configuration.SE2M_Accessibility.ed_nonce;
+			} else if (typeof parent !== 'undefined' && parent.ed_nonce) {
+				nonce = parent.ed_nonce;
+			}
+		} catch (e) {}
+		if (nonce) {
+			sPopupUrl += (sPopupUrl.indexOf('?') >= 0 ? '&' : '?') + '_nonce=' + encodeURIComponent(nonce);
+		}
 		return sPopupUrl;
 	},
 	

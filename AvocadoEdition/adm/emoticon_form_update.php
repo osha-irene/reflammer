@@ -19,6 +19,7 @@ if ($img = $_FILES['me_img']['name']) {
 
 		move_uploaded_file($_FILES['me_img']['tmp_name'], $emoticon_image_path);
 		chmod($emoticon_image_path, 0606);
+		if (function_exists('cdn_after_upload')) cdn_after_upload($emoticon_image_path);
 		$sql_common = " , me_img = '{$emoticon_image_url}' ";
 	}
 }

@@ -1660,7 +1660,7 @@ class HTMLPurifier_CSSDefinition extends HTMLPurifier_Definition
             // emit errors
             foreach ($allowed_properties as $name => $d) {
                 // :TODO: Is this htmlspecialchars() call really necessary?
-                $name = htmlspecialchars($name);
+                $name = htmlspecialchars($name, ENT_COMPAT);
                 trigger_error("Style attribute '$name' is not supported $support", E_USER_WARNING);
             }
         }
@@ -1914,7 +1914,7 @@ class HTMLPurifier_Config
         if (!isset($this->def->info[$key])) {
             // can't add % due to SimpleTest bug
             $this->triggerError(
-                'Cannot retrieve value of undefined directive ' . htmlspecialchars($key),
+                'Cannot retrieve value of undefined directive ' . htmlspecialchars($key, ENT_COMPAT),
                 E_USER_WARNING
             );
             return;
@@ -1959,7 +1959,7 @@ class HTMLPurifier_Config
         if (!isset($full[$namespace])) {
             $this->triggerError(
                 'Cannot retrieve undefined namespace ' .
-                htmlspecialchars($namespace),
+                htmlspecialchars($namespace, ENT_COMPAT),
                 E_USER_WARNING
             );
             return;
@@ -2042,7 +2042,7 @@ class HTMLPurifier_Config
         }
         if (!isset($this->def->info[$key])) {
             $this->triggerError(
-                'Cannot set undefined directive ' . htmlspecialchars($key) . ' to value',
+                'Cannot set undefined directive ' . htmlspecialchars($key, ENT_COMPAT) . ' to value',
                 E_USER_WARNING
             );
             return;
@@ -2536,7 +2536,7 @@ class HTMLPurifier_Config
         if ($index !== false) {
             $array = (isset($array[$index]) && is_array($array[$index])) ? $array[$index] : array();
         }
-        $mq = $mq_fix && function_exists('get_magic_quotes_gpc') && get_magic_quotes_gpc();
+        $mq = false;
 
         $allowed = HTMLPurifier_Config::getAllowedDirectivesForForm($allowed, $schema);
         $ret = array();
@@ -3495,7 +3495,7 @@ class HTMLPurifier_DoctypeRegistry
             $doctype = $this->aliases[$doctype];
         }
         if (!isset($this->doctypes[$doctype])) {
-            trigger_error('Doctype ' . htmlspecialchars($doctype) . ' does not exist', E_USER_ERROR);
+            trigger_error('Doctype ' . htmlspecialchars($doctype, ENT_COMPAT) . ' does not exist', E_USER_ERROR);
             $anon = new HTMLPurifier_Doctype($doctype);
             return $anon;
         }
@@ -3923,7 +3923,7 @@ class HTMLPurifier_Encoder
 
         $len = strlen($str);
         for ($i = 0; $i < $len; $i++) {
-            $in = ord($str{$i});
+            $in = ord($str[$i]);
             $char .= $str[$i]; // append byte to char
             if (0 == $mState) {
                 // When mState is zero we expect either a US-ASCII character
@@ -5568,7 +5568,7 @@ class HTMLPurifier_HTMLDefinition extends HTMLPurifier_Definition
             }
             // emit errors
             foreach ($allowed_elements as $element => $d) {
-                $element = htmlspecialchars($element); // PHP doesn't escape errors, be careful!
+                $element = htmlspecialchars($element, ENT_COMPAT); // PHP doesn't escape errors, be careful!
                 trigger_error("Element '$element' is not supported $support", E_USER_WARNING);
             }
         }
@@ -5627,8 +5627,8 @@ class HTMLPurifier_HTMLDefinition extends HTMLPurifier_Definition
                 switch ($c) {
                     case 2:
                         if ($bits[0] !== '*') {
-                            $element = htmlspecialchars($bits[0]);
-                            $attribute = htmlspecialchars($bits[1]);
+                            $element = htmlspecialchars($bits[0], ENT_COMPAT);
+                            $attribute = htmlspecialchars($bits[1], ENT_COMPAT);
                             if (!isset($this->info[$element])) {
                                 trigger_error(
                                     "Cannot allow attribute '$attribute' if element " .
@@ -5644,7 +5644,7 @@ class HTMLPurifier_HTMLDefinition extends HTMLPurifier_Definition
                         }
                         // otherwise fall through
                     case 1:
-                        $attribute = htmlspecialchars($bits[0]);
+                        $attribute = htmlspecialchars($bits[0], ENT_COMPAT);
                         trigger_error(
                             "Global attribute '$attribute' is not ".
                             "supported in any elements $support",
@@ -7546,7 +7546,7 @@ class HTMLPurifier_Lexer
                 default:
                     throw new HTMLPurifier_Exception(
                         "Cannot instantiate unrecognized Lexer type " .
-                        htmlspecialchars($lexer)
+                        htmlspecialchars($lexer, ENT_COMPAT)
                     );
             }
         }
@@ -13599,7 +13599,7 @@ class HTMLPurifier_AttrTransform_ImgSpace extends HTMLPurifier_AttrTransform
     {
         $this->attr = $attr;
         if (!isset($this->css[$attr])) {
-            trigger_error(htmlspecialchars($attr) . ' is not valid space attribute');
+            trigger_error(htmlspecialchars($attr, ENT_COMPAT) . ' is not valid space attribute');
         }
     }
 
@@ -14284,7 +14284,7 @@ class HTMLPurifier_ChildDef_Custom extends HTMLPurifier_ChildDef
     protected function _compileRegex()
     {
         $raw = str_replace(' ', '', $this->dtd_regex);
-        if ($raw{0} != '(') {
+        if ($raw[0] != '(') {
             $raw = "($raw)";
         }
         $el = '[#a-zA-Z0-9_.-]+';
@@ -17187,7 +17187,7 @@ class HTMLPurifier_HTMLModule_Tidy extends HTMLPurifier_HTMLModule
         }
         if ($i == $c) {
             trigger_error(
-                'Tidy level ' . htmlspecialchars($level) . ' not recognized',
+                'Tidy level ' . htmlspecialchars($level, ENT_COMPAT) . ' not recognized',
                 E_USER_WARNING
             );
             return array();
@@ -20681,7 +20681,7 @@ class HTMLPurifier_TagTransform_Font extends HTMLPurifier_TagTransform
         if (isset($attr['size'])) {
             // normalize large numbers
             if ($attr['size'] !== '') {
-                if ($attr['size']{0} == '+' || $attr['size']{0} == '-') {
+                if ($attr['size'][0] == '+' || $attr['size'][0] == '-') {
                     $size = (int)$attr['size'];
                     if ($size < -2) {
                         $attr['size'] = '-2';

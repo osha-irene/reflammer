@@ -9,14 +9,17 @@ function display_banner($skin='', $start=true, $effect='slide', $speed='3000', $
 
 
 	
-	if (!$skin_dir) $skin_dir = 'basic';
+	if (!isset($skin_dir)||!$skin_dir) $skin_dir = 'basic';
 
 	$banner_skin_path = G5_SKIN_PATH.'/banner/'.$skin_dir;
 	$banner_skin_url  = G5_SKIN_URL.'/banner/'.$skin_dir;
 
+	// 시기별 출력: 캐시 키에 현재 시기 포함
+	$_cur_time_for_banner = function_exists('get_current_time') ? (int)get_current_time() : 0;
+
 	$cache_fwrite = false;
 	if(G5_USE_CACHE) {
-		$cache_file = G5_DATA_PATH."/cache/banner-{$skin_dir}.php";
+		$cache_file = G5_DATA_PATH."/cache/banner-{$skin_dir}-t{$_cur_time_for_banner}.php";
 
 		if(!file_exists($cache_file)) {
 			$cache_fwrite = true;
@@ -37,7 +40,8 @@ function display_banner($skin='', $start=true, $effect='slide', $speed='3000', $
 	if(!G5_USE_CACHE || $cache_fwrite) {
 		$banner = array();
 
-		$sql = " select * from {$g5['banner_table']} where '".G5_TIME_YMDHIS."' between bn_begin_time and bn_end_time order by bn_order, bn_id desc ";
+		$where_time = function_exists('shop_time_sql_where') ? shop_time_sql_where('bn_time', $_cur_time_for_banner) : '';
+		$sql = " select * from {$g5['banner_table']} where '".G5_TIME_YMDHIS."' between bn_begin_time and bn_end_time {$where_time} order by bn_order, bn_id desc ";
 		$result = sql_query($sql);
 		for ($i=0; $row = sql_fetch_array($result); $i++) {
 			$banner[$i] = $row;

@@ -1,4 +1,4 @@
-<?php
+﻿<?php 
 $sub_menu = "400300";
 include_once('./_common.php');
 
@@ -48,7 +48,8 @@ if ($_POST['act_button'] == "선택수정") {
 			$sql = " update {$g5['title_table']}
 						set ti_title = '{$_POST['ti_title'][$k]}',
 							ti_use = '{$_POST['ti_use'][$k]}',
-							ti_value = '{$_POST['ti_value'][$k]}'
+							ti_type = '{$_POST['ti_type'][$k]}',
+							ti_style = '".sql_escape_string($_POST['ti_style'][$k])."'
 							{$sql_common}
 					where ti_id = '{$ti['ti_id']}' ";
 			sql_query($sql);

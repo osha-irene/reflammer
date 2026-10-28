@@ -1,5 +1,5 @@
 <?php
-$sub_menu = '300600';
+$sub_menu = "310201";
 include_once('./_common.php');
 
 if ($w == "u" || $w == "d")
@@ -15,8 +15,13 @@ check_admin_token();
 @mkdir(G5_DATA_PATH."/content", G5_DIR_PERMISSION);
 @chmod(G5_DATA_PATH."/content", G5_DIR_PERMISSION);
 
-if ($co_himg_del)  @unlink(G5_DATA_PATH."/content/{$co_id}_h");
-if ($co_timg_del)  @unlink(G5_DATA_PATH."/content/{$co_id}_t");
+if ($co_himg_del)  { $_p = G5_DATA_PATH."/content/{$co_id}_h"; if (function_exists('cdn_unlink')) { @cdn_unlink($_p); } else { @unlink($_p); } }
+if ($co_timg_del)  { $_p = G5_DATA_PATH."/content/{$co_id}_t"; if (function_exists('cdn_unlink')) { @cdn_unlink($_p); } else { @unlink($_p); } }
+
+// CDN: 본문 저장 시 토큰화
+if (function_exists('cdn_tokenize_content') && isset($co_content)) {
+    $co_content = cdn_tokenize_content($co_content);
+}
 
 $error_msg = '';
 
@@ -64,8 +69,8 @@ else if ($w == "u")
 }
 else if ($w == "d")
 {
-    @unlink(G5_DATA_PATH."/content/{$co_id}_h");
-    @unlink(G5_DATA_PATH."/content/{$co_id}_t");
+    $_p1 = G5_DATA_PATH."/content/{$co_id}_h"; $_p2 = G5_DATA_PATH."/content/{$co_id}_t";
+    if (function_exists('cdn_unlink')) { @cdn_unlink($_p1); @cdn_unlink($_p2); } else { @unlink($_p1); @unlink($_p2); }
 
     $sql = " delete from {$g5['content_table']} where co_id = '$co_id' ";
     sql_query($sql);
@@ -78,12 +83,14 @@ if ($w == "" || $w == "u")
         $dest_path = G5_DATA_PATH."/content/".$co_id."_h";
         @move_uploaded_file($_FILES['co_himg']['tmp_name'], $dest_path);
         @chmod($dest_path, G5_FILE_PERMISSION);
+        if (function_exists('cdn_after_upload')) cdn_after_upload($dest_path);
     }
     if ($_FILES['co_timg']['name'])
     {
         $dest_path = G5_DATA_PATH."/content/".$co_id."_t";
         @move_uploaded_file($_FILES['co_timg']['tmp_name'], $dest_path);
         @chmod($dest_path, G5_FILE_PERMISSION);
+        if (function_exists('cdn_after_upload')) cdn_after_upload($dest_path);
     }
 
     if( $error_msg ){

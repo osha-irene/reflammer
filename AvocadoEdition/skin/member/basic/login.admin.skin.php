@@ -11,10 +11,10 @@ add_stylesheet('<link rel="stylesheet" href="'.$member_skin_url.'/style.admin.cs
 		<div class="inner">
 			<h1>
 				<em>
-					<strong><?=$config['cf_title']?> 관리자</strong> 로그인
+					<strong><?php echo $config['cf_title']?> 관리자</strong> 로그인
 				</em>
 				<span>
-					AVOCADO EDITION Ver.<?=G5_GNUBOARD_VER?>
+					AVOCADO EDITION Ver.<?php echo G5_GNUBOARD_VER?>
 				</span>
 				<sup>
 					관리자 비번을 잊을 시, DB 접속을 통해 직접 변경 하여야 합니다.<br />

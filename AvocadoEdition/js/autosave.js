@@ -8,12 +8,18 @@ var save_wr_content = null;
 function autosave() {
     $("form#fwrite").each(function() {
         if(g5_editor != "") {
-            if (g5_editor.indexOf("ckeditor4") != -1 && typeof(CKEDITOR.instances.wr_content)!="undefined") {
+            if (g5_editor.indexOf("ckeditor4") != -1 && typeof(CKEDITOR) != "undefined" && typeof(CKEDITOR.instances.wr_content) != "undefined") {
                 this.wr_content.value = CKEDITOR.instances.wr_content.getData();
-            } else if (g5_editor.indexOf("cheditor5") != -1 && typeof(ed_wr_content)!="undefined") {
+            } else if (g5_editor.indexOf("cheditor5") != -1 && typeof(ed_wr_content) != "undefined") {
                 this.wr_content.value = ed_wr_content.outputBodyHTML();
+            } else if (g5_editor.indexOf("summernote") != -1 && typeof(jQuery) != "undefined" && jQuery('#wr_content').length) {
+                this.wr_content.value = jQuery('#wr_content').summernote('code');
+            } else if (g5_editor.indexOf("quill") != -1 && typeof(window['quill_wr_content']) != "undefined") {
+                this.wr_content.value = window['quill_wr_content'].root.innerHTML;
+            } else if (g5_editor.indexOf("toastuieditor") != -1 && typeof(window['toastEditor_wr_content']) != "undefined") {
+                this.wr_content.value = window['toastEditor_wr_content'].getHTML();
             } else {
-                if(typeof get_editor_wr_content == "function") {
+                if (typeof get_editor_wr_content == "function") {
                     this.wr_content.value = get_editor_wr_content();
                 }
             }

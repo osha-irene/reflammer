@@ -57,15 +57,15 @@ if (count($banner) > 0) {
 	<div class="swiper-pagination"></div>
 </div>
 
-<script src="<?=G5_JS_URL?>/swiper.js"></script>
+<script src="<?php echo G5_JS_URL?>/swiper.js"></script>
 <script>
 if($('.ban-basic.siwperslider').find('li').length > 1) {
-	var effect = "<?=$effect?>";
-	var speed = "<?=$speed?>";
-	var start = "<?=$start?>";
-	var mode = "<?=$mode?>";
-	var control = "<?=$control?>";
-	var a_spped = "<?=$animationspeed?>";
+	var effect = "<?php echo $effect?>";
+	var speed = "<?php echo $speed?>";
+	var start = "<?php echo $start?>";
+	var mode = "<?php echo $mode?>";
+	var control = "<?php echo $control?>";
+	var a_spped = "<?php echo $animationspeed?>";
 
 	if(typeof(effect) == 'undefined' || !effect) { effect = 'slide'; }
 	if(typeof(speed) == 'undefined' || !speed) { speed = 3000; }
@@ -75,19 +75,19 @@ if($('.ban-basic.siwperslider').find('li').length > 1) {
 	if(typeof(a_spped) == 'undefined' || !a_spped) { a_spped = 700; }
 
 	var swiper = new Swiper(".ban-basic.siwperslider .swiper-container", {
-		<? if($start) { ?>
+		<?php  if($start) { ?>
 			autoplay: {
 				delay: speed,
 				disableOnInteraction: false,
 			},
-		<? } ?>
+		<?php  } ?>
 		effect: effect,
-		<? if($control) { ?>
+		<?php  if($control) { ?>
 		navigation: {
 			nextEl: ".ban-basic.siwperslider .swiper-button-prev",
 			prevEl: ".ban-basic.siwperslider .swiper-button-next",
 		},
-		<? } ?>
+		<?php  } ?>
 		pagination: {
 			el: ".ban-basic.siwperslider .swiper-pagination"
 		}
@@ -95,4 +95,4 @@ if($('.ban-basic.siwperslider').find('li').length > 1) {
 }
 
 </script>
-<? } ?>
+<?php  } ?>

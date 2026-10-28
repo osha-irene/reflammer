@@ -14,19 +14,18 @@ function outlogin($skin_dir='basic')
 	}
 
 	$outlogin_skin_path = G5_SKIN_PATH.'/outlogin/'.$skin_dir;
-	$outlogin_skin_url = G5_SKIN_URL.'/outlogin/'.$skin_dir;
+	$outlogin_skin_url  = G5_SKIN_URL.'/outlogin/'.$skin_dir;
+	// 테마 오버라이드 — 'basic' 슬롯만 등록되어 있음. 다른 skin_dir 은 그대로.
+	if ($skin_dir === 'basic' && function_exists('theme_skin_dir')) {
+		$outlogin_skin_path = theme_skin_dir('skin_outlogin_basic', $outlogin_skin_path);
+		$outlogin_skin_url  = theme_skin_url('skin_outlogin_basic', $outlogin_skin_url);
+	}
 
 	// 읽지 않은 쪽지가 있다면
 	if ($is_member) {
 		$sql = " select count(*) as cnt from {$g5['memo_table']} where me_recv_mb_id = '{$member['mb_id']}' and me_read_datetime = '0000-00-00 00:00:00' ";
 		$row = sql_fetch($sql);
 		$memo_not_read = $row['cnt'];
-
-		$is_auth = false;
-		$sql = " select count(*) as cnt from {$g5['auth_table']} where mb_id = '{$member['mb_id']}' ";
-		$row = sql_fetch($sql);
-		if ($row['cnt'])
-			$is_auth = true;
 	}
 
 	$outlogin_url        = login_url($urlencode);

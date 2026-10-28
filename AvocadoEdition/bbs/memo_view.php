@@ -1,5 +1,6 @@
 <?php
 include_once('./_common.php');
+if (function_exists('perm_check_page')) perm_check_page('memo');
 
 if (!$is_member)
     alert('회원만 이용하실 수 있습니다.');

@@ -37,7 +37,7 @@ if ($_POST['act_button'] == "선택수정") {
 				} else {
 					// 기존 데이터 삭제
 					$prev_file_path = str_replace(G5_URL, G5_PATH, $si['si_img'][$k]);
-					@unlink($prev_file_path);
+					if (function_exists('cdn_unlink')) { @cdn_unlink($prev_file_path); } else { @unlink($prev_file_path); }
 					
 					// 확장자 따기
 					$exp = explode(".", $_FILES['si_img']['name'][$k]);
@@ -45,6 +45,7 @@ if ($_POST['act_button'] == "선택수정") {
 
 					$image_name = "side_".time().".".$exp;
 					upload_file($_FILES['si_img']['tmp_name'][$k], $image_name, $side_path);
+					if (function_exists('cdn_after_upload')) cdn_after_upload($side_path.'/'.$image_name);
 					$image_url = $side_url."/".$image_name;
 
 					$sql_common .= " , si_img = '{$image_url}' ";
@@ -77,7 +78,7 @@ if ($_POST['act_button'] == "선택수정") {
 		if($_POST['old_si_img'][$k]) { 
 			// 기존 데이터 삭제
 			$prev_file_path = str_replace(G5_URL, G5_PATH, $_POST['old_si_img'][$k]);
-			@unlink($prev_file_path);
+			if (function_exists('cdn_unlink')) { @cdn_unlink($prev_file_path); } else { @unlink($prev_file_path); }
 		}
 	}
 }

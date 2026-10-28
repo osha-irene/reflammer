@@ -24,7 +24,7 @@ $result = sql_query($sql);
 
 
 <form action="./money_update.php" method="post" name="frmItemSend">
-	<input type="hidden" name="se_mb_id" value="<?=$member['mb_id']?>" />
+	<input type="hidden" name="se_mb_id" value="<?php echo $member['mb_id']?>" />
 	<table class="theme-form">
 		<colgroup>
 			<col style="width: 100px;" />
@@ -40,9 +40,9 @@ $result = sql_query($sql);
 				</td>
 			</tr>
 			<tr>
-				<th>전달<?=$config['cf_money']?></th>
+				<th>전달<?php echo $config['cf_money']?></th>
 				<td>
-					<input type="text" name="po_point" id="po_point" size="10"/> <?=$config['cf_money_pice']?>
+					<input type="text" name="po_point" id="po_point" size="10"/> <?php echo $config['cf_money_pice']?>
 				</td>
 			</tr>
 		</tbody>
@@ -84,8 +84,6 @@ $result = sql_query($sql);
 			$po_content = $row['po_content'];
 
 			$expr = '';
-			if($row['po_expired'] == 1)
-				$expr = ' txt_expired';
 		?>
 		<tr>
 			<td>[<?php echo $row['po_datetime']; ?>] <?php echo $po_content; ?></td>
@@ -106,12 +104,12 @@ $result = sql_query($sql);
 
 		<tr>
 			<th scope="row">소계</th>
-			<td class="txt-right"><?php echo $sum_point1; ?><?=$config['cf_money_pice']?></td>
-			<td class="txt-right"><?php echo $sum_point2; ?><?=$config['cf_money_pice']?></td>
+			<td class="txt-right"><?php echo $sum_point1; ?><?php echo $config['cf_money_pice']?></td>
+			<td class="txt-right"><?php echo $sum_point2; ?><?php echo $config['cf_money_pice']?></td>
 		</tr>
 		<tr>
 			<th scope="row">보유 금액</th>
-			<td colspan="2"  class="txt-right"><?php echo number_format($member['mb_point']); ?><?=$config['cf_money_pice']?></td>
+			<td colspan="2"  class="txt-right"><?php echo number_format($member['mb_point']); ?><?php echo $config['cf_money_pice']?></td>
 		</tr>
 	</tbody>
 </table>

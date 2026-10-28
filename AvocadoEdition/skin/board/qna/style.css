@@ -24,7 +24,7 @@
 .ui-qna-list li p				{ clear: both; margin: 0 0 10px; line-height: 1.5em; overflow: hidden; }
 .ui-qna-list li p i				{ position: relative; font-style: normal; padding-right: 10px; margin-right: 5px; }
 .ui-qna-list li p em			{ font-style: normal; margin-right: 20px; }
-.ui-qna-list li p strong a		{ display: inline-block; font-size:9px; font-family: 'Dotum'; padding: 2px 5px; font-weight: normal; }
+.ui-qna-list li p strong a		{ display: inline-block; font-size:9px; padding: 2px 5px; font-weight: normal; }
 .ui-qna-list li p span.date		{ float: right; }
 .ui-qna-list li .qna-content			{ padding: 15px;  line-height: 1.8em; }
 .ui-qna-list li .qna-comment-content	{ padding: 15px; line-height: 1.8em; }
@@ -44,7 +44,7 @@
 .ui-qna-list .ui-qna-list-password input		{ position: relative; z-index: 1; }
 .ui-qna-list .ui-qna-list-password button		{ 
 	height: 28px; line-height: 28px; padding: 0 25px;
-	font-family: 'Dotum'; margin-left: -5px; border-left-width: 0;
+	margin-left: -5px; border-left-width: 0;
 
 }
 

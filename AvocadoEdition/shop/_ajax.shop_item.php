@@ -1,4 +1,4 @@
-<?
+<?php 
 include_once("./_common.php");
 
 $item = sql_fetch("select * from {$g5['shop_table']} shop, {$g5['item_table']} item where shop.it_id = item.it_id and shop.sh_id = '{$sh_id}'");
@@ -29,10 +29,16 @@ if($item['sh_id']) {
 	}
 }
 
-if(defined('G5_THEME_PATH') && is_file(G5_THEME_PATH."/shop/shop.item.skin.php")) {
-	include(G5_THEME_PATH."/shop/shop.item.skin.php");
-} else {
-	include(G5_PATH."/shop/skin/shop.item.skin.php");
+$_shop_skin_dir = G5_PATH.'/shop/skin';
+if (function_exists('get_slot_theme') && function_exists('theme_resolve_base')) {
+    $_th = get_slot_theme('shop');
+    if ($_th !== '' && $_th !== 'default') {
+        $_tb = theme_resolve_base($_th);
+        if ($_tb['abs'] !== '' && is_file($_tb['abs'].'/shop/skin/shop.item.skin.php')) {
+            $_shop_skin_dir = $_tb['abs'].'/shop/skin';
+        }
+    }
 }
+include($_shop_skin_dir."/shop.item.skin.php");
 
 ?>

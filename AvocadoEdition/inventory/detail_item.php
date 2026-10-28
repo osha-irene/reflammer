@@ -10,10 +10,7 @@ if(!$in['in_id']) {
 	echo "<p>아이템 보유 정보를 확인할 수 없습니다.</p>";
 } else {
 
-	if(defined('G5_THEME_PATH') && is_file(G5_THEME_PATH."/inventory/item.skin.php")) {
-		include(G5_THEME_PATH."/inventory/item.skin.php");
-	} else {
-		include(G5_PATH."/inventory/skin/item.skin.php");
-	}
+	// 레거시 G5_THEME_PATH 오버라이드 제거 (테마가 다시 이 파일을 include 하면 무한루프 가능)
+	include(function_exists('theme_dir_file') ? theme_dir_file('inventory/skin/item.skin.php') : (G5_PATH."/inventory/skin/item.skin.php"));
 
 } ?>

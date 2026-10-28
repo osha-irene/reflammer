@@ -1,5 +1,5 @@
 <?php
-$sub_menu = "400310";
+$sub_menu = "500510";
 include_once('./_common.php');
 
 auth_check($auth[$sub_menu], 'r');
@@ -195,7 +195,7 @@ $frm_submit = '<div class="btn_confirm01 btn_confirm">
 				<input type="checkbox" name="chk[]" value="<?php echo $i ?>" id="chk_<?php echo $i ?>">
 			</td>
 			<td>
-				<img src="<?=$ti['ti_img']?>"/>
+				<?php echo get_title_value($ti['ti_id']); ?>
 			</td>
 			<td class="txt-left">
 				<?php echo get_text($ch['ch_name']); ?>
@@ -204,9 +204,8 @@ $frm_submit = '<div class="btn_confirm01 btn_confirm">
 				<?php echo get_text($ti['ti_title']); ?>
 			</td>
 			<td>
-				<?=$ch['ch_title'] == $row['ti_id'] ? "착용" : "<span style='color: #cacaca;'>미착용</span>"?>
+				<?php echo $ch['ch_title'] == $row['ti_id'] ? "착용" : "<span style='color: #cacaca;'>미착용</span>"?>
 			</td>
-
 			
 			<td>
 				<?php echo $row['hi_use'] == '1' ? 'Y' : 'N'?>

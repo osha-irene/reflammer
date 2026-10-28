@@ -29,5 +29,5 @@ for($i = 0; $i < count($cl_id); $i++) {
 	}
 }
 
-goto_url('./viewer.php?ch_id='.$ch_id);
+goto_url('./viewer.php?ch_id='.$ch_id.($cl_time > 1 ? '&time='.(int)$cl_time : ''));
 ?>

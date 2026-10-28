@@ -93,6 +93,10 @@ if ($_POST['act_button'] == "선택수정") {
 			sql_query(" delete from {$g5['closthes_table']} where ch_id = '{$ch['ch_id']}' ");
 			sql_query(" delete from {$g5['inventory_table']} where ch_id = '{$ch['ch_id']}' ");
 
+			if (function_exists('mdl_do_action')) {
+				mdl_do_action('character_delete_after', $ch['ch_id'], array('mb_id' => $ch['mb_id'], 'context' => 'admin_bulk'));
+			}
+
 			$sql = " update {$g5['member_table']}
 						set ch_id = ''
 						where mb_id = '{$ch['mb_id']}' and ch_id = '{$ch['ch_id']}' ";

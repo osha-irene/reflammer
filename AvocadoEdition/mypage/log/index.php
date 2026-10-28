@@ -36,7 +36,7 @@ for ($i=0; $row=sql_fetch_array($result); $i++) {
 		$row2 = sql_fetch(" select * from {$tmp_write_table} where wr_id = '{$row['wr_id']}' ");
 		$list[$i] = $row2;
 
-		$name = get_sideview($row2['mb_id'], get_text(cut_str($row2['wr_name'], $config['cf_cut_name'])), $row2['wr_email'], $row2['wr_homepage']);
+		$name = get_sideview($row2['mb_id'], get_text(cut_str($row2['wr_name'], $config['cf_cut_name'])));
 		// 당일인 경우 시간으로 표시함
 		$datetime = substr($row2['wr_datetime'],0,10);
 		$datetime2 = $row2['wr_datetime'];
@@ -51,13 +51,11 @@ for ($i=0; $row=sql_fetch_array($result); $i++) {
 		$comment = '[코] ';
 		$comment_link = '#c_'.$row['wr_id'];
 		$row2 = sql_fetch(" select * from {$tmp_write_table} where wr_id = '{$row['wr_parent']}' ");
-		$row3 = sql_fetch(" select mb_id, wr_name, wr_email, wr_homepage, wr_datetime from {$tmp_write_table} where wr_id = '{$row['wr_id']}' ");
+		$row3 = sql_fetch(" select mb_id, wr_name, wr_datetime from {$tmp_write_table} where wr_id = '{$row['wr_id']}' ");
 		$list[$i] = $row2;
 		$list[$i]['wr_id'] = $row['wr_id'];
 		$list[$i]['mb_id'] = $row3['mb_id'];
 		$list[$i]['wr_name'] = $row3['wr_name'];
-		$list[$i]['wr_email'] = $row3['wr_email'];
-		$list[$i]['wr_homepage'] = $row3['wr_homepage'];
 		// 당일인 경우 시간으로 표시함
 		$datetime = substr($row3['wr_datetime'],0,10);
 		$datetime2 = $row3['wr_datetime'];
@@ -105,7 +103,7 @@ $write_pages = get_paging(G5_IS_MOBILE ? $config['cf_mobile_pages'] : $config['c
 
 <div class="mypage-log-list">
 
-<? for ($i=0; $i<count($list); $i++) {
+<?php  for ($i=0; $i<count($list); $i++) {
 	$bo_subject = cut_str($list[$i]['bo_subject'], 20);
 	$ca_name = $list[$i]['ca_name'];
 	if($list[$i]['wr_type'] == 'UPLOAD') { 
@@ -124,12 +122,12 @@ $write_pages = get_paging(G5_IS_MOBILE ? $config['cf_mobile_pages'] : $config['c
 ?>
 		<dl>
 			<dt>
-				<a href="<?=G5_BBS_URL?>/board.php?bo_table=<?php echo $list[$i]['bo_table'] ?>&amp;log=<?=$list[$i]['log_num']?>">
-					<img src="<?=$image_url?>" />
+				<a href="<?php echo G5_BBS_URL?>/board.php?bo_table=<?php echo $list[$i]['bo_table'] ?>&amp;log=<?php echo $list[$i]['log_num']?>">
+					<img src="<?php echo $image_url?>" />
 				</a>
 			</dt>
 			<dd>
-<?
+<?php 
 // 코멘트 리스트
 $sql = " select * from {$g5['write_prefix']}{$list[$i]['bo_table']} where wr_parent = '{$list[$i]['wr_id']}' and wr_subject != '--|UPLOADING|--' order by wr_datetime desc, wr_comment_reply limit 0, 3";
 $result = sql_query($sql);
@@ -142,29 +140,29 @@ for ($j=0; $row=sql_fetch_array($result); $j++)
 ?>
 					<li>
 						<p>
-						<? if($c_list[$j]['wr_noname']) { ?>
+						<?php  if($c_list[$j]['wr_noname']) { ?>
 							[ 익명의 누군가 ]
-						<? } else { ?>
-							[ <?=$c_list[$j]['wr_subject']?>/<?=$c_list[$j]['wr_name']?> ]
-						<? } ?>
-							<?=htmlspecialchars($c_list[$j]['content'])?>
+						<?php  } else { ?>
+							[ <?php echo $c_list[$j]['wr_subject']?>/<?php echo $c_list[$j]['wr_name']?> ]
+						<?php  } ?>
+							<?php echo htmlspecialchars($c_list[$j]['content'], ENT_QUOTES)?>
 						</p>
 						<p class="con txt-right">
-							<span class="date"><?=date('y.m.d H:i', strtotime($c_list[$j]['wr_datetime']))?></span>
+							<span class="date"><?php echo date('y.m.d H:i', strtotime($c_list[$j]['wr_datetime']))?></span>
 						</p>
 					</li>
-<?
+<?php 
 } if($j > 0) { 
 	echo "</ul>";
 } 
 ?>
 			</dd>
 		</dl>
-<? } if($i==0) { ?>
+<?php  } if($i==0) { ?>
 		<div class="no-data">
 				등록한 로그 내역이 없습니다.
 		</div>
-<? } ?>
+<?php  } ?>
 </div>
 
 <i class="style-line horizon"></i>

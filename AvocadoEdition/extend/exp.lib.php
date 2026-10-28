@@ -48,6 +48,10 @@ function insert_exp($ch_id, $exp, $content='', $rel_action='')
 		sql_query($rank_up_sql); 
 	}
 
+	if (function_exists('mdl_do_action')) {
+		mdl_do_action('exp_insert_after', $ch_id, $exp, $content, $rel_action);
+	}
+
 	return 1;
 }
 

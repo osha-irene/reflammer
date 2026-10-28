@@ -21,12 +21,20 @@ if($sfl != 'ch_state' && $stx != '삭제') {
 	$sql_search .= " and ch_state != '삭제' ";
 }
 
-if($s_side) { 
+if(isset($s_side)&&$s_side) { 
 	$sql_search .= " and ch_side = '{$s_side}' ";
 }
 
-if($s_class) { 
+if(isset($s_class)&&$s_class) { 
 	$sql_search .= " and ch_class = '{$s_class}' ";
+}
+
+// Wave10 #5: ch_type 탭 (전체 / main / sub / npc)
+$ch_type_tab = isset($_GET['ch_type']) ? trim((string)$_GET['ch_type']) : '';
+$_allowed_types = array('main','sub','npc');
+if ($ch_type_tab !== '' && in_array($ch_type_tab, $_allowed_types, true)) {
+	$_t_esc = sql_escape_string($ch_type_tab);
+	$sql_search .= " and ch_type = '{$_t_esc}' ";
 }
 
 if (!$sst) {
@@ -100,6 +108,72 @@ if($profile['ad_use_rank']) {
 
 ?>
 
+<?php
+// Wave10 #5: ch_type 탭 UI
+$_tab_qs = $_GET; unset($_tab_qs['ch_type'], $_tab_qs['page']);
+$_tab_base = $_SERVER['PHP_SELF'].(count($_tab_qs)?'?'.http_build_query($_tab_qs).'&amp;':'?');
+$_tabs = array('' => '전체', 'main' => '메인', 'sub' => '서브', 'npc' => 'NPC');
+?>
+<ul class="local_desc01 local_desc" style="list-style:none;padding:8px 12px;margin:0 0 8px;border:1px solid #d9dbe0;background:#f7f8fa;">
+<?php foreach ($_tabs as $_tk => $_tl): $_active = ($ch_type_tab === $_tk); ?>
+	<li style="display:inline-block;margin-right:8px;">
+		<a href="<?php echo $_tab_base ?>ch_type=<?php echo urlencode($_tk) ?>" style="padding:4px 10px;border:1px solid #ccc;border-radius:3px;background:<?php echo $_active?'#3a8afd':'#fff' ?>;color:<?php echo $_active?'#fff':'#333' ?>;text-decoration:none;"><?php echo $_tl ?></a>
+	</li>
+<?php endforeach; ?>
+</ul>
+
+<?php
+// Wave10 #7: NPC 탭일 때 시기별 활성 NPC 매트릭스
+if ($ch_type_tab === 'npc' && function_exists('get_time_list')):
+	require_once G5_EXTEND_PATH.'/02_side_class_time.lib.php';
+	$_npc_times = get_time_list(true, true, true);
+	// renewal/au/event 만 필터
+	$_npc_times = array_values(array_filter($_npc_times, function($t){
+		$tt = isset($t['ti_type']) ? $t['ti_type'] : 'renewal';
+		return $tt === 'renewal' || $tt === 'au' || $tt === 'event';
+	}));
+	$_npc_rows = sql_query("SELECT ch_id, ch_name FROM `{$g5['character_table']}` WHERE ch_type='npc' AND ch_state='승인' ORDER BY ch_id ASC");
+	$_npc_chars = array();
+	while ($_r = sql_fetch_array($_npc_rows)) $_npc_chars[] = $_r;
+	// 매핑 적재 (ch_id => [ti_id => 1])
+	$_map = array();
+	if (!empty($g5['npc_time_table'])) {
+		$_mr = sql_query("SELECT ch_id, ti_id FROM `{$g5['npc_time_table']}`", false);
+		while ($_m = sql_fetch_array($_mr)) $_map[(int)$_m['ch_id']][(int)$_m['ti_id']] = 1;
+	}
+?>
+<details open style="margin:10px 0;border:1px solid #d9dbe0;border-radius:4px;background:#fff;">
+<summary style="padding:10px 14px;cursor:pointer;font-weight:bold;background:#f7f8fa;">시기별 활성 NPC 설정 <span style="font-weight:normal;color:#666;">— 체크된 시기에만 노출. 매핑이 비어 있으면 모든 NPC가 모든 시기에 노출됨.</span></summary>
+<form method="post" action="./character_npc_time_update.php" style="padding:12px;">
+<input type="hidden" name="token" value="<?php echo get_token() ?>">
+<div style="overflow:auto;">
+<table class="tbl_head01" style="min-width:auto;">
+<thead><tr><th style="text-align:left;padding:6px 8px;">NPC</th>
+<?php foreach ($_npc_times as $_t): ?>
+<th style="padding:6px 8px;text-align:center;"><?php echo (int)$_t['ti_order'].' (<small>'.htmlspecialchars($_t['ti_type']).'</small>)' ?></th>
+<?php endforeach; ?>
+</tr></thead>
+<tbody>
+<?php foreach ($_npc_chars as $_nc): $_cid = (int)$_nc['ch_id']; ?>
+<tr><td style="padding:6px 8px;">#<?php echo $_cid ?> <?php echo htmlspecialchars($_nc['ch_name']) ?></td>
+<?php foreach ($_npc_times as $_t): $_tid = (int)$_t['ti_id']; $_chk = !empty($_map[$_cid][$_tid]); ?>
+<td style="text-align:center;padding:6px 8px;"><input type="checkbox" name="m[<?php echo (int)$_t['ti_order'] ?>][]" value="<?php echo $_cid ?>"<?php echo $_chk?' checked':'' ?>></td>
+<?php endforeach; ?>
+</tr>
+<?php endforeach; ?>
+<?php if (empty($_npc_chars)): ?>
+<tr><td colspan="<?php echo 1+count($_npc_times) ?>" style="padding:14px;text-align:center;color:#888;">등록된 NPC 가 없습니다.</td></tr>
+<?php endif; ?>
+</tbody>
+</table>
+</div>
+<div style="margin-top:10px;text-align:right;">
+<button type="submit" class="btn_submit">시기 매핑 저장</button>
+</div>
+</form>
+</details>
+<?php endif; ?>
+
 <div class="local_ov01 local_ov">
 	<?php echo $listall ?>
 	총캐릭터수 <?php echo number_format($total_count) ?>명
@@ -113,26 +187,26 @@ if($profile['ad_use_rank']) {
 <form id="fsearch" name="fsearch" class="local_sch01 local_sch" method="get">
 <label for="sfl" class="sound_only">검색대상</label>
 
-<?
+<?php 
 	if(count($ch_si) > 0) {
 ?>
 <select name="s_side" id="c_side">
-	<option value=""><?=$config['cf_side_title']?>선택</option>
-<? for($i=0; $i < count($ch_si); $i++) { ?>
-	<option value="<?=$ch_si[$i]['id']?>" <?php echo get_selected($_GET['s_side'], $ch_si[$i]['id']); ?>><?=$ch_si[$i]['name']?></option>
-<? } ?>
+	<option value=""><?php echo $config['cf_side_title']?>선택</option>
+<?php  for($i=0; $i < count($ch_si); $i++) { ?>
+	<option value="<?php echo $ch_si[$i]['id']?>" <?php echo get_selected($_GET['s_side'], $ch_si[$i]['id']); ?>><?php echo $ch_si[$i]['name']?></option>
+<?php  } ?>
 </select>
-<? } ?>
-<?
+<?php  } ?>
+<?php 
 	if(count($ch_cl) > 0) {
 ?>
 <select name="s_class" id="c_class">
-	<option value=""><?=$config['cf_class_title']?>선택</option>
-<? for($i=0; $i < count($ch_cl); $i++) { ?>
-	<option value="<?=$ch_cl[$i]['id']?>" <?php echo get_selected($_GET['s_class'], $ch_cl[$i]['id']); ?>><?=$ch_cl[$i]['name']?></option>
-<? } ?>
+	<option value=""><?php echo $config['cf_class_title']?>선택</option>
+<?php  for($i=0; $i < count($ch_cl); $i++) { ?>
+	<option value="<?php echo $ch_cl[$i]['id']?>" <?php echo get_selected($_GET['s_class'], $ch_cl[$i]['id']); ?>><?php echo $ch_cl[$i]['name']?></option>
+<?php  } ?>
 </select>
-<? } ?>
+<?php  } ?>
 
 <select name="sfl" id="sfl">
 	<option value="ch_name"<?php echo get_selected($_GET['sfl'], "ch_name"); ?>>캐릭터 이름</option>
@@ -145,7 +219,7 @@ if($profile['ad_use_rank']) {
 </form>
 
 
-<?php if ($is_admin == 'super') { ?>
+<?php if ($is_admin) { ?>
 <div class="btn_add01 btn_add">
 	<a href="./character_form.php" id="member_add">캐릭터추가</a>
 </div>
@@ -167,15 +241,15 @@ if($profile['ad_use_rank']) {
 		<col />
 
 
-<? if($profile['ad_use_rank']) { ?>
+<?php  if($profile['ad_use_rank']) { ?>
 		<col style="width: 120px;" />
-<? } ?>
-<? if($config['cf_side_title']) { ?>
+<?php  } ?>
+<?php  if($config['cf_side_title']) { ?>
 		<col style="width: 120px;" />
-<? } ?>
-<? if($config['cf_class_title']) { ?>
+<?php  } ?>
+<?php  if($config['cf_class_title']) { ?>
 		<col style="width: 120px;" />
-<? } ?>
+<?php  } ?>
 		<col style="width: 80px;" />
 		<col style="width: 100px;" />
 	</colgroup>
@@ -189,15 +263,15 @@ if($profile['ad_use_rank']) {
 		<th>이름</th>
 
 
-<? if($profile['ad_use_rank']) { ?>
+<?php  if($profile['ad_use_rank']) { ?>
 		<th>랭킹</th>
-<? } ?>
-<? if($config['cf_side_title']) { ?>
-		<th><?=$config['cf_side_title']?></th>
-<? } ?>
-<? if($config['cf_class_title']) { ?>
-		<th><?=$config['cf_class_title']?></th>
-<? } ?>
+<?php  } ?>
+<?php  if($config['cf_side_title']) { ?>
+		<th><?php echo $config['cf_side_title']?></th>
+<?php  } ?>
+<?php  if($config['cf_class_title']) { ?>
+		<th><?php echo $config['cf_class_title']?></th>
+<?php  } ?>
 		<th>상태</th>
 		<th>관리</th>
 	</tr>
@@ -220,48 +294,48 @@ if($profile['ad_use_rank']) {
 		</td>
 
 		<td>
-			<select name="ch_type[<?=$i?>]" class="frm_input">
+			<select name="ch_type[<?php echo $i?>]" class="frm_input">
 				<option value="">유형선택</option>
-				<option value="main" <?=$row['ch_type'] == "main" ? "selected" : "" ?>>MAIN</option>
-				<option value="sub" <?=$row['ch_type'] == "sub" ? "selected" : "" ?>>SUB</option>
-				<option value="npc" <?=$row['ch_type'] == "npc" ? "selected" : "" ?>>NPC</option>
+				<option value="main" <?php echo $row['ch_type'] == "main" ? "selected" : "" ?>>MAIN</option>
+				<option value="sub" <?php echo $row['ch_type'] == "sub" ? "selected" : "" ?>>SUB</option>
+				<option value="npc" <?php echo $row['ch_type'] == "npc" ? "selected" : "" ?>>NPC</option>
 			</select>
 		</td>
 
 		<td class="txt-left"><?php echo get_text($row['ch_name']); ?></td>
 
 
-<? if($profile['ad_use_rank']) { ?>
+<?php  if($profile['ad_use_rank']) { ?>
 		<td>
-			<?=get_rank_name($row['ch_rank'])?>
+			<?php echo get_rank_name($row['ch_rank'])?>
 		</td>
-<? } ?>
-<? if($config['cf_side_title']) { ?>
+<?php  } ?>
+<?php  if($config['cf_side_title']) { ?>
 		<td>
-			<select name="ch_side[<?=$i?>]" class="frm_input">
-				<option value=""><?=$config['cf_side_title']?>선택</option>
-			<? for($k=0; $k < count($ch_si); $k++) { ?>
-				<option value="<?=$ch_si[$k]['id']?>" <?php echo get_selected($row['ch_side'], $ch_si[$k]['id']); ?>><?=$ch_si[$k]['name']?></option>
-			<? } ?>
+			<select name="ch_side[<?php echo $i?>]" class="frm_input">
+				<option value=""><?php echo $config['cf_side_title']?>선택</option>
+			<?php  for($k=0; $k < count($ch_si); $k++) { ?>
+				<option value="<?php echo $ch_si[$k]['id']?>" <?php echo get_selected($row['ch_side'], $ch_si[$k]['id']); ?>><?php echo $ch_si[$k]['name']?></option>
+			<?php  } ?>
 			</select>
 		</td>
-<? } ?>
-<? if($config['cf_class_title']) { ?>
+<?php  } ?>
+<?php  if($config['cf_class_title']) { ?>
 		<td>
-			<select name="ch_class[<?=$i?>]" class="frm_input">
-				<option value=""><?=$config['cf_class_title']?>선택</option>
-			<? for($k=0; $k < count($ch_cl); $k++) { ?>
-				<option value="<?=$ch_cl[$k]['id']?>" <?php echo get_selected($row['ch_class'], $ch_cl[$k]['id']); ?>><?=$ch_cl[$k]['name']?></option>
-			<? } ?>
+			<select name="ch_class[<?php echo $i?>]" class="frm_input">
+				<option value=""><?php echo $config['cf_class_title']?>선택</option>
+			<?php  for($k=0; $k < count($ch_cl); $k++) { ?>
+				<option value="<?php echo $ch_cl[$k]['id']?>" <?php echo get_selected($row['ch_class'], $ch_cl[$k]['id']); ?>><?php echo $ch_cl[$k]['name']?></option>
+			<?php  } ?>
 			</select>
 		</td>
-<? } ?>
+<?php  } ?>
 		<td>
-			<select name="ch_state[<?=$i?>]" class="frm_input">
+			<select name="ch_state[<?php echo $i?>]" class="frm_input">
 				<option value="수정중">수정중</option>
-				<option value="대기" <?=$row['ch_state'] == "대기" ? "selected" : "" ?>>대기</option>
-				<option value="승인" <?=$row['ch_state'] == "승인" ? "selected" : "" ?>>승인</option>
-				<option value="삭제" <?=$row['ch_state'] == "삭제" ? "selected" : "" ?>>삭제</option>
+				<option value="대기" <?php echo $row['ch_state'] == "대기" ? "selected" : "" ?>>대기</option>
+				<option value="승인" <?php echo $row['ch_state'] == "승인" ? "selected" : "" ?>>승인</option>
+				<option value="삭제" <?php echo $row['ch_state'] == "삭제" ? "selected" : "" ?>>삭제</option>
 			</select>
 		</td>
 

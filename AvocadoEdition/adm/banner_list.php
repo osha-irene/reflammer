@@ -1,5 +1,5 @@
 <?php
-$sub_menu = '100320';
+$sub_menu = "100300";
 include_once('./_common.php');
 
 auth_check($auth[$sub_menu], "r");
@@ -32,6 +32,7 @@ $result = sql_query($sql);
 
 <div class="btn_add01 btn_add">
 	<a href="./banner_form.php">메인슬라이드 추가</a>
+	<a href="./banner_time_bulk.php" style="margin-left:6px;">출력 시기 일괄 설정</a>
 </div>
 
 <div class="tbl_head01 tbl_wrap">
@@ -41,6 +42,7 @@ $result = sql_query($sql);
 			<col style="width: 50px;" />
 			<col style="width: 170px;" />
 			<col />
+			<col style="width: 130px;" />
 			<col style="width: 130px;" />
 			<col style="width: 130px;" />
 			<col style="width: 80px;" />
@@ -53,6 +55,7 @@ $result = sql_query($sql);
 				<th scope="col">대체텍스트</th>
 				<th scope="col">시작일시</th>
 				<th scope="col">종료일시</th>
+				<th scope="col">출력시기</th>
 				<th scope="col">출력순서</th>
 				<th scope="col">관리</th>
 			</tr>
@@ -77,6 +80,25 @@ $result = sql_query($sql);
 				$bn_begin_time = substr($row['bn_begin_time'], 2, 14);
 				$bn_end_time   = substr($row['bn_end_time'], 2, 14);
 
+				// 출력 시기 (bn_time)
+				$bn_time_disp = '<span style="color:#999;">전체</span>';
+				if (function_exists('shop_time_from_db') && !empty($row['bn_time']) && strtolower($row['bn_time']) !== 'all') {
+					$_bnt_arr = shop_time_from_db($row['bn_time']);
+					if (!empty($_bnt_arr)) {
+						static $_bnt_name_map = null;
+						if ($_bnt_name_map === null) {
+							$_bnt_name_map = array();
+							if (!empty($g5['time_table'])) {
+								$_r2 = sql_query("SELECT ti_order, ti_name FROM `{$g5['time_table']}` ORDER BY ti_order ASC", false);
+								if ($_r2) { while ($_x2 = sql_fetch_array($_r2)) { $_bnt_name_map[(int)$_x2['ti_order']] = $_x2['ti_name']; } }
+							}
+						}
+						$_lbl = array();
+						foreach ($_bnt_arr as $_tio) { $_lbl[] = '#'.$_tio.' '.(isset($_bnt_name_map[$_tio]) ? $_bnt_name_map[$_tio] : ''); }
+						$bn_time_disp = '<span style="color:#7a5500;">'.htmlspecialchars(implode(', ', $_lbl), ENT_QUOTES, 'UTF-8').'</span>';
+					}
+				}
+
 				$bg = 'bg'.($i%2);
 			?>
 
@@ -86,6 +108,7 @@ $result = sql_query($sql);
 				<td><?php echo $row['bn_alt']; ?></td>
 				<td><?php echo $bn_begin_time; ?></td>
 				<td><?php echo $bn_end_time; ?></td>
+				<td><?php echo $bn_time_disp; ?></td>
 				<td><?php echo $row['bn_order']; ?></td>
 				<td>
 					<a href="./banner_form.php?w=u&amp;bn_id=<?php echo $row['bn_id']; ?>">수정</a></li>
@@ -97,7 +120,7 @@ $result = sql_query($sql);
 			<?php
 			}
 			if ($i == 0) {
-			echo '<tr><td colspan="7" class="empty_table">자료가 없습니다.</td></tr>';
+			echo '<tr><td colspan="8" class="empty_table">자료가 없습니다.</td></tr>';
 			}
 			?>
 		</tbody>
@@ -105,7 +128,7 @@ $result = sql_query($sql);
 
 </div>
 
-<?php echo get_paging(G5_IS_MOBILE ? $config['cf_mobile_pages'] : $config['cf_write_pages'], $page, $total_page, "{$_SERVER['PHP_SELF']}?$qstr&amp;position=$position&amp;page="); ?>
+<?php echo get_paging(G5_IS_MOBILE ? $config['cf_mobile_pages'] : $config['cf_write_pages'], $page, $total_page, "{$_SERVER['PHP_SELF']}?$qstr&amp;page="); ?>
 
 <script>
 $(function() {

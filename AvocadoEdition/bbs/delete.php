@@ -11,7 +11,7 @@ if (!($token && $delete_token == $token))
 
 @include_once($board_skin_path.'/delete.head.skin.php');
 
-if ($is_admin == 'super') // 최고관리자 통과
+if ($is_admin) // 관리자 통과
 	;
 else if ($is_admin == 'group') { // 그룹관리자
 	$mb = get_member($write['mb_id']);
@@ -134,6 +134,8 @@ if ($count_write > 0 || $count_comment > 0)
 @include_once($board_skin_path.'/delete.tail.skin.php');
 
 delete_cache_latest($bo_table);
+
+if (function_exists('mdl_do_action')) mdl_do_action('write_delete_after', $bo_table, $wr_id);
 
 goto_url('./board.php?bo_table='.$bo_table.'&amp;page='.$page.$qstr);
 ?>

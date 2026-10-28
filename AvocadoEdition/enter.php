@@ -1,24 +1,33 @@
-<?
+<?php
 	include_once('./_common.php');
-	if($is_member & !$config['cf_open']) {
-		goto_url(G5_URL.'/main.php');
-	}
-	if(defined('G5_THEME_PATH')) {
-		require_once(G5_THEME_PATH.'/enter.php');
+
+	// 모바일 index.php 가 이 파일을 include 하면 SCRIPT_FILENAME 은 index.php 라
+	// 디스패처가 enter 슬롯을 못 잡는다. 직접 호출과 동일하게 여기서 오버라이드.
+	if (function_exists('theme_include') && ($_p = theme_include('enter', 'enter.php'))) {
+		include $_p;
 		return;
 	}
-	
+
+	if ($is_member) {
+		goto_url(G5_URL.'/main.php');
+	}
+
 	/*********** Logo Data ************/
-	$logo = get_logo('pc');
-	$logo_data = "";
-	if($logo)		$logo_data .= "<img src='".$logo."' ";
-	if($m_logo)		$logo_data .= "class='only-pc' /><img src='".$m_logo."' class='not-pc'";
-	if($logo_data)	$logo_data.= " />";
+	$logo   = function_exists('get_logo') ? get_logo('pc') : '';
+	$m_logo = function_exists('get_logo') ? get_logo('mo') : '';
+	$logo_data = '';
+	if ($logo) {
+		$logo_data .= '<img src="'.htmlspecialchars($logo, ENT_QUOTES, 'UTF-8').'" alt="" class="only-pc">';
+	}
+	if ($m_logo) {
+		$logo_data .= '<img src="'.htmlspecialchars($m_logo, ENT_QUOTES, 'UTF-8').'" alt="" class="not-pc">';
+	}
 	/*********************************/
 ?>
 <!doctype html>
 <html lang="ko">
 <head>
+	<script>if (!window.parent || window.parent === window) { document.documentElement.classList.add('single'); }</script>
 	<meta charset="utf-8">
 	<meta name="mobile-web-app-capable" content="yes">
 	<meta name="apple-mobile-web-app-capable" content="yes">
@@ -26,22 +35,21 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=Edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 
-	<meta name="title" content="<?=$g5['title']?>">
-	<meta name="keywords" content="<?=$config['cf_site_descript']?>">
-	<meta name="description" content="<?=$config['cf_site_descript']?>">
+	<meta name="title" content="<?php echo $g5['title']=isset($g5['title'])?$g5['title']:'아보카도 8'?>">
+	<meta name="keywords" content="<?php echo $config['cf_site_descript']?>">
+	<meta name="description" content="<?php echo $config['cf_site_descript']?>">
 
-	<meta property="og:title" content="<?=$g5['title']?>">
-	<meta property="og:description" content="<?=$config['cf_site_descript']?>">
-	<meta property="og:url" content="<?=G5_URL?>">
+	<meta property="og:title" content="<?php echo $g5['title']?>">
+	<meta property="og:description" content="<?php echo $config['cf_site_descript']?>">
+	<meta property="og:url" content="<?php echo G5_URL?>">
 
-	<title><?=$g5['title']?></title>
+	<title><?php echo $g5['title']?></title>
 
-	<link rel="shortcut icon" href="<?=$config['cf_favicon']?>">
-	<link rel="icon" href="<?=$config['cf_favicon']?>">
-	<link media="all" type="text/css" rel="stylesheet" href="<?=G5_CSS_URL?>/enter.css">
-	<?
-		if(!$config['cf_7']) { 
-			echo '<link rel="stylesheet" href="'.G5_DATA_URL.'/css/_design.config.css" type="text/css" />';
+	<link rel="shortcut icon" href="<?php echo $config['cf_favicon']?>">
+	<link rel="icon" href="<?php echo $config['cf_favicon']?>">
+	<?php
+		if (function_exists('emit_enter_head_css')) {
+			emit_enter_head_css();
 		}
 	?>
 
@@ -54,7 +62,7 @@
 	<div class="inner">
 		<div class="index-logo">
 			<a href="./main.php">
-				<?=$logo_data?>
+				<?php echo $logo_data?>
 				<p class="txt-default">본 홈페이지는 1920 * 1080 PC를 기준으로 제작되었으며, 크롬 브라우저 이용을 권장합니다.</p>
 			</a>
 		</div>

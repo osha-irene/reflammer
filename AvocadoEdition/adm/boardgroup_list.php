@@ -1,22 +1,37 @@
 <?php
-$sub_menu = "300200";
+$sub_menu = "300010";
 include_once('./_common.php');
 
 auth_check($auth[$sub_menu], 'r');
 
-if (!isset($group['gr_device'])) {
-    // 게시판 그룹 사용 필드 추가
-    // both : pc, mobile 둘다 사용
-    // pc : pc 전용 사용
-    // mobile : mobile 전용 사용
-    // none : 사용 안함
-    sql_query(" ALTER TABLE  `{$g5['board_group_table']}` ADD  `gr_device` ENUM(  'both',  'pc',  'mobile' ) NOT NULL DEFAULT  'both' AFTER  `gr_subject` ", false);
+// 게시판 기본 / 기본 스킨 설정 저장 (config_form 에서 이전)
+if (isset($_POST['board_default_update']) && check_admin_token()) {
+	if (!$is_admin) alert('관리자만 접근 가능합니다.');
+	$cf_page_rows       = (int)($_POST['cf_page_rows'] ?? 15);
+	$cf_write_pages     = (int)($_POST['cf_write_pages'] ?? 10);
+	$cf_delay_sec       = (int)($_POST['cf_delay_sec'] ?? 0);
+	$cf_search_part     = (int)($_POST['cf_search_part'] ?? 0);
+	$cf_link_target     = preg_replace('/[^a-zA-Z_]/', '', (string)($_POST['cf_link_target'] ?? '_blank'));
+	$cf_image_extension = sql_escape_string(trim($_POST['cf_image_extension'] ?? ''));
+	$cf_movie_extension = sql_escape_string(trim($_POST['cf_movie_extension'] ?? ''));
+	$cf_filter          = sql_escape_string($_POST['cf_filter'] ?? '');
+	sql_query("UPDATE `{$g5['config_table']}`
+		SET cf_page_rows='{$cf_page_rows}',
+		    cf_write_pages='{$cf_write_pages}',
+		    cf_delay_sec='{$cf_delay_sec}',
+		    cf_search_part='{$cf_search_part}',
+		    cf_link_target='{$cf_link_target}',
+		    cf_image_extension='{$cf_image_extension}',
+		    cf_movie_extension='{$cf_movie_extension}',
+		    cf_filter='{$cf_filter}'");
+	goto_url('./boardgroup_list.php');
 }
+
 
 $sql_common = " from {$g5['group_table']} ";
 
 $sql_search = " where (1) ";
-if ($is_admin != 'super')
+if (!$is_admin)
     $sql_search .= " and (gr_admin = '{$member['mb_id']}') ";
 
 if ($stx) {
@@ -58,6 +73,63 @@ include_once('./admin.head.php');
 $colspan = 10;
 ?>
 
+<details class="adm-panel"<?php echo ($is_admin) ? ' open' : ' style="display:none;"'; ?>>
+<summary>게시판 기본 설정 / 기본 스킨 설정</summary>
+<div class="adm-panel-body">
+<p class="adm-panel-help">모든 게시판에 공통으로 적용되는 <strong>기본값</strong>입니다. 각 게시판에서 개별 설정 시 이 값을 덮어씁니다.</p>
+<form method="post" action="">
+<?php echo get_admin_token_field(); ?>
+<input type="hidden" name="board_default_update" value="1">
+<div class="tbl_frm01 tbl_wrap">
+<table>
+<colgroup><col style="width:160px;"><col><col style="width:160px;"><col></colgroup>
+<tbody>
+<tr>
+	<th scope="row"><label for="cf_page_rows">한 페이지당 줄 수</label></th>
+	<td><input type="number" name="cf_page_rows" id="cf_page_rows" value="<?php echo (int)$config['cf_page_rows'] ?>" class="frm_input" size="5" min="1"></td>
+	<th scope="row"><label for="cf_write_pages">페이지 표시 수</label></th>
+	<td><input type="number" name="cf_write_pages" id="cf_write_pages" value="<?php echo (int)$config['cf_write_pages'] ?>" class="frm_input" size="5" min="1" required></td>
+</tr>
+<tr>
+	<th scope="row"><label for="cf_delay_sec">글쓰기 간격</label></th>
+	<td><input type="number" name="cf_delay_sec" id="cf_delay_sec" value="<?php echo (int)$config['cf_delay_sec'] ?>" class="frm_input" size="5" min="0"> 초 후 가능</td>
+	<th scope="row"><label for="cf_search_part">검색 단위</label></th>
+	<td><input type="number" name="cf_search_part" id="cf_search_part" value="<?php echo (int)$config['cf_search_part'] ?>" class="frm_input" size="5" min="0"> 건 단위</td>
+</tr>
+<tr>
+	<th scope="row"><label for="cf_link_target">새창 링크</label></th>
+	<td colspan="3">
+		<?php echo help('글내용 중 자동 링크되는 타겟을 지정합니다.') ?>
+		<select name="cf_link_target" id="cf_link_target">
+			<?php foreach (['_blank','_self','_top','_new'] as $tg): ?>
+			<option value="<?php echo $tg ?>"<?php echo get_selected($config['cf_link_target'], $tg) ?>><?php echo $tg ?></option>
+			<?php endforeach; ?>
+		</select>
+	</td>
+</tr>
+<tr>
+	<th scope="row"><label for="cf_image_extension">이미지 확장자</label></th>
+	<td><input type="text" name="cf_image_extension" id="cf_image_extension" value="<?php echo $config['cf_image_extension'] ?>" class="frm_input" size="40" placeholder="jpg|jpeg|png|gif"></td>
+	<th scope="row"><label for="cf_movie_extension">동영상 확장자</label></th>
+	<td><input type="text" name="cf_movie_extension" id="cf_movie_extension" value="<?php echo $config['cf_movie_extension'] ?>" class="frm_input" size="40" placeholder="mp4|webm"></td>
+</tr>
+<tr>
+	<th scope="row"><label for="cf_filter">단어 필터링</label></th>
+	<td colspan="3">
+		<?php echo help('입력된 단어가 포함된 내용은 게시할 수 없습니다. 단어와 단어 사이는 ,로 구분합니다.') ?>
+		<textarea name="cf_filter" id="cf_filter" rows="4" style="width:100%;"><?php echo $config['cf_filter'] ?></textarea>
+	</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="adm-panel-actions">
+	<button type="submit" class="btn_submit">기본 설정 저장</button>
+</div>
+</form>
+</div>
+</details>
+
 <div class="local_ov01 local_ov">
     <?php echo $listall ?>
     전체그룹 <?php echo number_format($total_count) ?>개
@@ -76,7 +148,7 @@ $colspan = 10;
 </fieldset>
 </form>
 
-<?php if ($is_admin == 'super') { ?>
+<?php if ($is_admin) { ?>
 <div class="btn_add01 btn_add sort_with">
     <a href="./boardgroup_form.php" id="bo_gr_add">게시판그룹 추가</a>
 </div>
@@ -145,7 +217,7 @@ $colspan = 10;
             <input type="text" name="gr_subject[<?php echo $i ?>]" value="<?php echo get_text($row['gr_subject']) ?>" id="gr_subject_<?php echo $i ?>" class="frm_input full">
         </td>
         <td class="td_mng td_input">
-        <?php if ($is_admin == 'super'){ ?>
+        <?php if ($is_admin){ ?>
             <input type="text" name="gr_admin[<?php echo $i ?>]" value="<?php echo $row['gr_admin'] ?>" id="gr_admin_<?php echo $i ?>" class="frm_input full" size="10" maxlength="20">
         <?php }else{ ?>
             <input type="hidden" name="gr_admin[<?php echo $i ?>]" value="<?php echo $row['gr_admin'] ?>"><?php echo $row['gr_admin'] ?>

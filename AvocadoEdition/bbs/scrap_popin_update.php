@@ -48,8 +48,7 @@ if ($wr_content && ($member['mb_level'] >= $board['bo_comment_level']))
         $mb_id = $member['mb_id'];
         $wr_name = addslashes(clean_xss_tags($board['bo_use_name'] ? $member['mb_name'] : $member['mb_nick']));
         $wr_password = $member['mb_password'];
-        $wr_email = addslashes($member['mb_email']);
-        $wr_homepage = addslashes(clean_xss_tags($member['mb_homepage']));
+
 
         $sql = " select max(wr_comment) as max_comment from $write_table
                     where wr_parent = '$wr_id' and wr_is_comment = '1' ";
@@ -68,8 +67,6 @@ if ($wr_content && ($member['mb_level'] >= $board['bo_comment_level']))
                          mb_id = '$mb_id',
                          wr_password = '$wr_password',
                          wr_name = '$wr_name',
-                         wr_email = '$wr_email',
-                         wr_homepage = '$wr_homepage',
                          wr_datetime = '".G5_TIME_YMDHIS."',
                          wr_ip = '{$_SERVER['REMOTE_ADDR']}' ";
         sql_query($sql);
@@ -92,6 +89,8 @@ if ($wr_content && ($member['mb_level'] >= $board['bo_comment_level']))
 
 $sql = " insert into {$g5['scrap_table']} ( mb_id, bo_table, wr_id, ms_datetime ) values ( '{$member['mb_id']}', '$bo_table', '$wr_id', '".G5_TIME_YMDHIS."' ) ";
 sql_query($sql);
+
+if (function_exists('mdl_do_action')) mdl_do_action('write_scrap_after', $bo_table, $wr_id, $member['mb_id']);
 
 delete_cache_latest($bo_table);
 

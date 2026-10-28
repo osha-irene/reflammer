@@ -1,5 +1,5 @@
 <?php
-$sub_menu = "300200";
+$sub_menu = "300010";
 include_once('./_common.php');
 
 auth_check($auth[$sub_menu], 'r');
@@ -104,7 +104,7 @@ $colspan = 7;
         if ($row2['cnt'])
             $group = '<a href="./boardgroupmember_form.php?mb_id='.$row['mb_id'].'">'.$row2['cnt'].'</a>';
 
-        $mb_nick = get_sideview($row['mb_id'], $row['mb_nick'], $row['mb_email'], $row['mb_homepage']);
+        $mb_nick = get_sideview($row['mb_id'], $row['mb_nick']);
 
         $bg = 'bg'.($i%2);
     ?>

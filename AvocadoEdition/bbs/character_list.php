@@ -113,26 +113,26 @@ if($profile['ad_use_rank']) {
 <form id="fsearch" name="fsearch" class="local_sch01 local_sch" method="get">
 <label for="sfl" class="sound_only">검색대상</label>
 
-<?
+<?php 
 	if(count($ch_si) > 0) {
 ?>
 <select name="s_side" id="c_side">
-	<option value=""><?=$config['cf_side_title']?>선택</option>
-<? for($i=0; $i < count($ch_si); $i++) { ?>
-	<option value="<?=$ch_si[$i]['id']?>" <?php echo get_selected($_GET['s_side'], $ch_si[$i]['id']); ?>><?=$ch_si[$i]['name']?></option>
-<? } ?>
+	<option value=""><?php echo $config['cf_side_title']?>선택</option>
+<?php  for($i=0; $i < count($ch_si); $i++) { ?>
+	<option value="<?php echo $ch_si[$i]['id']?>" <?php echo get_selected($_GET['s_side'], $ch_si[$i]['id']); ?>><?php echo $ch_si[$i]['name']?></option>
+<?php  } ?>
 </select>
-<? } ?>
-<?
+<?php  } ?>
+<?php 
 	if(count($ch_cl) > 0) {
 ?>
 <select name="s_class" id="c_class">
-	<option value=""><?=$config['cf_class_title']?>선택</option>
-<? for($i=0; $i < count($ch_cl); $i++) { ?>
-	<option value="<?=$ch_cl[$i]['id']?>" <?php echo get_selected($_GET['s_class'], $ch_cl[$i]['id']); ?>><?=$ch_cl[$i]['name']?></option>
-<? } ?>
+	<option value=""><?php echo $config['cf_class_title']?>선택</option>
+<?php  for($i=0; $i < count($ch_cl); $i++) { ?>
+	<option value="<?php echo $ch_cl[$i]['id']?>" <?php echo get_selected($_GET['s_class'], $ch_cl[$i]['id']); ?>><?php echo $ch_cl[$i]['name']?></option>
+<?php  } ?>
 </select>
-<? } ?>
+<?php  } ?>
 
 <select name="sfl" id="sfl">
 	<option value="ch_name"<?php echo get_selected($_GET['sfl'], "ch_name"); ?>>캐릭터 이름</option>
@@ -145,7 +145,7 @@ if($profile['ad_use_rank']) {
 </form>
 
 
-<?php if ($is_admin == 'super') { ?>
+<?php if ($is_admin) { ?>
 <div class="btn_add01 btn_add">
 	<a href="./character_form.php" id="member_add">캐릭터추가</a>
 </div>
@@ -167,15 +167,15 @@ if($profile['ad_use_rank']) {
 		<col />
 
 
-<? if($profile['ad_use_rank']) { ?>
+<?php  if($profile['ad_use_rank']) { ?>
 		<col style="width: 120px;" />
-<? } ?>
-<? if($config['cf_side_title']) { ?>
+<?php  } ?>
+<?php  if($config['cf_side_title']) { ?>
 		<col style="width: 120px;" />
-<? } ?>
-<? if($config['cf_class_title']) { ?>
+<?php  } ?>
+<?php  if($config['cf_class_title']) { ?>
 		<col style="width: 120px;" />
-<? } ?>
+<?php  } ?>
 		<col style="width: 80px;" />
 		<col style="width: 100px;" />
 	</colgroup>
@@ -189,15 +189,15 @@ if($profile['ad_use_rank']) {
 		<th>이름</th>
 
 
-<? if($profile['ad_use_rank']) { ?>
+<?php  if($profile['ad_use_rank']) { ?>
 		<th>랭킹</th>
-<? } ?>
-<? if($config['cf_side_title']) { ?>
-		<th><?=$config['cf_side_title']?></th>
-<? } ?>
-<? if($config['cf_class_title']) { ?>
-		<th><?=$config['cf_class_title']?></th>
-<? } ?>
+<?php  } ?>
+<?php  if($config['cf_side_title']) { ?>
+		<th><?php echo $config['cf_side_title']?></th>
+<?php  } ?>
+<?php  if($config['cf_class_title']) { ?>
+		<th><?php echo $config['cf_class_title']?></th>
+<?php  } ?>
 		<th>상태</th>
 		<th>관리</th>
 	</tr>
@@ -220,48 +220,48 @@ if($profile['ad_use_rank']) {
 		</td>
 
 		<td>
-			<select name="ch_type[<?=$i?>]" class="frm_input">
+			<select name="ch_type[<?php echo $i?>]" class="frm_input">
 				<option value="">유형선택</option>
-				<option value="main" <?=$row['ch_type'] == "main" ? "selected" : "" ?>>MAIN</option>
-				<option value="sub" <?=$row['ch_type'] == "sub" ? "selected" : "" ?>>SUB</option>
-				<option value="npc" <?=$row['ch_type'] == "npc" ? "selected" : "" ?>>NPC</option>
+				<option value="main" <?php echo $row['ch_type'] == "main" ? "selected" : "" ?>>MAIN</option>
+				<option value="sub" <?php echo $row['ch_type'] == "sub" ? "selected" : "" ?>>SUB</option>
+				<option value="npc" <?php echo $row['ch_type'] == "npc" ? "selected" : "" ?>>NPC</option>
 			</select>
 		</td>
 
 		<td class="txt-left"><?php echo get_text($row['ch_name']); ?></td>
 
 
-<? if($profile['ad_use_rank']) { ?>
+<?php  if($profile['ad_use_rank']) { ?>
 		<td>
-			<?=get_rank_name($row['ch_rank'])?>
+			<?php echo get_rank_name($row['ch_rank'])?>
 		</td>
-<? } ?>
-<? if($config['cf_side_title']) { ?>
+<?php  } ?>
+<?php  if($config['cf_side_title']) { ?>
 		<td>
-			<select name="ch_side[<?=$i?>]" class="frm_input">
-				<option value=""><?=$config['cf_side_title']?>선택</option>
-			<? for($k=0; $k < count($ch_si); $k++) { ?>
-				<option value="<?=$ch_si[$k]['id']?>" <?php echo get_selected($row['ch_side'], $ch_si[$k]['id']); ?>><?=$ch_si[$k]['name']?></option>
-			<? } ?>
+			<select name="ch_side[<?php echo $i?>]" class="frm_input">
+				<option value=""><?php echo $config['cf_side_title']?>선택</option>
+			<?php  for($k=0; $k < count($ch_si); $k++) { ?>
+				<option value="<?php echo $ch_si[$k]['id']?>" <?php echo get_selected($row['ch_side'], $ch_si[$k]['id']); ?>><?php echo $ch_si[$k]['name']?></option>
+			<?php  } ?>
 			</select>
 		</td>
-<? } ?>
-<? if($config['cf_class_title']) { ?>
+<?php  } ?>
+<?php  if($config['cf_class_title']) { ?>
 		<td>
-			<select name="ch_class[<?=$i?>]" class="frm_input">
-				<option value=""><?=$config['cf_class_title']?>선택</option>
-			<? for($k=0; $k < count($ch_cl); $k++) { ?>
-				<option value="<?=$ch_cl[$k]['id']?>" <?php echo get_selected($row['ch_class'], $ch_cl[$k]['id']); ?>><?=$ch_cl[$k]['name']?></option>
-			<? } ?>
+			<select name="ch_class[<?php echo $i?>]" class="frm_input">
+				<option value=""><?php echo $config['cf_class_title']?>선택</option>
+			<?php  for($k=0; $k < count($ch_cl); $k++) { ?>
+				<option value="<?php echo $ch_cl[$k]['id']?>" <?php echo get_selected($row['ch_class'], $ch_cl[$k]['id']); ?>><?php echo $ch_cl[$k]['name']?></option>
+			<?php  } ?>
 			</select>
 		</td>
-<? } ?>
+<?php  } ?>
 		<td>
-			<select name="ch_state[<?=$i?>]" class="frm_input">
+			<select name="ch_state[<?php echo $i?>]" class="frm_input">
 				<option value="수정중">수정중</option>
-				<option value="대기" <?=$row['ch_state'] == "대기" ? "selected" : "" ?>>대기</option>
-				<option value="승인" <?=$row['ch_state'] == "승인" ? "selected" : "" ?>>승인</option>
-				<option value="삭제" <?=$row['ch_state'] == "삭제" ? "selected" : "" ?>>삭제</option>
+				<option value="대기" <?php echo $row['ch_state'] == "대기" ? "selected" : "" ?>>대기</option>
+				<option value="승인" <?php echo $row['ch_state'] == "승인" ? "selected" : "" ?>>승인</option>
+				<option value="삭제" <?php echo $row['ch_state'] == "삭제" ? "selected" : "" ?>>삭제</option>
 			</select>
 		</td>
 

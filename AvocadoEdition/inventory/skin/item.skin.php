@@ -4,44 +4,44 @@ if (!defined('_GNUBOARD_')) exit; // 개별 페이지 접근 불가
 
 
 <div class="info">
-	<div class="ui-thumb">
-		<img src="<?=$in['it_img']?>" />
+	<div class="item-box">
+		<img src="<?php echo $in['it_img']?>" />
 	</div>
 </div>
 <div class="text">
 	<p class="title">
-		<?=$in['it_name']?>
-		<span><?=number_format($in['it_sell'])?><?=$config['cf_money_pice']?></span>
+		<?php echo $in['it_name']?>
+		<span><?php echo number_format($in['it_sell'])?><?php echo $config['cf_money_pice']?></span>
 	</p>
 	<div class="item-content-box">
 		<div class="default">
-			<?=$in['it_content']?>
+			<?php echo $in['it_content']?>
 		</div>
-	<? if($in['it_content2']) { ?>
+	<?php  if($in['it_content2']) { ?>
 		<div class="effect">
-			<?=$in['it_content2']?>
+			<?php echo $in['it_content2']?>
 		</div>
-	<? }?>
-	<? if($in['se_ch_name']) { ?>
+	<?php  }?>
+	<?php  if($in['se_ch_name']) { ?>
 		<div class="memo">
-			<? if($in['in_memo']) { ?><p><?=$in['in_memo']?></p><? } ?>
-			<p style="text-align: right;">By. <?=$in['se_ch_name']?></p>
+			<?php  if($in['in_memo']) { ?><p><?php echo $in['in_memo']?></p><?php  } ?>
+			<p style="text-align: right;">By. <?php echo $in['se_ch_name']?></p>
 		</div>
-	<? }?>
+	<?php  }?>
 	</div>
 </div>
 <div class="control-box">
-<? if($is_mine) { ?>
+<?php  if($is_mine) { ?>
 	<ul>
-		<? if($in['it_use_sell']) { ?>
-			<li><a href="javascript:fn_inven_link_event('<?=$in['in_id']?>', 'sell');" data-idx="<?=$in['in_id']?>" data-type="sell" class="ui-style-btn">판매하기</a></li>
-		<? }?>
-		<? if($in['it_use_able']) { ?>
-			<li><a href="javascript:fn_inven_link_event('<?=$in['in_id']?>', 'use');" data-idx="<?=$in['in_id']?>" data-type="use" class="ui-style-btn">사용하기</a></li>
-		<? } ?>
-		<? if(!$in['it_has']) { ?>
-			<li><a href="javascript:fn_inven_link_event('<?=$in['in_id']?>', 'take');" data-idx="<?=$in['in_id']?>" data-type="take" class="ui-style-btn">선물하기</a></li>
-		<? } ?>
+		<?php  if($in['it_use_sell']) { ?>
+			<li><a href="javascript:fn_inven_link_event('<?php echo $in['in_id']?>', 'sell');" data-idx="<?php echo $in['in_id']?>" data-type="sell" class="ui-style-btn">판매하기</a></li>
+		<?php  }?>
+		<?php  if($in['it_use_able']) { ?>
+			<li><a href="javascript:fn_inven_link_event('<?php echo $in['in_id']?>', 'use');" data-idx="<?php echo $in['in_id']?>" data-type="use" class="ui-style-btn">사용하기</a></li>
+		<?php  } ?>
+		<?php  if(!$in['it_has']) { ?>
+			<li><a href="javascript:fn_inven_link_event('<?php echo $in['in_id']?>', 'take');" data-idx="<?php echo $in['in_id']?>" data-type="take" class="ui-style-btn">선물하기</a></li>
+		<?php  } ?>
 	</ul>
-<? } ?>
+<?php  } ?>
 </div>

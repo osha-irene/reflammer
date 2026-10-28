@@ -27,7 +27,7 @@ if ($stx) {
 	$sql_search .= " ) ";
 }
 
-if ($is_admin != 'super')
+if (!$is_admin)
 	$sql_search .= " and mb_level <= '{$member['mb_level']}' ";
 
 if (!$sst) {
@@ -98,7 +98,7 @@ $colspan = 10;
 </form>
 
 
-<?php if ($is_admin == 'super') { ?>
+<?php if ($is_admin) { ?>
 <div class="btn_add01 btn_add">
 	<a href="./member_form.php" id="member_add">회원추가</a>
 </div>
@@ -138,7 +138,7 @@ $colspan = 10;
 		$s_mod = '<a href="./member_form.php?'.$qstr.'&amp;w=u&amp;mb_id='.$row['mb_id'].'">수정</a>';
 		$leave_date = $row['mb_leave_date'] ? $row['mb_leave_date'] : date('Ymd', G5_SERVER_TIME);
 		$intercept_date = $row['mb_intercept_date'] ? $row['mb_intercept_date'] : date('Ymd', G5_SERVER_TIME);
-		$mb_nick = get_sideview($row['mb_id'], get_text($row['mb_nick']), $row['mb_email'], $row['mb_homepage']);
+		$mb_nick = get_sideview($row['mb_id'], get_text($row['mb_nick']));
 		$mb_id = $row['mb_id'];
 		$leave_msg = '';
 		$intercept_msg = '';
@@ -168,22 +168,22 @@ $colspan = 10;
 		<td><?php echo get_text($row['mb_name']); ?></td>
 		<td><?php echo get_text($row['mb_birth']); ?></td>
 		<td class="txt-left">
-		<?
+		<?php 
 			// 해당 멤버의 캐릭터 검색
 			$add_character_str = "";
 			$ch_result = sql_query("select ch_name, ch_id from {$g5['character_table']} where mb_id = '{$row['mb_id']}'");
 			for($j = 0; $ch = sql_fetch_array($ch_result); $j++) { 
 		?>
-			<?=$add_character_str?>
-			<a href="./character_form.php?w=u&amp;ch_id=<?=$ch['ch_id']?>"><?=$ch['ch_name']?></a>
+			<?php echo $add_character_str?>
+			<a href="./character_form.php?w=u&amp;ch_id=<?php echo $ch['ch_id']?>"><?php echo $ch['ch_name']?></a>
 
-		<?
+		<?php 
 				$add_character_str = " / ";
 			}
 			if($j == 0) { 
 		?>
 			<span style="color:#bbb;">보유중인 캐릭터가 없습니다.</span>
-		<? } ?>
+		<?php  } ?>
 		</td>
 		
 		<td>
@@ -197,7 +197,7 @@ $colspan = 10;
 		</td>
 		<td><?php echo substr($row['mb_datetime'],2,8); ?></td>
 		<td><?php echo substr($row['mb_today_login'],2,8); ?></td>
-		<td><?php echo $s_mod ?> <?php echo $s_grp ?></td>
+		<td><?php echo $s_mod ?></td>
 	</tr>
 
 	<?php

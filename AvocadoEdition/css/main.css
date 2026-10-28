@@ -4,7 +4,7 @@
 --------------------------------------------------
 	- 최초 작성일 : 2021.08.15
 	- 최초 작성자 : 아보카도
-	- 최종 수정일 :
+	- 최종 수정일 : 2026.08.26
 	- 최종 수정자 :
 --------------------------------------------------*/
 
@@ -12,47 +12,198 @@
 	메인 레이아웃
 ****************************************************/
 
-#body {opacity:0;}
-#no_design_main {position:relative; padding:50px 0; }
-#no_design_main:after {content:""; display:block; position:relative; clear:both;}
+/* FOUC 방지 — JS 비활성/지연시에도 보이도록 fallback 처리 */
+#body {
+	opacity: 1;
+	transition: opacity .2s ease;
+	position: relative;
+	background:
+		linear-gradient(180deg, rgba(5, 9, 20, .45) 0%, rgba(5, 9, 20, .55) 45%, rgba(5, 9, 20, .85) 100%),
+		url('../img/bg.png') center bottom / cover no-repeat fixed;
+}
+@media all and (max-width: 1024px) {
+	#body { background-attachment: scroll; }
+}
+
+#main_body {
+	min-width: 0;
+	max-width: 100%;
+	overflow-x: hidden;
+	word-break: break-word;
+	overflow-wrap: break-word;
+}
+#main_body img,
+#main_body video {
+	max-width: 100%;
+	height: auto;
+}
+#main_body iframe {
+	max-width: 100%;
+}
+#main_body table {
+	max-width: 100%;
+}
+
+/****************************************************
+	메인 헤더 — 금장 테두리 메뉴 패널 (img/menu.png)
+	  779:1401 비율의 세로 캡슐형 테두리 이미지라
+	  가로 내비 대신 세로로 쌓이는 기존 #no_design_gnb 구조를 그대로 살려서
+	  프레임 안에 메뉴 목록을 넣는 방식으로 적용.
+	  (모바일 슬라이드 메뉴는 기존 레이아웃 유지)
+****************************************************/
+@media all and (min-width: 1025px) {
+	#gnb { display: flex; justify-content: center; }
+
+	#gnb #no_design_gnb {
+		width: min(100%, 300px);
+		aspect-ratio: 779 / 1401;
+		margin: 10px auto 20px;
+		padding: 22% 12%;
+		box-sizing: border-box;
+		background: url('../img/menu.png') center / contain no-repeat;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		gap: 10px;
+		text-align: center;
+		line-height: 1.3;
+	}
+	#gnb #no_design_gnb li { margin: 0; }
+	#gnb #no_design_gnb li a {
+		display: block;
+		color: #f3dfa0;
+		font-size: 13px;
+		letter-spacing: .04em;
+		text-shadow: 0 0 6px rgba(243, 223, 160, .35);
+	}
+	#gnb #no_design_gnb li a:hover {
+		color: #ffffff;
+		text-shadow: 0 0 10px rgba(255, 255, 255, .6);
+	}
+}
+
+
+#no_design_main {
+	position: relative;
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	grid-template-areas:
+		"visual visual"
+		"notice side"
+		"copy copy";
+	gap: 20px;
+	padding: 50px 0;
+	align-items: start;
+}
+
+/* 야간 배경 위에서 박스 가독성 확보 — 글래스 패널 스타일 */
+#no_design_main .theme-box {
+	background-color: rgba(8, 13, 26, .55);
+	backdrop-filter: blur(8px);
+	-webkit-backdrop-filter: blur(8px);
+	border: 1px solid rgba(255, 255, 255, .08);
+	border-radius: 14px;
+	color: #e9edf5;
+}
+#no_design_main a { color: #bcd3ff; }
+#no_design_main a:hover { color: #ffffff; }
+#no_design_main #main_copyright_box {
+	color: #9aa6c0;
+	background: transparent;
+	backdrop-filter: none;
+	-webkit-backdrop-filter: none;
+	border: none;
+}
 
 
 /****************************************************
 	메인 슬라이드 배너
 ****************************************************/
 
-#main_visual_box {min-height:100px; background:#000; margin-bottom:20px;}
-
-
-/****************************************************
-	메인 트위터 박스
-****************************************************/
-
-#main_twitter_box {position:relative; width:32%; height:260px; float:left; margin-bottom:20px;}
-.twitter {max-height:100%;}
+#main_visual_box {
+	grid-area: visual;
+	min-height: 0;
+	background: transparent;
+	overflow: hidden;
+}
+#main_visual_box:has(img) {
+	min-height: 100px;
+}
+#main_visual_box img {
+	width: 100%;
+	height: auto;
+	display: block;
+	vertical-align: top;
+}
 
 
 /****************************************************
 	메인 이미지 박스
 ****************************************************/
 
-#main_image_box {position:relative; width:32%; margin-left:2%; margin-right:2%; height:260px; text-align:center; line-height:260px; float:left; margin-bottom:20px;}
+#main_image_box {
+	position: relative;
+	min-height: 260px;
+	text-align: center;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+
+/****************************************************
+	메인 공지사항 박스
+****************************************************/
+
+#main_notice_box {
+	grid-area: notice;
+	position: relative;
+	min-height: 0;
+	max-height: 400px;
+	line-height: 1.5;
+	overflow: auto;
+	-webkit-overflow-scrolling: touch;
+	height:100%;
+}
 
 
 /****************************************************
 	메인 우측 박스 (로그인 / 일반)
 ****************************************************/
 
-#main_side_box {position:relative; width:32%; height:260px; float:right; margin-bottom:20px;}
-#main_login_box {margin-bottom:20px;}
-#main_banner_box {padding:20px; height:130px; text-align:center; box-sizing:border-box;}
+#main_side_box {
+	grid-area: side;
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+	min-width: 0;
+}
+#main_login_box { margin-bottom: 0; }
+#main_banner_box {
+	padding: 20px;
+	text-align: center;
+	box-sizing: border-box;
+	min-width: 0;
+}
+#main_banner_box img { max-width: 100%; height: auto; }
+#main_banner_box p,
+#main_banner_box a {
+	overflow-wrap: anywhere;
+	word-break: break-all;
+}
 
 
 /****************************************************
 	메인 카피라이터
 ****************************************************/
 
-#main_copyright_box {display:block; position:relative; clear:both; text-align:center;}
+#main_copyright_box {
+	grid-area: copy;
+	display: block;
+	position: relative;
+	text-align: center;
+}
 
 
 /****************************************************
@@ -60,10 +211,39 @@
 ****************************************************/
 
 @media all and (max-width:1024px)  {
-	#no_design_main {padding-top:20px;}
-}
-@media all and (max-width:800px)  {
-	#main_twitter_box,
+	#no_design_main {
+		grid-template-columns: 1fr;
+		grid-template-areas:
+			"visual"
+			"side"
+			"notice"
+			"copy";
+		gap: 12px;
+		padding: 12px 0 24px;
+	}
+
 	#main_image_box,
-	#main_side_box  {width:auto; float:none; margin:0 0px 20px;}
+	#main_notice_box,
+	#main_side_box {
+		width: 100%;
+		float: none;
+		height: auto;
+		min-height: 0;
+		max-height: none;
+		margin: 0;
+	}
+
+	#main_notice_box {
+		max-height: min(50vh, 360px);
+	}
+
+	#main_banner_box {
+		height: auto;
+		padding: 16px 12px;
+	}
+}
+
+@media all and (max-width:480px)  {
+	#no_design_main { gap: 10px; padding: 8px 0 20px; }
+	#main_banner_box { padding: 12px 10px; }
 }

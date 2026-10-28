@@ -106,7 +106,7 @@ if (!isset($_POST['agree']) || $_POST['agree'] != '동의함') {
 
 	<p>
 		<strong class="st_strong">주의! 이미 <?php echo G5_VERSION ?>이 존재한다면 DB 자료가 망실되므로 주의하십시오.</strong><br>
-		주의사항을 이해했으며, 아보카도 에디션 설치를 계속 진행하시려면 다음을 누르십시오.
+		주의사항을 이해했으며, 아보카도 8 설치를 계속 진행하시려면 다음을 누르십시오.
 	</p>
 
 	<div class="inner_btn">

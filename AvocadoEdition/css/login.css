@@ -23,3 +23,6 @@ body {height:100%;}
 .login-form-box button {display:block; position:absolute; right:0; top:0; width:75px; bottom:0; height:100%;}
 .login-form-box fieldset + fieldset {margin-top:5px;}
 .login-form-box input {width:100%;}
+
+.login-join {max-width:280px; margin:14px auto 0; font-size:13px; line-height:1.4;}
+.login-join a {text-decoration:underline;}

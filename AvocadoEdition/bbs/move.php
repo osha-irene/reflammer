@@ -9,7 +9,7 @@ else
     alert('sw 값이 제대로 넘어오지 않았습니다.');
 
 // 게시판 관리자 이상 복사, 이동 가능
-if ($is_admin != 'board' && $is_admin != 'group' && $is_admin != 'super')
+if (!$is_admin)
     alert_close("게시판 관리자 이상 접근이 가능합니다.");
 
 $g5['title'] = '게시물 ' . $act;

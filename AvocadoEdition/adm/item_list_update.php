@@ -46,7 +46,7 @@ if ($_POST['act_button'] == "선택수정") {
 		$it = sql_fetch("select it_img from {$g5['item_table']} where it_id = '{$tmp_it_id}'");
 		
 		$prev_file_path = str_replace(G5_URL, G5_PATH, $it['it_img']);
-		@unlink($prev_file_path);
+		if (function_exists('cdn_unlink')) { @cdn_unlink($prev_file_path); } else { @unlink($prev_file_path); }
 		
 		sql_query(" delete from {$g5['item_table']} where it_id = '{$temp_it_id}'");
 		sql_query(" delete from {$g5['inventory_table']} where it_id = '{$temp_it_id}'");

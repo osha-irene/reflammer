@@ -1,15 +1,15 @@
 <?php
-$sub_menu = "100280";
+$sub_menu = "110200";
 include_once('./_common.php');
 
-if ($is_admin != 'super')
-    alert('최고관리자만 접근 가능합니다.');
-
-// 테마 필드 추가
-if(!isset($config['cf_theme'])) {
-    sql_query(" ALTER TABLE `{$g5['config_table']}`
-                    ADD `cf_theme` varchar(255) NOT NULL DEFAULT '' AFTER `cf_title` ", true);
-}
+// 신규 프리셋 관리 페이지로 리다이렉트
+goto_url('./theme_preset_list.php');
+?>
+<?php /* 이전 단일 cf_theme 기반 UI는 폐기됨. 아래 코드는 보존만 — 실제 실행되지 않음. */ ?>
+<?php exit; ?>
+<?php
+if (!$is_admin)
+    alert('관리자만 접근 가능합니다.');
 
 $theme = get_theme_dir();
 if($config['cf_theme'] && in_array($config['cf_theme'], $theme))
@@ -47,7 +47,7 @@ include_once('./admin.head.php');
             $btn_active = '<span class="theme_sl theme_sl_use">사용중</span><button type="button" class="theme_sl theme_deactive" data-theme="'.$theme[$i].'" '.'data-name="'.$name.'">사용안함</button>';
         } else {
             $tconfig = get_theme_config_value($theme[$i], 'set_default_skin');
-            if($tconfig['set_default_skin'])
+            if(isset($tconfig['set_default_skin'])&&$tconfig['set_default_skin'])
                 $set_default_skin = 'true';
             else
                 $set_default_skin = 'false';

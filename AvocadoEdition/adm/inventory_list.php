@@ -127,7 +127,7 @@ $frm_submit = '<div class="btn_confirm01 btn_confirm">
 
 	</section>
 
-	<?=$frm_submit?>
+	<?php echo $frm_submit?>
 </form>
 
 <section id="anc_002">
@@ -198,16 +198,16 @@ $frm_submit = '<div class="btn_confirm01 btn_confirm">
 						</td>
 						<td class="txt-left"><?php echo get_text($row['ch_name']); ?></td>
 						<td>
-						<? if($it['it_img']) { ?>
-							<img src="<?=$it['it_img']?>" style="max-width: 30px;"/>
-						<? } else { ?>
+						<?php  if($it['it_img']) { ?>
+							<img src="<?php echo $it['it_img']?>" style="max-width: 30px;"/>
+						<?php  } else { ?>
 							이미지 없음
-						<? } ?>
+						<?php  } ?>
 						</td>
 						<td class="txt-left">
 							<?php echo get_text($row['it_name']); ?>
 						</td>
-						<td class="txt-left"><?=$row['se_ch_name']?></td>
+						<td class="txt-left"><?php echo $row['se_ch_name']?></td>
 						<td class="txt-left"><?php echo $row['in_memo'] ?></td>
 					</tr>
 

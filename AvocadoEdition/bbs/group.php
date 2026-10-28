@@ -1,14 +1,6 @@
 <?php
 include_once('./_common.php');
 
-if(defined('G5_THEME_PATH')) {
-    $group_file = G5_THEME_PATH.'/group.php';
-    if(is_file($group_file)) {
-        require_once($group_file);
-        return;
-    }
-    unset($group_file);
-}
 
 if (G5_IS_MOBILE) {
     include_once(G5_MOBILE_PATH.'/group.php');

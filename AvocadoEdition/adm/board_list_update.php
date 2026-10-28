@@ -17,14 +17,14 @@ if ($_POST['act_button'] == "선택수정") {
 		// 실제 번호를 넘김
 		$k = $_POST['chk'][$i];
 
-		if ($is_admin != 'super') {
+		if (!$is_admin) {
 			$sql = " select count(*) as cnt from {$g5['board_table']} a, {$g5['group_table']} b
 					  where a.gr_id = '{$_POST['gr_id'][$k]}'
 						and a.gr_id = b.gr_id
 						and b.gr_admin = '{$member['mb_id']}' ";
 			$row = sql_fetch($sql);
 			if (!$row['cnt'])
-				alert('최고관리자가 아닌 경우 다른 관리자의 게시판('.$board_table[$k].')은 수정이 불가합니다.');
+				alert('관리자가 아닌 경우 다른 관리자의 게시판('.$board_table[$k].')은 수정이 불가합니다.');
 		}
 
 		$sql = " update {$g5['board_table']}
@@ -41,8 +41,8 @@ if ($_POST['act_button'] == "선택수정") {
 
 } else if ($_POST['act_button'] == "선택삭제") {
 
-	if ($is_admin != 'super')
-		alert('게시판 삭제는 최고관리자만 가능합니다.');
+	if (!$is_admin)
+		alert('게시판 삭제는 관리자만 가능합니다.');
 
 	auth_check($auth[$sub_menu], 'd');
 

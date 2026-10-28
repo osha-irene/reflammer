@@ -1,10 +1,5 @@
 <?php
 include_once('./_common.php');
-include_once(G5_LIB_PATH.'/naver_syndi.lib.php');
-include_once(G5_CAPTCHA_PATH.'/captcha.lib.php');
-
-// 토큰체크
-//check_write_token($bo_table);
 
 $g5['title'] = '게시글 저장';
 
@@ -68,6 +63,20 @@ if (substr_count($wr_content, '&#') > 50) {
     alert('내용에 올바르지 않은 코드가 다수 포함되어 있습니다.');
     exit;
 }
+
+// ─── avo8.0 본문 글자 수 제한 (제외 문자 적용, 관리자 제외) ─────────
+if (!$is_admin && isset($wr_content) && $wr_content !== '') {
+    $_max = (int)($board['bo_write_limit_text'] ?? 0);
+    if ($_max > 0) {
+        $_exc = trim($board['bo_comment_limit_text_exc'] ?? '');
+        $_chars_exc = $_exc !== '' ? array_filter(array_map('trim', explode(',', $_exc)), 'strlen') : array();
+        $_measure = $wr_content;
+        foreach ($_chars_exc as $_ch) { $_measure = str_replace($_ch, '', $_measure); }
+        $_len = function_exists('mb_strlen') ? mb_strlen($_measure, 'UTF-8') : strlen($_measure);
+        if ($_len > $_max) alert('본문은 최대 '.$_max.'자 이하로 작성해 주세요. (제외 문자 미포함)');
+    }
+}
+// ─── /본문 글자 수 제한 ─────────────────────────────────────────────
 
 $upload_max_filesize = ini_get('upload_max_filesize');
 
@@ -188,9 +197,6 @@ if ($w == '' || $w == 'u') {
     alert('w 값이 제대로 넘어오지 않았습니다.');
 }
 
-if ($is_guest && !chk_captcha()) {
-    alert('자동등록방지 숫자가 틀렸습니다.');
-}
 
 if ($w == '' || $w == 'r') {
     if (isset($_SESSION['ss_datetime'])) {
@@ -210,8 +216,6 @@ if ($w == '' || $w == 'r') {
         $mb_id = $member['mb_id'];
         $wr_name = addslashes(clean_xss_tags($board['bo_use_name'] ? $member['mb_name'] : $member['mb_nick']));
         $wr_password = $member['mb_password'];
-        $wr_email = addslashes($member['mb_email']);
-        $wr_homepage = addslashes(clean_xss_tags($member['mb_homepage']));
     } else {
         $mb_id = '';
         // 비회원의 경우 이름이 누락되는 경우가 있음
@@ -219,8 +223,6 @@ if ($w == '' || $w == 'r') {
         if (!$wr_name)
             alert('이름은 필히 입력하셔야 합니다.');
         $wr_password = get_encrypt_string($wr_password);
-        $wr_email = get_email_address(trim($_POST['wr_email']));
-        $wr_homepage = clean_xss_tags($wr_homepage);
     }
 
     if ($w == 'r') {
@@ -254,8 +256,6 @@ if ($w == '' || $w == 'r') {
                      mb_id = '{$member['mb_id']}',
                      wr_password = '$wr_password',
                      wr_name = '$wr_name',
-                     wr_email = '$wr_email',
-                     wr_homepage = '$wr_homepage',
                      wr_datetime = '".G5_TIME_YMDHIS."',
                      wr_last = '".G5_TIME_YMDHIS."',
                      wr_ip = '{$_SERVER['REMOTE_ADDR']}',
@@ -273,9 +273,9 @@ if ($w == '' || $w == 'r') {
 					 wr_adult = '$wr_adult',
 					 wr_wide = '$wr_wide',
 					 wr_plip = '$wr_plip',
-
+                    
+                     cf_time = '{$config['cf_time']}',
 					 wr_noname = '$wr_noname',
-
                      wr_1 = '$wr_1',
                      wr_2 = '$wr_2',
                      wr_3 = '$wr_3',
@@ -319,7 +319,7 @@ if ($w == '' || $w == 'r') {
 
     $return_url = './board.php?bo_table='.$bo_table.'&amp;wr_id='.$wr_id;
 
-    if ($is_admin == 'super') // 최고관리자 통과
+    if ($is_admin) // 관리자 통과
         ;
     else if ($is_admin == 'group') { // 그룹관리자
         $mb = get_member($write['mb_id']);
@@ -346,29 +346,18 @@ if ($w == '' || $w == 'r') {
         if ($member['mb_id'] == $wr['mb_id']) {
             $mb_id = $member['mb_id'];
             $wr_name = addslashes(clean_xss_tags($board['bo_use_name'] ? $member['mb_name'] : $member['mb_nick']));
-            $wr_email = addslashes($member['mb_email']);
-            $wr_homepage = addslashes(clean_xss_tags($member['mb_homepage']));
         } else {
             $mb_id = $wr['mb_id'];
             if(isset($_POST['wr_name']) && $_POST['wr_name'])
                 $wr_name = clean_xss_tags(trim($_POST['wr_name']));
             else
                 $wr_name = addslashes(clean_xss_tags($wr['wr_name']));
-            if(isset($_POST['wr_email']) && $_POST['wr_email'])
-                $wr_email = get_email_address(trim($_POST['wr_email']));
-            else
-                $wr_email = addslashes($wr['wr_email']);
-            if(isset($_POST['wr_homepage']) && $_POST['wr_homepage'])
-                $wr_homepage = addslashes(clean_xss_tags($_POST['wr_homepage']));
-            else
-                $wr_homepage = addslashes(clean_xss_tags($wr['wr_homepage']));
         }
     } else {
         $mb_id = "";
         // 비회원의 경우 이름이 누락되는 경우가 있음
         if (!trim($wr_name)) alert("이름은 필히 입력하셔야 합니다.");
         $wr_name = clean_xss_tags(trim($_POST['wr_name']));
-        $wr_email = get_email_address(trim($_POST['wr_email']));
     }
 
     $sql_password = $wr_password ? " , wr_password = '".get_encrypt_string($wr_password)."' " : "";
@@ -386,9 +375,6 @@ if ($w == '' || $w == 'r') {
                      wr_link2 = '{$wr_link2}',
                      mb_id = '{$mb_id}',
                      wr_name = '{$wr_name}',
-                     wr_email = '{$wr_email}',
-                     wr_homepage = '{$wr_homepage}',
-
 					 wr_width = '$wr_width',
 					 wr_height = '$wr_height',
 					 wr_url = '$wr_url',
@@ -443,14 +429,11 @@ if ($w == '' || $w == 'r') {
     sql_query(" update {$g5['board_table']} set bo_notice = '{$bo_notice}' where bo_table = '{$bo_table}' ");
 }
 
-// 게시판그룹접근사용을 하지 않아야 하고 비회원 글읽기가 가능해야 하며 비밀글이 아니어야 합니다.
-if (!$group['gr_use_access'] && $board['bo_read_level'] < 2 && !$secret) {
-    naver_syndi_ping($bo_table, $wr_id);
-}
+
 
 // 파일개수 체크
 $file_count   = 0;
-$upload_count = count($_FILES['bf_file']['name']);
+$upload_count = (isset($_FILES['bf_file']['name']) && is_array($_FILES['bf_file']['name'])) ? count($_FILES['bf_file']['name']) : 0;
 
 for ($i=0; $i<$upload_count; $i++) {
     if($_FILES['bf_file']['name'][$i] && is_uploaded_file($_FILES['bf_file']['tmp_name'][$i]))
@@ -475,7 +458,7 @@ $chars_array = array_merge(range(0,9), range('a','z'), range('A','Z'));
 // 가변 파일 업로드
 $file_upload_msg = '';
 $upload = array();
-for ($i=0; $i<count($_FILES['bf_file']['name']); $i++) {
+for ($i=0; $i<$upload_count; $i++) {
     $upload[$i]['file']     = '';
     $upload[$i]['source']   = '';
     $upload[$i]['filesize'] = 0;
@@ -530,8 +513,7 @@ for ($i=0; $i<count($_FILES['bf_file']['name']); $i++) {
         //-----------------------------------------------------------------
         $timg = @getimagesize($tmp_file);
         // image type
-        if ( preg_match("/\.({$config['cf_image_extension']})$/i", $filename) ||
-             preg_match("/\.({$config['cf_flash_extension']})$/i", $filename) ) {
+        if ( preg_match("/\.({$config['cf_image_extension']})$/i", $filename) ) {
             if ($timg['2'] < 1 || $timg['2'] > 16)
                 continue;
         }
@@ -570,15 +552,18 @@ for ($i=0; $i<count($_FILES['bf_file']['name']); $i++) {
 
         // 올라간 파일의 퍼미션을 변경합니다.
         chmod($dest_file, G5_FILE_PERMISSION);
+
+        // CDN: 업로드 직후 미러링 (모듈 비활시 무시)
+        if (function_exists('cdn_after_upload')) cdn_after_upload($dest_file);
     }
 }
 
 // 나중에 테이블에 저장하는 이유는 $wr_id 값을 저장해야 하기 때문입니다.
 for ($i=0; $i<count($upload); $i++)
 {
-    if (!get_magic_quotes_gpc()) {
-        $upload[$i]['source'] = addslashes($upload[$i]['source']);
-    }
+  
+    $upload[$i]['source'] = addslashes($upload[$i]['source']);
+    
 
     $row = sql_fetch(" select count(*) as cnt from {$g5['board_file_table']} where bo_table = '{$bo_table}' and wr_id = '{$wr_id}' and bf_no = '{$i}' ");
     if ($row['cnt'])
@@ -656,71 +641,15 @@ sql_query(" delete from {$g5['autosave_table']} where as_uid = '{$uid}' ");
 if ($secret)
     set_session("ss_secret_{$bo_table}_{$wr_num}", TRUE);
 
-// 메일발송 사용 (수정글은 발송하지 않음)
-if (!($w == 'u' || $w == 'cu') && $config['cf_email_use'] && $board['bo_use_email']) {
-
-    // 관리자의 정보를 얻고
-    $super_admin = get_admin('super');
-    $group_admin = get_admin('group');
-    $board_admin = get_admin('board');
-
-    $wr_subject = get_text(stripslashes($wr_subject));
-
-    $tmp_html = 0;
-    if (strstr($html, 'html1'))
-        $tmp_html = 1;
-    else if (strstr($html, 'html2'))
-        $tmp_html = 2;
-
-    $wr_content = conv_content(conv_unescape_nl(stripslashes($wr_content)), $tmp_html);
-
-    $warr = array( ''=>'입력', 'u'=>'수정', 'r'=>'답변', 'c'=>'코멘트', 'cu'=>'코멘트 수정' );
-    $str = $warr[$w];
-
-    $subject = '['.$config['cf_title'].'] '.$board['bo_subject'].' 게시판에 '.$str.'글이 올라왔습니다.';
-
-    $link_url = G5_BBS_URL.'/board.php?bo_table='.$bo_table.'&amp;wr_id='.$wr_id.'&amp;'.$qstr;
-
-    include_once(G5_LIB_PATH.'/mailer.lib.php');
-
-    ob_start();
-    include_once ('./write_update_mail.php');
-    $content = ob_get_contents();
-    ob_end_clean();
-
-    $array_email = array();
-    // 게시판관리자에게 보내는 메일
-    if ($config['cf_email_wr_board_admin']) $array_email[] = $board_admin['mb_email'];
-    // 게시판그룹관리자에게 보내는 메일
-    if ($config['cf_email_wr_group_admin']) $array_email[] = $group_admin['mb_email'];
-    // 최고관리자에게 보내는 메일
-    if ($config['cf_email_wr_super_admin']) $array_email[] = $super_admin['mb_email'];
-
-    // 원글게시자에게 보내는 메일
-    if ($config['cf_email_wr_write']) {
-        if($w == '')
-            $wr['wr_email'] = $wr_email;
-
-        $array_email[] = $wr['wr_email'];
-    }
-
-    // 옵션에 메일받기가 체크되어 있고, 게시자의 메일이 있다면
-    if (strstr($wr['wr_option'], 'mail') && $wr['wr_email'])
-        $array_email[] = $wr['wr_email'];
-
-    // 중복된 메일 주소는 제거
-    $unique_email = array_unique($array_email);
-    $unique_email = array_values($unique_email);
-    for ($i=0; $i<count($unique_email); $i++) {
-        mailer($wr_name, $wr_email, $unique_email[$i], $subject, $content, 1);
-    }
-}
+// inventory 등 게시판 공유 모듈은 표준 write_after 훅에 등록 (코어에서 밄사하는 모듈 전용 훅 제거)
 
 // 사용자 코드 실행
 @include_once($board_skin_path.'/write_update.skin.php');
 @include_once($board_skin_path.'/write_update.tail.skin.php');
 
 delete_cache_latest($bo_table);
+
+if (function_exists('mdl_do_action')) mdl_do_action('write_after', $bo_table, $wr_id, $w);
 
 if ($file_upload_msg)
     alert($file_upload_msg, G5_HTTP_BBS_URL.'/board.php?bo_table='.$bo_table.'&amp;wr_id='.$wr_id.$qstr);

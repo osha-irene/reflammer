@@ -32,7 +32,7 @@ if ($stx) {
     $result = sql_query($sql);
     for ($i=0; $row=sql_fetch_array($result); $i++)
     {
-        if ($is_admin != 'super')
+        if (!$is_admin)
         {
             // 그룹접근 사용에 대한 검색 차단
             $sql2 = " select gr_use_access, gr_admin from {$g5['group_table']} where gr_id = '{$row['gr_id']}' ";
@@ -74,7 +74,7 @@ if ($stx) {
         $search_str = $s[$i];
 
         // 인기검색어
-        insert_popular($field, $search_str);
+       
 
         $str .= $op1;
         $str .= "(";
@@ -203,7 +203,7 @@ if ($stx) {
 
             $list[$idx][$i]['subject'] = $subject;
             $list[$idx][$i]['content'] = $content;
-            $list[$idx][$i]['name'] = get_sideview($row['mb_id'], get_text(cut_str($row['wr_name'], $config['cf_cut_name'])), $row['wr_email'], $row['wr_homepage']);
+            $list[$idx][$i]['name'] = get_sideview($row['mb_id'], get_text(cut_str($row['wr_name'], $config['cf_cut_name'])));
 
             $k++;
             if ($k >= $rows)

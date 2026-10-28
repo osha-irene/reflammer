@@ -1,8 +1,18 @@
 <?php
-$sub_menu = "400410";
+$sub_menu = "410110";
 include_once('./_common.php');
 
 auth_check($auth[$sub_menu], 'r');
+
+// 경험치 명칭/단위 저장 (point_list 패턴)
+if (isset($_POST['exp_cfg_update']) && check_admin_token()) {
+    $cf_exp_name = sql_escape_string(trim($_POST['cf_exp_name'] ?? ''));
+    $cf_exp_pice = sql_escape_string(trim($_POST['cf_exp_pice'] ?? ''));
+    sql_query("UPDATE {$g5['config_table']} SET cf_exp_name = '{$cf_exp_name}', cf_exp_pice = '{$cf_exp_pice}'");
+    goto_url('./exp_list.php?'.($qstr ?? ''));
+}
+// config 재로드 (저장 후 즉시 반영용 — goto_url 로 충분하므로 위에서 redirect)
+$config = sql_fetch("SELECT * FROM {$g5['config_table']}");
 
 $token = get_token();
 
@@ -72,6 +82,29 @@ $frm_submit = '<div class="btn_confirm01 btn_confirm">
 </div>';
 ?>
 
+<details class="adm-panel" open>
+<summary><?php echo get_text($config['cf_exp_name']); ?> 명칭 / 단위 설정</summary>
+<div class="adm-panel-body">
+<form method="post" action="">
+<?php echo get_admin_token_field(); ?>
+<input type="hidden" name="exp_cfg_update" value="1">
+<p class="adm-panel-help">사이트에서 사용할 <strong>경험치의 이름과 단위</strong>를 지정합니다. (예: 경험치 / EXP)</p>
+<div class="adm-opt-grid">
+	<label class="adm-opt-label" for="cf_exp_name">경험치 명칭</label>
+	<div>
+		<input type="text" name="cf_exp_name" id="cf_exp_name" value="<?php echo get_text($config['cf_exp_name']); ?>" size="12" class="frm_input" placeholder="예: 경험치">
+	</div>
+	<label class="adm-opt-label" for="cf_exp_pice">단위</label>
+	<div>
+		<input type="text" name="cf_exp_pice" id="cf_exp_pice" value="<?php echo get_text($config['cf_exp_pice']); ?>" size="8" class="frm_input" placeholder="예: EXP">
+	</div>
+</div>
+<div class="adm-panel-actions">
+	<button type="submit" class="btn_submit"><?php echo get_text($config['cf_exp_name']); ?> 설정 저장</button>
+</div>
+</form>
+</div>
+</details>
 
 <form name="fpointlist2" method="post" id="fpointlist2" action="./exp_update.php" autocomplete="off">
 	<input type="hidden" name="sfl" value="<?php echo $sfl ?>">
@@ -82,7 +115,7 @@ $frm_submit = '<div class="btn_confirm01 btn_confirm">
 	<input type="hidden" name="token" value="<?php echo $token ?>">
 
 	<section id="anc_001">
-		<h2 class="h2_frm"><?=$config['cf_exp_name']?> 지급/회수</h2>
+		<h2 class="h2_frm"><?php echo $config['cf_exp_name']?> 지급/회수</h2>
 		<?php echo $pg_anchor ?>
 
 		<div class="tbl_frm01 tbl_wrap">
@@ -116,7 +149,7 @@ $frm_submit = '<div class="btn_confirm01 btn_confirm">
 						<td><input type="text" name="ex_content" id="ex_content" required class="required frm_input" size="80"></td>
 					</tr>
 					<tr>
-						<th scope="row"><label for="ex_point"><?=$config['cf_exp_name']?><strong class="sound_only">필수</strong></label></th>
+						<th scope="row"><label for="ex_point"><?php echo $config['cf_exp_name']?><strong class="sound_only">필수</strong></label></th>
 						<td><input type="text" name="ex_point" id="ex_point" required class="required frm_input"></td>
 					</tr>
 				</tbody>
@@ -132,7 +165,7 @@ $frm_submit = '<div class="btn_confirm01 btn_confirm">
 
 
 <section id="anc_002">
-	<h2 class="h2_frm"><?=$config['cf_exp_name']?> 내역</h2>
+	<h2 class="h2_frm"><?php echo $config['cf_exp_name']?> 내역</h2>
 	<?php echo $pg_anchor ?>
 
 	<div class="local_ov01 local_ov">
@@ -184,16 +217,16 @@ $frm_submit = '<div class="btn_confirm01 btn_confirm">
 		<thead>
 		<tr>
 			<th>
-				<label for="chkall" class="sound_only"><?=$config['cf_exp_name']?> 지급 내역 전체</label>
+				<label for="chkall" class="sound_only"><?php echo $config['cf_exp_name']?> 지급 내역 전체</label>
 				<input type="checkbox" name="chkall" value="1" id="chkall" onclick="check_all(this.form)">
 			</th>
 			<th>오너명</th>
 
 			<th>캐릭터 이름</th>
 			<th>지급 내용</th>
-			<th><?=$config['cf_exp_name']?></th>
+			<th><?php echo $config['cf_exp_name']?></th>
 			<th>일시</th>
-			<th><?=$config['cf_exp_name']?> 합계</th>
+			<th><?php echo $config['cf_exp_name']?> 합계</th>
 		</tr>
 		</thead>
 		<tbody>
@@ -211,7 +244,7 @@ $frm_submit = '<div class="btn_confirm01 btn_confirm">
 				<input type="checkbox" name="chk[]" value="<?php echo $i ?>" id="chk_<?php echo $i ?>">
 			</td>
 			
-			<td><?=get_member_name($ch['mb_id'])?></td>
+			<td><?php echo get_member_name($ch['mb_id'])?></td>
 
 			<td><a href="?sfl=ch_name&amp;stx=<?php echo $row['ch_name'] ?>"><?php echo $row['ch_name'] ?></a></td>
 			<td class="txt-left"><?php echo $row['ex_content'] ?></td>

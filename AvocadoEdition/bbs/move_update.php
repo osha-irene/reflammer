@@ -2,7 +2,7 @@
 include_once('./_common.php');
 
 // 게시판 관리자 이상 복사, 이동 가능
-if ($is_admin != 'board' && $is_admin != 'group' && $is_admin != 'super')
+if (!$is_admin)
     alert_close('게시판 관리자 이상 접근이 가능합니다.');
 
 if ($sw != 'move' && $sw != 'copy')
@@ -44,17 +44,6 @@ while ($row = sql_fetch_array($result))
         while ($row2 = sql_fetch_array($result2))
         {
             $nick = cut_str($member['mb_nick'], $config['cf_cut_name']);
-            if (!$row2['wr_is_comment'] && $config['cf_use_copy_log']) {
-                if(strstr($row2['wr_option'], 'html')) {
-                    $log_tag1 = '<div class="content_'.$sw.'">';
-                    $log_tag2 = '</div>';
-                } else {
-                    $log_tag1 = "\n";
-                    $log_tag2 = '';
-                }
-
-                $row2['wr_content'] .= "\n".$log_tag1.'[이 게시물은 '.$nick.'님에 의해 '.G5_TIME_YMDHIS.' '.$board['bo_subject'].'에서 '.($sw == 'copy' ? '복사' : '이동').' 됨]'.$log_tag2;
-            }
 
             // 게시글 추천, 비추천수
             $wr_good = $wr_nogood = 0;
@@ -83,8 +72,6 @@ while ($row = sql_fetch_array($result))
                              mb_id = '{$row2['mb_id']}',
                              wr_password = '{$row2['wr_password']}',
                              wr_name = '".addslashes($row2['wr_name'])."',
-                             wr_email = '".addslashes($row2['wr_email'])."',
-                             wr_homepage = '".addslashes($row2['wr_homepage'])."',
                              wr_datetime = '{$row2['wr_datetime']}',
                              wr_file = '{$row2['wr_file']}',
                              wr_last = '{$row2['wr_last']}',

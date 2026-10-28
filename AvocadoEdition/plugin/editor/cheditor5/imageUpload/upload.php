@@ -89,14 +89,16 @@ if ($found != true) {
 	exit;
 }
 
-// ÀúÀå ÆÄÀÏ ÀÌ¸§: ³â¿ùÀÏ½ÃºĞÃÊ_·»´ı¹®ÀÚ8ÀÚ
+// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ì¸ï¿½: ï¿½ï¿½ï¿½ï¿½Ï½Ãºï¿½ï¿½ï¿½_ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½8ï¿½ï¿½
 // 20140327125959_abcdefghi.jpg
-// ¿øº» ÆÄÀÏ ÀÌ¸§: $_POST["origname"]
+// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ì¸ï¿½: $_POST["origname"]
 
 $filename = che_replace_filename($filename);
 $savefile = SAVE_DIR . '/' . $filename;
 
 move_uploaded_file($tempfile, $savefile);
+// CDN: ì—ë””í„° ì—…ë¡œë“œ ë¯¸ëŸ¬ë§ (ëª¨ë“ˆ ë¹„í™œì„±ì‹œ ë¬´ì‹œ)
+if (function_exists('cdn_after_upload')) cdn_after_upload($savefile);
 $imgsize = getimagesize($savefile);
 $filesize = filesize($savefile);
 

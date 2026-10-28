@@ -9,20 +9,69 @@ jQuery.fn.bindAll = function(options) {
 jQuery(function ($) {
     'use strict';
 
-    var ed_nonce = '';
+    /**
+     * 스마트에디터 업로드 논스
+     * - 일반: opener(iframe) 의 SE2M_Configuration
+     * - 팝업 중첩(스크립트 작성창): opener 가 상위 창 → window.ed_nonce / parent.ed_nonce
+     * - URL 쿼리로 전달된 경우도 허용
+     */
+    function tlGetEditorNonce() {
+        var n = '';
+        try {
+            var params = (window.location.search || '').replace(/^\?/, '').split('&');
+            for (var i = 0; i < params.length; i++) {
+                var p = params[i].split('=');
+                if (decodeURIComponent(p[0] || '') === '_nonce' && p.length > 1) {
+                    n = decodeURIComponent(p.slice(1).join('=') || '');
+                    break;
+                }
+            }
+        } catch (e0) {}
+        if (n) return n;
 
-    if( !!opener && !!opener.window && !!opener.window.nhn ){
-        ed_nonce = opener.window.nhn.husky.SE2M_Configuration.SE2M_Accessibility.ed_nonce;
+        try {
+            if (!opener || !opener.window) return '';
+            var w = opener.window;
+            if (w.ed_nonce) n = w.ed_nonce;
+            if (!n && w.nhn && w.nhn.husky && w.nhn.husky.SE2M_Configuration
+                && w.nhn.husky.SE2M_Configuration.SE2M_Accessibility) {
+                n = w.nhn.husky.SE2M_Configuration.SE2M_Accessibility.ed_nonce || '';
+            }
+            if (!n && w.parent && w.parent !== w && w.parent.ed_nonce) {
+                n = w.parent.ed_nonce;
+            }
+            if (!n && w.top && w.top.ed_nonce) {
+                n = w.top.ed_nonce;
+            }
+        } catch (e1) {}
+        return n || '';
     }
 
+    function tlGetCustomUploadUrl() {
+        try {
+            if (!opener || !opener.window) return '';
+            var w = opener.window;
+            if (w.g5_se2_upload_url) return w.g5_se2_upload_url;
+            if (w.parent && w.parent !== w && w.parent.g5_se2_upload_url) return w.parent.g5_se2_upload_url;
+            if (w.top && w.top.g5_se2_upload_url) return w.top.g5_se2_upload_url;
+        } catch (e2) {}
+        return '';
+    }
+
+    var ed_nonce = tlGetEditorNonce();
+    var customUploadUrl = tlGetCustomUploadUrl();
+
     // Change this to the location of your server-side upload handler:
+    // | 문자가 인코딩되지 않으면 일부 서버에서 요청이 거절되어 fileuploadfail 이 난다.
+    // 디렉터리 URL(./php/)은 POST 리다이렉트로 실패할 수 있어 index.php 를 명시한다.
+    // 타임라인 스크립트 작성창은 g5_se2_upload_url 로 전용 업로드를 사용한다.
     var gnu = {
-        url : './php/?_nonce='+ed_nonce,
+        url : customUploadUrl || ('./php/index.php?_nonce=' + encodeURIComponent(ed_nonce)),
         container_el : 'body',
         dreg_area : '#drag_area',
         dreg_area_list : '#drag_area > ul',
         progress_bar : '#progress .progress-bar',
-        filter : /^(image\/bmp|image\/gif|image\/jpg|image\/jpeg|image\/png)$/i,
+        filter : /^(image\/bmp|image\/gif|image\/jpg|image\/jpeg|image\/png|image\/webp)$/i,
         files : [],
         file_limit : 10, //한번에 올릴수 파일갯수 제한
         imgw : 100,
@@ -68,7 +117,7 @@ jQuery(function ($) {
                 delete_url = $button.attr("data-delete");
             if( delete_url ){
                 $.ajax({
-                    url: othis.url+"&del=1&file="+ delete_url
+                    url: othis.url+"&del=1&file="+ encodeURIComponent(delete_url)
                 }).done(function (result) {
                 });
             }
@@ -101,15 +150,15 @@ jQuery(function ($) {
                         $img = "<img src='"+file.url+"' width='"+ret['width']+"' height='"+ret['height']+"' class='pre_thumb' />";
                         
                     }
-                    if (!index) {
-                        node
-                            .prepend('<br>')
-                            .prepend($img);
-                        if(size_text){
-                            node.append('<br>')
-                            .append($('<span/>').text(size_text))
-                        }
+                if (!index) {
+                    node
+                        .prepend('<br>')
+                        .prepend($img);
+                    if(size_text){
+                        node.append('<br>')
+                        .append($('<span/>').text(size_text))
                     }
+                }
                 node.appendTo(data.context);
                 node.find(".delete_img").on("click", othis._delete);
             });
@@ -158,6 +207,9 @@ jQuery(function ($) {
         },
         _done : function(e, data){
             var othis = this;
+            if (!data || !data.result || !data.result.files) {
+                return;
+            }
             $.each(data.result.files, function (index, file) {
                 if (file.url && !file.error) {
                     var ret = othis.get_ratio( file.width, file.height ),
@@ -221,7 +273,7 @@ jQuery(function ($) {
         dropZone: $(gnu.dreg_area),
         autoUpload: true,
         sequentialUploads: true,
-        acceptFileTypes: /(\.|\/)(gif|jpe?g|bmp|png)$/i,
+        acceptFileTypes: /(\.|\/)(gif|jpe?g|bmp|png|webp)$/i,
         // Enable image resizing, except for Android and Opera,
         // which actually support image resizing, but fail to
         // send Blob objects via XHR requests:
@@ -237,10 +289,30 @@ jQuery(function ($) {
 
     }).on('fileuploadfail', function (e, data) {
         $.each(data.files, function (index, file) {
-            var error = $('<span class="text-danger"/>').text('File upload failed.');
-            $(data.context.children()[index])
-                .append('<br>')
-                .append(error);
+            var msg = 'File upload failed.';
+            try {
+                if (data && data.jqXHR) {
+                    var xhr = data.jqXHR;
+                    if (xhr.responseJSON && xhr.responseJSON.files) {
+                        var f = xhr.responseJSON.files[index] || xhr.responseJSON.files[0];
+                        if (f && f.error) msg = f.error;
+                    } else if (xhr.responseText) {
+                        var m = String(xhr.responseText).match(/"error"\s*:\s*"([^"]+)"/);
+                        if (m && m[1]) msg = m[1];
+                        else if (xhr.status) msg = 'Upload failed (HTTP ' + xhr.status + ')';
+                    } else if (xhr.status) {
+                        msg = 'Upload failed (HTTP ' + xhr.status + ')';
+                    }
+                } else if (!ed_nonce) {
+                    msg = '업로드 인증이 없습니다. 작성 창을 새로고침 후 다시 시도해 주세요.';
+                }
+            } catch (err) {}
+            var error = $('<span class="text-danger"/>').text(msg);
+            if (data.context && data.context.children) {
+                $(data.context.children()[index])
+                    .append('<br>')
+                    .append(error);
+            }
         });
     }).prop('disabled', !$.support.fileInput)
         .parent().addClass($.support.fileInput ? undefined : 'disabled');

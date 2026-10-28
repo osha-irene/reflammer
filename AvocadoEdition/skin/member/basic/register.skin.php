@@ -19,7 +19,7 @@ add_stylesheet('<link rel="stylesheet" href="'.$member_skin_url.'/style.css">', 
 		<section id="fregister_term">
 			<h2>커뮤니티 활동 규칙</h2>
 			<div class="theme-box">
-				<?=nl2br($config['cf_stipulation'])?>
+				<?php echo nl2br($config['cf_stipulation'])?>
 			</div>
 			<fieldset class="check-agree">
 				<input type="checkbox" name="agree" value="1" id="agree11">
@@ -30,7 +30,7 @@ add_stylesheet('<link rel="stylesheet" href="'.$member_skin_url.'/style.css">', 
 		<section id="fregister_private">
 			<h2>캐릭터 유의사항</h2>
 			<div class="theme-box">
-				<?=nl2br($config['cf_privacy'])?>
+				<?php echo nl2br($config['cf_privacy'])?>
 			</div>
 			<fieldset class="check-agree">
 				<input type="checkbox" name="agree2" value="1" id="agree21">

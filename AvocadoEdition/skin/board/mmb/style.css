@@ -15,7 +15,7 @@
 .help.ui-btn		{ width: 100%; padding: 8px; line-height: 1.2em; border-radius: 3px; }
 .ui-paging			{ margin-bottom:0; padding-bottom:0;}
 
-
+.mmb-cmt-block		{ text-align:center; width: 98%;margin: -10px auto 0 auto;}
 /***************************************
 	List Page
 ****************************************/
@@ -67,7 +67,7 @@
 #log_list .item	.ui-pic .pic-header .new:before		{ content: '\ea7e'; display: block; position: absolute; top: 0; left: 0; right: 0; bottom: 0; line-height: 30px; text-indent: 0; text-align: center; font-size: 11px; font-family: 'icon'; font-weight: bold;}
 
 /* 카테고리 */
-#log_list .item	.ui-pic .ico-category	{ font-size: 11px; font-family: 'Dotum'; font-weight: 400; }
+#log_list .item	.ui-pic .ico-category	{ font-size: 11px; font-weight: 400; }
 
 #log_list .item .ui-pic .pic-data							{ text-align: center; }
 #log_list .item .ui-pic .pic-data.ui-blind					{ overflow: hidden; height: 250px; }
@@ -94,7 +94,7 @@
 #log_list .item-comment .co-header i		{ display: inline-block; height: 25px; }
 #log_list .item-comment .co-header i img	{ max-height: 100%; }
 
-#log_list .item-comment .co-content							{ padding: 10px 15px; line-height: 1.6em; font-family: 'Dotum'; }
+#log_list .item-comment .co-content							{ padding: 10px 15px; line-height: 1.6em; }
 #log_list .item-comment .co-content .log_link_tag:before	{ content: "\e936"; font-family: 'icon'; padding-right: 5px; }
 #log_list .item-comment .co-content .member_call			{ padding: 0 5px; }
 #log_list .item-comment .co-content .member_call:before		{ content: "\e951"; font-family: 'icon'; padding-right: 3px;  }
@@ -119,6 +119,9 @@
 #log_list .bo_vc_w									{ position: relative; padding-right: 70px; }
 #log_list .bo_vc_w .input-comment					{ position: relative; margin-bottom: 5px; }
 #log_list .bo_vc_w .input-comment textarea			{ display: block; width: 100%; height: 80px; box-sizing: border-box; margin: 0;}
+#log_list .bo_vc_w .action-check					{ background: var(--d-btn_default-1, transparent);}
+#log_list .bo_vc_w .action-check select				{display: inline-block;width: auto; vertical-align: middle;margin-right: 10px;}
+#log_list .bo_vc_w .action-check .mmb-item-effect	{ display: block; }
 
 #log_list .bo_vc_w .btn_confirm						{ display: block; position: absolute; top: 0; right: 0; bottom: 0; width: 70px; }
 #log_list .bo_vc_w .btn_confirm .ui-comment-submit	{ display: block; width: 100%; height: 100%; }
@@ -189,13 +192,19 @@
 #board_category input:checked + label:after	{ content: " 》"; }
 
 #board_action		{ padding-top: 15px; }
+#bo_w .mmb-item-write { padding-top: 15px; }
+#bo_w .mmb-item-write .mmb-item-mode { line-height: 30px; }
+#bo_w .mmb-item-write .mmb-item-mode-opt { display: inline-block; padding-right: 12px; cursor: pointer; }
+#bo_w .mmb-item-write select { width: 100%; box-sizing: border-box; }
+#bo_w .mmb-item-write .mmb-item-gift-to { margin-top: 5px; }
+#bo_w .mmb-item-write .mmb-item-empty { margin: 0; font-size: 12px; line-height: 1.4; }
 
 #load_log_board .inner { padding: 0 30px 0; }
 @media all and (max-width: 640px) {
 	#load_log_board .inner { padding: 0 0 0; }
 }
 
-.comment-data						{ display: none; padding: 10px 0 10px 20px; border-left: 1px solid #996c33; margin-left: 5px;  }
+.comment-data						{ display: none; padding: 10px 0 10px 20px; border-left: 1px solid #996c33;  background: var(--d-btn_default-1, transparent);  }
 .comment-data.on					{ display: block; }
 .comment-data select,
 .comment-data input[type="text"]	{ width: 100%; box-sizing: border-box; }
@@ -231,4 +240,29 @@
 .guest-box .name label	{ display: block; position: absolute; top: 0; left: 0; width: 60px; line-height: 30px; }
 .guest-box .pw			{ position: relative; padding-left: 60px; box-sizing: border-box; }
 .guest-box .pw label	{ display: block; position: absolute; top: 0; left: 0; width: 60px; line-height: 30px; }
+/* 아이템 효과 표시 */
+.mmb-item-effect        { margin-top: 4px; padding: 4px 8px; background: rgba(0,0,0,.05); border-radius: 3px; font-size: 12px; line-height: 1.4; }
+.mmb-item-effect strong { margin-right: 4px; }
 
+/*글자수 제한*/
+.mmb-cl-badge{
+	position: absolute;
+	right: 0px;
+	top: 56px;
+	font-size: 12px;
+	opacity: 0.3;
+	pointer-events: none;
+	padding: 1px 6px;
+}
+/*글자수 제한*/
+.mmb-cl-badge{
+	position: absolute;
+	right: 0px;
+	top: 56px;
+	font-size: 12px;
+	opacity: 0.3;
+	pointer-events: none;
+	padding: 1px 6px;
+}
+.modify_area .mmb-cl-badge{right:60px; bottom:0px; top:initial;}
+#bo_w .mmb-cl-badge{bottom: 40px;top:initial;}

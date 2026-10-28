@@ -29,15 +29,15 @@ if($w == '') {
 		<body>
 			<form name="fboardpassword" id="fboardpassword" action="./write.php" method="post">
 				<input type="hidden" name="w" value="u">
-				<input type="hidden" name="bo_table" value="<?=$bo_table?>">
-				<input type="hidden" name="wr_id" value="<?=$wr_id?>">
-				<input type="hidden" name="wr_password" value="<?=$_POST['wr_password']?>">
+				<input type="hidden" name="bo_table" value="<?php echo $bo_table?>">
+				<input type="hidden" name="wr_id" value="<?php echo $wr_id?>">
+				<input type="hidden" name="wr_password" value="<?php echo $_POST['wr_password']?>">
 				<button type="submit"></button>
 			</form>
 			<script>document.getElementById('fboardpassword').submit();</script>
 		</body>
 	</html>
-<?
+<?php 
 	exit;
 	}
 }
@@ -68,6 +68,12 @@ if($write['wr_ing'] == '1') {
 				set wr_ing = '0'
 			  where wr_id = '{$wr_id}' ";
 	sql_query($sql);
+}
+
+if (function_exists('mdl_do_action')) {
+	mdl_do_action('bbs_post_after', $bo_table, $wr_id, $w);
+	// 표준 write_after 도 발사 — bbs_item_use 등 게시판 공유 모듈이 구독
+	mdl_do_action('write_after', $bo_table, $wr_id, $w);
 }
 
 if ($file_upload_msg) {

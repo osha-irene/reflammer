@@ -33,7 +33,7 @@ $write_page = get_paging(G5_IS_MOBILE ? $config['cf_mobile_pages'] : $config['cf
 </div>
 
 <div class="ui-chatting-memo">
-<?
+<?php 
 	for($i=0; $row = sql_fetch_array($result); $i++) {
 		$me = sql_fetch("select * from {$g5['memo_table']} where me_id = '{$row['me_id']}'");
 		$total = $row['count'];
@@ -43,45 +43,49 @@ $write_page = get_paging(G5_IS_MOBILE ? $config['cf_mobile_pages'] : $config['cf
 ?>
 	<div class="message-item index you">
 		<div class="thumb">
-		<? if($ch['ch_thumb']){?>
-			<img src="<?=$ch['ch_thumb']?>" />
-		<? } ?>
+		<?php  if($ch['ch_thumb']){?>
+			<img src="<?php echo $ch['ch_thumb']?>" />
+		<?php  } ?>
 		</div>
 		<div class="detail theme-box">
 			<h3>
-				<strong><?=$mb['mb_name']?>&nbsp;</strong>
+				<strong><?php echo $mb['mb_name']?>&nbsp;</strong>
 			</h3>
 			<div class="info">
 				<span class="date">
-					<strong class="not-mo"><?=$me['me_send_datetime']?></strong>
-					<strong class="only-mo"><?=date('m-d H:i', strtotime($me['me_send_datetime']))?></strong>
+					<strong class="not-mo"><?php echo $me['me_send_datetime']?></strong>
+					<strong class="only-mo"><?php echo date('m-d H:i', strtotime($me['me_send_datetime']))?></strong>
 				</span>
-				<? if($me['me_read_datetime'] == '0000-00-00 00:00:00' && $me['me_send_mb_id'] != $member['mb_id']) { ?>
+				<?php  if($me['me_read_datetime'] == '0000-00-00 00:00:00' && $me['me_send_mb_id'] != $member['mb_id']) { ?>
 				<i class="ico-new">N</i>
-				<? } ?>
+				<?php  } ?>
 				<i class="ico-total ui-btn point">T</i>
 				<span class="total-text">
-					<?=$total?>
+					<?php echo $total?>
 				</span>
 			</div>
-			<div class="text no-link theme-box <? if($me['me_send_mb_id'] == $member['mb_id']) { ?> mine<? } ?>">
-				<a href="./memo_view.php?re_mb_id=<?=$row['mb_id']?>">
-					<? if($me['me_send_mb_id'] == $member['mb_id']) { ?>
+			<div class="text no-link theme-box <?php  if($me['me_send_mb_id'] == $member['mb_id']) { ?> mine<?php  } ?>">
+				<a href="./memo_view.php?re_mb_id=<?php echo $row['mb_id']?>">
+					<?php  if($me['me_send_mb_id'] == $member['mb_id']) { ?>
 					ME ▶
-					<? } ?>
-					<?php echo conv_subject($me['me_memo'], 120, '...'); ?>
+					<?php  } ?>
+					<?php
+					$_memo_sub = conv_subject($me['me_memo'], 120, '...');
+					if (!empty($config['cf_use_memo_emoticon']) && function_exists('emote_ev')) $_memo_sub = emote_ev($_memo_sub);
+					echo $_memo_sub;
+					?>
 				</a>
 			</div>
 		</div>
 	</div>
-<? } ?>
+<?php  } ?>
 </div>
 
-<?=$write_page?>
+<?php echo $write_page?>
 
 <hr class="padding" />
 <hr class="padding" />
 
-<?
+<?php 
 include_once('./_tail.php');
 ?>

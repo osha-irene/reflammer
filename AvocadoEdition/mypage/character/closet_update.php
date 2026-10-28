@@ -10,6 +10,13 @@ if($member['mb_id'] != $ch['mb_id']) {
 	alert('의상을 관리할 권한이 없습니다.', './viewer.php?ch_id='.$ch_id);
 }
 
+// 시기
+$cl_time = (int)ses($_POST, 'cl_time', 0, 'int');
+if ($cl_time < 1) $cl_time = (int)ses($_GET, 'cl_time', 0, 'int');
+if ($cl_time < 1) $cl_time = get_current_time();
+if ($cl_time < 1) $cl_time = 1;
+$_redir_qs = '?ch_id='.$ch_id.($cl_time > 1 ? '&time='.$cl_time : '');
+
 $character_image_path = G5_DATA_PATH."/character/".$ch['mb_id']."/closet";
 $character_image_url = G5_DATA_URL."/character/".$ch['mb_id']."/closet";
 
@@ -48,7 +55,7 @@ if($w == '') {
 	}
 	$sql_add .= " , cl_path		= '{$cl_path}'";
 
-	sql_query("insert into {$g5['closthes_table']} set ch_id = '{$ch['ch_id']}', cl_subject = '{$cl_subject}', cl_path = '{$cl_path}', cl_use = '0'");
+	sql_query("insert into {$g5['closthes_table']} set ch_id = '{$ch['ch_id']}', cl_subject = '{$cl_subject}', cl_path = '{$cl_path}', cl_use = '0', cl_time = '{$cl_time}'");
 
 } else { 
 
@@ -56,9 +63,12 @@ if($w == '') {
 	if(!$cl['cl_id']) {
 		alert('의상 정보를 확인할 수 없습니다.', './viewer.php?ch_id='.$ch_id);
 	}
+	$cl_time = (int)$cl['cl_time'];
+	if ($cl_time < 1) $cl_time = 1;
+	$_redir_qs = '?ch_id='.$ch_id.($cl_time > 1 ? '&time='.$cl_time : '');
 
 	if($w == 'u') { 
-		sql_query("update {$g5['closthes_table']} set cl_use = '0' where cl_id != '{$cl['cl_id']}' and ch_id = '{$ch['ch_id']}'");
+		sql_query("update {$g5['closthes_table']} set cl_use = '0' where cl_id != '{$cl['cl_id']}' and ch_id = '{$ch['ch_id']}' and cl_time = '{$cl_time}'");
 		sql_query("update {$g5['closthes_table']} set cl_use = '1' where cl_id = '{$cl['cl_id']}'");
 	} else if($w == 'd') { 
 		if($cl['cl_type'] == 'default') {
@@ -75,5 +85,5 @@ if($w == '') {
 	}
 }
 
-goto_url('./viewer.php?ch_id='.$ch_id);
+goto_url('./viewer.php'.$_redir_qs);
 ?>

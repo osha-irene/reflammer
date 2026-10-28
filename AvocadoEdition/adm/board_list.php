@@ -7,7 +7,7 @@ auth_check($auth[$sub_menu], 'r');
 $sql_common = " from {$g5['board_table']} a ";
 $sql_search = " where (1) ";
 
-if ($is_admin != "super") {
+if (!$is_admin) {
 	$sql_common .= " , {$g5['group_table']} b ";
 	$sql_search .= " and (a.gr_id = b.gr_id and b.gr_admin = '{$member['mb_id']}') ";
 }
@@ -50,6 +50,9 @@ $listall = '<a href="'.$_SERVER['SCRIPT_NAME'].'" class="ov_listall">전체목�
 
 $g5['title'] = '게시판관리';
 include_once('./admin.head.php');
+$mgmt_hub = 'board';
+$mgmt_hub_tab = 'list';
+include_once('./_mgmt_hub_tabs.inc.php');
 
 $colspan = 10;
 ?>
@@ -73,7 +76,7 @@ $colspan = 10;
 
 </form>
 
-<?php if ($is_admin == 'super') { ?>
+<?php if ($is_admin) { ?>
 <div class="btn_add01 btn_add">
 	<a href="./board_form.php" id="bo_add">게시판 추가</a>
 </div>
@@ -122,7 +125,7 @@ $colspan = 10;
 			<input type="checkbox" name="chk[]" value="<?php echo $i ?>" id="chk_<?php echo $i ?>">
 		</td>
 		<td>
-			<?php if ($is_admin == 'super'){ ?>
+			<?php if ($is_admin){ ?>
 				<?php echo get_group_select("gr_id[$i]", $row['gr_id']) ?>
 			<?php }else{ ?>
 				<input type="hidden" name="gr_id[<?php echo $i ?>]" value="<?php echo $row['gr_id'] ?>"><?php echo $row['gr_subject'] ?>
@@ -172,7 +175,7 @@ $colspan = 10;
 
 <div class="btn_list01 btn_list">
 	<input type="submit" name="act_button" value="선택수정" onclick="document.pressed=this.value">
-	<?php if ($is_admin == 'super') { ?>
+	<?php if ($is_admin) { ?>
 	<input type="submit" name="act_button" value="선택삭제" onclick="document.pressed=this.value">
 	<?php } ?>
 </div>

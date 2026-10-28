@@ -11,11 +11,11 @@ add_stylesheet('<link rel="stylesheet" href="'.$board_skin_url.'/style.css">', 0
 <div class="frame-theme-BODY">
 	<div class="inner">
 
-		<? if($board['bo_content_head']) { ?>
-			<div class="board-notice frm-theme-NOTICE">
-				<?=stripslashes($board['bo_content_head']);?>
+		<?php  if($board['bo_content_head']) { ?>
+			<div class="board-notice">
+				<?php echo stripslashes($board['bo_content_head']);?>
 			</div>
-		<? } ?>
+		<?php  } ?>
 
 		<!-- 게시판 목록 시작 { -->
 		<div id="bo_list">
@@ -24,7 +24,7 @@ add_stylesheet('<link rel="stylesheet" href="'.$board_skin_url.'/style.css">', 0
 			<?php if ($is_category) { ?>
 			<nav  class="board-category">
 				<ul>
-					<li <?=!$sca == ''? 'class="selected"' : ''?>><a href="./board.php?bo_table=<?=$bo_table?>">ALL</a></li><? echo $category_list ?>
+					<li <?php echo !$sca == ''? 'class="selected"' : ''?>><a href="./board.php?bo_table=<?php echo $bo_table?>">ALL</a></li><?php  echo $category_list ?>
 				</ul>
 			</nav>
 			<?php } ?>
@@ -40,7 +40,7 @@ add_stylesheet('<link rel="stylesheet" href="'.$board_skin_url.'/style.css">', 0
 			<input type="hidden" name="page" value="<?php echo $page ?>">
 			<input type="hidden" name="sw" value="">
 
-			<table class="board-list">
+			<table class="board-list theme-list">
 				<caption><?php echo $board['bo_subject'] ?> 목록</caption>
 				<colgroup>
 					<col style="width: 80px;" />
@@ -62,7 +62,7 @@ add_stylesheet('<link rel="stylesheet" href="'.$board_skin_url.'/style.css">', 0
 				<?php
 				for ($i=0; $i<count($list); $i++) {
 				 ?>
-				<tr class="bg-<?=$i%2?> <?php if ($list[$i]['is_notice']) echo "bo_notice"; ?>">
+				<tr class="bg-<?php echo $i%2?> <?php if ($list[$i]['is_notice']) echo "bo_notice"; ?>">
 					<td class="td_num">
 					<?php
 					if ($list[$i]['is_notice']) // 공지사항

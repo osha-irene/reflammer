@@ -95,8 +95,7 @@ function get_sql_search_mmb($search_ca_name, $search_field, $search_text, $searc
 		if ($search_str == "") continue;
 
 		// 인기검색어
-		insert_popular($field, $search_str);
-
+	
 		$str .= $op1;
 		$str .= "(";
 
@@ -151,6 +150,10 @@ function get_sql_search_mmb($search_ca_name, $search_field, $search_text, $searc
 	$str .= " ) ";
 	if ($not_comment)
 		$str .= " and wr_is_comment = '0' ";
+
+	if (function_exists('mdl_apply_filters')) {
+		$str = mdl_apply_filters('sql_search_mmb_where', $str, $search_ca_name, $search_field, $search_text);
+	}
 
 	return $str;
 }

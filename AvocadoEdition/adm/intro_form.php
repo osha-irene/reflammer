@@ -1,5 +1,5 @@
 <?php
-$sub_menu = '100330';
+$sub_menu = "100400";
 include_once('./_common.php');
 
 auth_check($auth[$sub_menu], "w");
@@ -40,34 +40,34 @@ include_once (G5_ADMIN_PATH.'/admin.head.php');
 			<tr>
 				<th scope="row" rowspan="2">인트로 이미지</th>
 				<td rowspan="2" class="txt-center bo-right ">
-				<? if($bn['bn_img']) { ?>
-					<img src="<?=$bn['bn_img']?>" class="prev_thumb" />
-				<? } else { ?>
+				<?php  if($bn['bn_img']) { ?>
+					<img src="<?php echo $bn['bn_img']?>" class="prev_thumb" />
+				<?php  } else { ?>
 					이미지 없음
-				<? } ?>
+				<?php  } ?>
 				</td>
 				<td>
 					직접등록&nbsp;&nbsp; <input type="file" name="bn_img_file" size="50"/>
 				</td></tr><tr>
 				<td>
-					외부경로&nbsp;&nbsp; <input type="text" name="bn_img" value="<?=$bn['bn_img']?>" size="50"/>
+					외부경로&nbsp;&nbsp; <input type="text" name="bn_img" value="<?php echo $bn['bn_img']?>" size="50"/>
 				</td>
 			</tr>
 
 			<tr>
 				<th scope="row" rowspan="2">인트로 모바일 이미지</th>
 				<td rowspan="2" class="txt-center bo-right ">
-				<? if($bn['bn_img']) { ?>
-					<img src="<?=$bn['bn_m_img']?>" class="prev_thumb" />
-				<? } else { ?>
+				<?php  if($bn['bn_img']) { ?>
+					<img src="<?php echo $bn['bn_m_img']?>" class="prev_thumb" />
+				<?php  } else { ?>
 					이미지 없음
-				<? } ?>
+				<?php  } ?>
 				</td>
 				<td>
 					직접등록&nbsp;&nbsp; <input type="file" name="bn_m_img_file" size="50"/>
 				</td></tr><tr>
 				<td>
-					외부경로&nbsp;&nbsp; <input type="text" name="bn_m_img" value="<?=$bn['bn_m_img']?>" size="50"/>
+					외부경로&nbsp;&nbsp; <input type="text" name="bn_m_img" value="<?php echo $bn['bn_m_img']?>" size="50"/>
 				</td>
 			</tr>
 
@@ -101,6 +101,13 @@ include_once (G5_ADMIN_PATH.'/admin.head.php');
 				<td colspan="2">
 					<?php echo help("인트로를 출력할 때 순서를 정합니다. 숫자가 작을수록 먼저 출력됩니다."); ?>
 					<?php echo order_select("bn_order", $bn['bn_order']); ?>
+				</td>
+			</tr>
+
+			<tr>
+				<th scope="row">출력 시기</th>
+				<td colspan="2">
+					<?php av_time_checkbox_group('bn_time', isset($bn['bn_time']) ? $bn['bn_time'] : ''); ?>
 				</td>
 			</tr>
 

@@ -30,6 +30,8 @@ $(function(){
 	});
 	
 	$('.gnb_1da').bind('click', function(){
+		// no-submenu 클래스(메뉴 000 등) 은 기본 링크 동작 허용 (즉시 이동)
+		if ($(this).hasClass('no-submenu')) { return true; }
 		var gnb_parent = $(this).closest('li');
 
 		if(gnb_parent.hasClass('on')) { 
@@ -48,6 +50,7 @@ $(function(){
 
 </script>
 
+<?php if (function_exists('mdl_do_action')) mdl_do_action('admin_tail'); ?>
 <?php
 include_once(G5_PATH.'/tail.sub.php');
 ?>

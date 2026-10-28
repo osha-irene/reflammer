@@ -1,9 +1,21 @@
 @charset "utf-8";
 @import url('../../../css/swiper.css');
 
-.ban-basic			{ position: relative; opacity: 1; }
+.ban-basic			{ position: relative; opacity: 1; overflow: hidden; }
 
-.ban-basic .slides li img	{ width: 100%; }
+.ban-basic .slides li img,
+.ban-basic .swiper-slide img	{ width: 100%; height: auto; display: block; }
+
+@media all and (max-width:1024px) {
+	.ban-basic .flex-direction-nav a,
+	.ban-basic .swiper-button-prev,
+	.ban-basic .swiper-button-next {
+		width: 32px;
+		height: 32px;
+		margin-top: -16px;
+	}
+	.ban-basic .flex-direction-nav a:before { line-height: 32px; font-size: 13px; }
+}
 
 .ban-basic .flex-direction-nav a	{
 	display: block;

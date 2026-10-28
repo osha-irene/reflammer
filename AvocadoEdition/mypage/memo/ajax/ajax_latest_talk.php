@@ -46,6 +46,6 @@ if($total > 0 ) {
 		include('../memo_view.skin.php');
 	}
 	?>
-	<i id="last_idx" style="display: none;"><?=$last_me_id ?></i>
-	<i id="last_count" style="display: none;"><?=$i?></i>
-<? } ?>
+	<i id="last_idx" style="display: none;"><?php echo $last_me_id ?></i>
+	<i id="last_count" style="display: none;"><?php echo $i?></i>
+<?php  } ?>

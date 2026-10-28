@@ -33,6 +33,8 @@ if ($sop != 'and' && $sop != 'or')
 
 // 분류 선택 또는 검색어가 있다면
 $stx = trim($stx);
+$log    = isset($log)    ? (int)$log    : 0;
+$single = isset($single) ? (string)$single : '';
 if ($sca || $stx) {
     $sql_search = get_sql_search($sca, $sfl, $stx, $sop);
 
@@ -55,19 +57,33 @@ if ($sca || $stx) {
     $result = sql_query($sql);
     $total_count = sql_num_rows($result);
     */
+} elseif ($log > 0) {
+    // @글번호 로그링크: ?log=NUM&single=Y
+    $log_num = $log * -1;
+    $sql_search = " wr_is_comment = '0' and wr_num >= {$log_num} ";
+    if ($single === 'Y') {
+        $sql_search .= " and wr_num < " . ($log_num + 1);
+    }
+    $sql = " SELECT COUNT(DISTINCT wr_parent) AS cnt FROM {$write_table} WHERE {$sql_search} ";
+    $row = sql_fetch($sql);
+    $total_count = isset($row['cnt']) ? (int)$row['cnt'] : 0;
 } else {
     $sql_search = "";
 
     $total_count = $board['bo_count_write'];
 }
 
-if(G5_IS_MOBILE) {
-    $page_rows = 5;
-    $list_page_rows = 5;
+if (G5_IS_MOBILE) {
+    $page_rows = (int)(isset($board['bo_mobile_page_rows']) ? $board['bo_mobile_page_rows'] : 0);
+    if ($page_rows <= 0) {
+        $page_rows = (int)(isset($board['bo_page_rows']) ? $board['bo_page_rows'] : 0);
+    }
+    if ($page_rows <= 0) $page_rows = 15;
 } else {
-    $page_rows = $board['bo_page_rows'];
-    $list_page_rows = $board['bo_page_rows'];
+    $page_rows = (int)(isset($board['bo_page_rows']) ? $board['bo_page_rows'] : 0);
+    if ($page_rows <= 0) $page_rows = 15;
 }
+$list_page_rows = $page_rows;
 
 if ($page < 1) { $page = 1; } // 페이지가 없으면 첫 페이지 (1 페이지)
 
@@ -80,7 +96,7 @@ $notice_count = 0;
 $notice_array = array();
 
 // 공지 처리
-if (!$sca && !$stx) {
+if (!$sca && !$stx && !$log) {
     $arr_notice = explode(',', trim($board['bo_notice']));
     $from_notice_idx = ($page - 1) * $page_rows;
     if($from_notice_idx < 0)
@@ -128,7 +144,7 @@ if(!empty($notice_array)) {
 
 // 관리자라면 CheckBox 보임
 $is_checkbox = false;
-if ($is_member && ($is_admin == 'super' || $group['gr_admin'] == $member['mb_id'] || $board['bo_admin'] == $member['mb_id']))
+if ($is_member && ($is_admin || $group['gr_admin'] == $member['mb_id'] || $board['bo_admin'] == $member['mb_id']))
     $is_checkbox = true;
 
 // 정렬에 사용하는 QUERY_STRING
@@ -162,7 +178,7 @@ if ($sst) {
     $sql_order = " order by {$sst} {$sod} ";
 }
 
-if ($sca || $stx) {
+if ($sca || $stx || $log > 0) {
     $sql = " select distinct wr_parent from {$write_table} where {$sql_search} {$sql_order} limit {$from_record}, $page_rows ";
 } else {
     $sql = " select * from {$write_table} where wr_is_comment = 0 ";
@@ -241,5 +257,7 @@ if ($board['bo_use_rss_view']) {
 }
 
 $stx = get_text(stripslashes($stx));
+if (function_exists('mdl_apply_filters')) echo mdl_apply_filters('list_top', '', $bo_table);
 include_once($board_skin_path.'/list.skin.php');
+if (function_exists('mdl_apply_filters')) echo mdl_apply_filters('list_bottom', '', $bo_table);
 ?>

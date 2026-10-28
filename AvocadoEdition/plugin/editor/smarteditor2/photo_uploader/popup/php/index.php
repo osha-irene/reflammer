@@ -26,7 +26,12 @@ $ym = date('ym', G5_SERVER_TIME);
 $data_dir = G5_DATA_PATH.'/editor/'.$ym.'/';
 $data_url = G5_DATA_URL.'/editor/'.$ym.'/';
 
-@mkdir($data_dir, G5_DIR_PERMISSION);
+// parent editor 디렉터리까지 재귀 생성
+if (!is_dir(G5_DATA_PATH.'/editor')) {
+    @mkdir(G5_DATA_PATH.'/editor', G5_DIR_PERMISSION, true);
+}
+@mkdir($data_dir, G5_DIR_PERMISSION, true);
+@chmod(G5_DATA_PATH.'/editor', G5_DIR_PERMISSION);
 @chmod($data_dir, G5_DIR_PERMISSION);
 
 if(!function_exists('ft_nonce_is_valid')){
@@ -35,8 +40,26 @@ if(!function_exists('ft_nonce_is_valid')){
 
 $is_editor_upload = false;
 
-if( isset($_GET['_nonce']) && ft_nonce_is_valid( $_GET['_nonce'] , 'smarteditor' ) ){
+// G5 common.php 가 $_GET 에 addslashes 를 적용하므로 검증 전 1회 제거
+$editor_nonce = '';
+if (isset($_GET['_nonce'])) {
+    $editor_nonce = stripslashes((string)$_GET['_nonce']);
+} elseif (isset($_POST['_nonce'])) {
+    $editor_nonce = stripslashes((string)$_POST['_nonce']);
+}
+
+if ($editor_nonce !== '' && function_exists('ft_nonce_is_valid') && ft_nonce_is_valid($editor_nonce, 'smarteditor')) {
     $is_editor_upload = true;
+}
+
+// 팝업 중첩 등으로 논스가 깨져도, 로그인 회원이면 업로드 허용
+if (!$is_editor_upload && !empty($is_member)) {
+    $is_editor_upload = true;
+}
+
+// common/extend 출력이 JSON을 깨지 않게 버퍼 비우기
+while (ob_get_level() > 0) {
+    ob_end_clean();
 }
 
 if( $is_editor_upload ) {
@@ -53,6 +76,7 @@ if( $is_editor_upload ) {
     $upload_handler = new UploadHandler($options);
 
 } else {
-    echo json_encode(array('files'=>array('0'=>array('error'=>'정상적인 업로드가 아닙니다.'))));
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode(array('files'=>array(array('error'=>'정상적인 업로드가 아닙니다. 로그인 후 다시 시도해 주세요.'))));
     exit;
 }

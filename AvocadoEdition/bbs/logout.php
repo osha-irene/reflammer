@@ -1,6 +1,8 @@
 <?php
 include_once('./_common.php');
 
+if (function_exists('mdl_do_action')) mdl_do_action('member_logout', isset($member['mb_id']) ? $member['mb_id'] : '');
+
 // 이호경님 제안 코드
 session_unset(); // 모든 세션변수를 언레지스터 시켜줌
 session_destroy(); // 세션해제함

@@ -1,11 +1,11 @@
 <?php
-$sub_menu = "100290";
+$sub_menu = "100200";
 include_once('./_common.php');
 
 check_demo();
 
-if ($is_admin != 'super')
-    alert('최고관리자만 접근 가능합니다.');
+if (!$is_admin)
+    alert('관리자만 접근 가능합니다.');
 
 check_admin_token();
 

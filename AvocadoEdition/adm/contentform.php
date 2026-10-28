@@ -1,37 +1,9 @@
 <?php
-$sub_menu = '300600';
+$sub_menu = "310201";
 include_once('./_common.php');
 include_once(G5_EDITOR_LIB);
 
 auth_check($auth[$sub_menu], "w");
-
-// 상단, 하단 파일경로 필드 추가
-if(!sql_query(" select co_include_head from {$g5['content_table']} limit 1 ", false)) {
-	$sql = " ALTER TABLE `{$g5['content_table']}`  ADD `co_include_head` VARCHAR( 255 ) NOT NULL ,
-													ADD `co_include_tail` VARCHAR( 255 ) NOT NULL ";
-	sql_query($sql, false);
-}
-
-// html purifier 사용여부 필드
-if(!sql_query(" select co_tag_filter_use from {$g5['content_table']} limit 1 ", false)) {
-	sql_query(" ALTER TABLE `{$g5['content_table']}`
-					ADD `co_tag_filter_use` tinyint(4) NOT NULL DEFAULT '0' AFTER `co_content` ", true);
-	sql_query(" update {$g5['content_table']} set co_tag_filter_use = '1' ");
-}
-
-// 모바일 내용 추가
-if(!sql_query(" select co_mobile_content from {$g5['content_table']} limit 1", false)) {
-	sql_query(" ALTER TABLE `{$g5['content_table']}`
-					ADD `co_mobile_content` longtext NOT NULL AFTER `co_content` ", true);
-}
-
-// 스킨 설정 추가
-if(!sql_query(" select co_skin from {$g5['content_table']} limit 1 ", false)) {
-	sql_query(" ALTER TABLE `{$g5['content_table']}`
-					ADD `co_skin` varchar(255) NOT NULL DEFAULT '' AFTER `co_mobile_content`,
-					ADD `co_mobile_skin` varchar(255) NOT NULL DEFAULT '' AFTER `co_skin` ", true);
-	sql_query(" update {$g5['content_table']} set co_skin = 'basic', co_mobile_skin = 'basic' ");
-}
 
 $html_title = "내용";
 $g5['title'] = $html_title.' 관리';
@@ -50,12 +22,17 @@ else
 {
 	$html_title .= ' 입력';
 	$co['co_html'] = 2;
-	$co['co_skin'] = 'basic';
-	$co['co_mobile_skin'] = 'basic';
+	$co['co_skin'] = '';
+	$co['co_mobile_skin'] = '';
 }
 
-include_once (G5_ADMIN_PATH.'/admin.head.php');
+$g5['title'] = $html_title;
+include_once(G5_ADMIN_PATH.'/admin.head.php');
 ?>
+
+<div class="btn_add01 btn_add">
+    <a href="./content_design_form.php">문서 디자인 설정</a>
+</div>
 
 <form name="frmcontentform" action="./contentformupdate.php" onsubmit="return frmcontentform_check(this);" method="post" enctype="MULTIPART/FORM-DATA" >
 <input type="hidden" name="w" value="<?php echo $w; ?>">
@@ -91,9 +68,10 @@ include_once (G5_ADMIN_PATH.'/admin.head.php');
 		<td><?php echo editor_html('co_mobile_content', get_text($co['co_mobile_content'], 0)); ?></td>
 	</tr>
 	<tr>
-		<th scope="row"><label for="co_skin">스킨 디렉토리<strong class="sound_only">필수</strong></label></th>
+		<th scope="row"><label for="co_skin">스킨 디렉토리</label></th>
 		<td>
-			<?php echo get_skin_select('content', 'co_skin', 'co_skin', $co['co_skin'], 'required'); ?>
+			<?php echo get_skin_select('content', 'co_skin', 'co_skin', $co['co_skin'], '', array('empty_label'=>'테마 프리셋에 따름','preset_type'=>'content')); ?>
+			<?php echo help('비워두면 테마 프리셋의 「문서 디자인」 또는 글로벌 설정이 적용됩니다. 「디자인 프리셋」 그룹은 코드를 따로 두지 않고 색상·여백 등 프리셋 설정만 적용하는 옵션이며, 「코어/테마」 그룹은 해당 폴더의 스킨 코드를 사용합니다.'); ?>
 		</td>
 	</tr>
 	<tr>

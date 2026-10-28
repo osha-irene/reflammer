@@ -1,22 +1,21 @@
 <?php
-$sub_menu = "100200";
+$sub_menu = "100100";
 include_once('./_common.php');
 include_once(G5_ADMIN_PATH."/config_form_prev.php");
 include_once(G5_EDITOR_LIB);
 
-auth_check($auth[$sub_menu], 'r');
-
-if ($is_admin != 'super')
-	alert('최고관리자만 접근 가능합니다.');
+if (!$is_admin)
+	alert('관리자만 접근 가능합니다.');
 
 $g5['title'] = '커뮤니티 설정';
 include_once ('./admin.head.php');
 
 $pg_anchor = '<ul class="anchor">
-	<li><a href="#anc_001">기본설정</a></li>
-	<li><a href="#anc_002">기능설정</a></li>
-	<li><a href="#anc_004">카테고리 설정</a></li>
-	<li><a href="#anc_003">기타항목설정</a></li>
+	<li><a href="#anc_001">기본환경</a></li>
+	<li><a href="#anc_003">기타항목 명칭</a></li>
+	<li><a href="#anc_007">여분 필드 (cf_1~cf_10)</a></li>
+	<li><a href="#anc_008">접속 제한</a></li>
+	<li><a href="#anc_010">레이아웃 추가설정</a></li>
 </ul>';
 
 $frm_submit = '<div class="btn_confirm01 btn_confirm">
@@ -24,8 +23,22 @@ $frm_submit = '<div class="btn_confirm01 btn_confirm">
 </div>';
 ?>
 
+<div class="local_desc02 local_desc" style="background:#f7f7f7; padding:8px 12px; border-left:3px solid #888; margin-bottom:10px;">
+	<p>이 페이지는 <strong>커뮤니티 기본환경 / 기타 항목 명칭</strong> 만 관리합니다.</p>
+	<ul style="margin:6px 0 0 18px; font-size:12px; color:#555;">
+		<li>사이트 공개 / 계정·캐릭터 가능 여부 → <a href="./permission_form.php">권한 설정</a></li>
+		<li>화폐 명칭/단위 → <a href="./point_list.php">화폐 관리</a></li>
+		<li>알림(쪽지) 보관 기간 → <a href="./config_call_form.php">알림 설정</a></li>
+		<li>최초 스탯 포인트 → <a href="./status_list.php">스탯 설정 관리</a></li>
+		<li>캐릭터 최대 생성 갯수 → <a href="./permission_form.php">권한 설정</a></li>
+		<li>상점 카테고리 → <a href="./shop_list.php">상점 관리</a></li>
+		<li>아이템 기능 카테고리 → <a href="./item_list.php">아이템 관리</a></li>
+		<li>멤버 리스트 표시 → <a href="./character_article_list.php#anc_000">프로필 양식 관리</a></li>
+	</ul>
+</div>
+
 <form name="fconfigform" id="fconfigform" method="post" onsubmit="return fconfigform_submit(this);" enctype="multipart/form-data">
-<input type="hidden" name="token" value="" id="token">
+<?php echo get_admin_token_field(); ?>
 
 <section id="anc_001">
 	<h2 class="h2_frm">커뮤니티 기본환경 설정</h2>
@@ -40,19 +53,21 @@ $frm_submit = '<div class="btn_confirm01 btn_confirm">
 		</colgroup>
 		<tbody>
 		<tr>
-			<th scope="row">공개설정</th>
+			<th scope="row"><label for="cf_admin">최고관리자<strong class="sound_only">필수</strong></label></th>
+			<td><?php echo get_member_id_select('cf_admin', 10, $config['cf_admin'], 'required') ?></td>
+		</tr>
+		<tr>
+			<th scope="row">관리자 아이콘</th>
 			<td>
-				<input type="checkbox" name="cf_open" value="1" id="cf_open" <?php echo $config['cf_open']?'checked':''; ?>>
-				<label for="cf_open">사이트공개</label>
-				&nbsp;&nbsp;
-				<input type="checkbox" name="cf_1" value="1" id="cf_1" <?php echo $config['cf_1']?'checked':''; ?>>
-				<label for="cf_1">계정생성 가능</label>
-				&nbsp;&nbsp;
-				<input type="checkbox" name="cf_2" value="1" id="cf_2" <?php echo $config['cf_2']?'checked':''; ?>>
-				<label for="cf_2">캐릭터생성 가능</label>
-				&nbsp;&nbsp;
-				<input type="checkbox" name="cf_3" value="1" id="cf_3" <?php echo $config['cf_3']?'checked':''; ?>>
-				<label for="cf_3">캐릭터수정 가능</label>
+				<i class="admin-icon-box">
+				<?php if (is_file(G5_DATA_PATH."/site/ico_admin")) { ?>
+					<img src="<?php echo G5_DATA_URL ?>/site/ico_admin" alt="관리자 아이콘" />
+				<?php } ?>
+				</i>
+				<input type="file" name="admin_icon_file" value="" size="50">
+				<?php if (is_file(G5_DATA_PATH."/site/ico_admin")) { ?>
+				<label style="margin-left:8px;"><input type="checkbox" name="admin_icon_delete" value="1"> 현재 아이콘 삭제</label>
+				<?php } ?>
 			</td>
 		</tr>
 		<tr>
@@ -72,7 +87,7 @@ $frm_submit = '<div class="btn_confirm01 btn_confirm">
 				직접등록&nbsp;&nbsp; <input type="file" name="cf_favicon_file" value="" size="50">
 			</td></tr><tr>
 			<td>
-				외부경로&nbsp;&nbsp; <input type="text" name="cf_favicon" value="<?=$config['cf_favicon']?>" size="50"/>
+				외부경로&nbsp;&nbsp; <input type="text" name="cf_favicon" value="<?php echo $config['cf_favicon']?>" size="50"/>
 			</td>
 		</tr>
 		<tr>
@@ -82,10 +97,9 @@ $frm_submit = '<div class="btn_confirm01 btn_confirm">
 				직접등록&nbsp;&nbsp; <input type="file" name="cf_site_img_file" value="" size="50">
 			</td></tr><tr>
 			<td>
-				외부경로&nbsp;&nbsp; <input type="text" name="cf_site_img" value="<?=$config['cf_site_img']?>" size="50"/>
+				외부경로&nbsp;&nbsp; <input type="text" name="cf_site_img" value="<?php echo $config['cf_site_img']?>" size="50"/>
 			</td>
 		</tr>
-		
 		<tr>
 			<th scope="row"><label for="site_back">배경음악</label></th>
 			<td>
@@ -94,192 +108,31 @@ $frm_submit = '<div class="btn_confirm01 btn_confirm">
 			</td>
 		</tr>
 		<tr>
-			<th scope="row"><label for="cf_twitter">트위터 위젯</label></th>
-			<td>
-				<?php echo help('트위터 아이디를 입력해 주세요.') ?>
-				<input type="text" name="cf_twitter" value="<?php echo $config['cf_twitter'] ?>" id="cf_twitter"  size="40" />
-			</td>
-		</tr>
-		<tr>
 			<th scope="row">기타설정</th>
 			<td>
 				<?php echo help('디자인 관리 사용을 하시면, 기본 디자인 + 관리자 디자인 설정을 사용하실 수 있습니다. <br> 직접 디자인 수정을 원하신다면, 디자인 관리 사용하지 않음에 체크 하세요.') ?>
 				<input type="checkbox" name="cf_7" value="1" id="cf_7" <?php echo $config['cf_7']?'checked':''; ?>>
 				<label for="cf_7">디자인 관리 사용하지 않음</label>
-				
+			</td>
+		</tr>
+		<tr>
+			<th scope="row"><label for="cf_editor">에디터 선택</label></th>
+			<td>
+				<?php echo help('게시판/회원가입 등에서 사용할 기본 에디터를 선택합니다.') ?>
+				<select name="cf_editor" id="cf_editor">
+				<?php
+				$arr = get_skin_dir('', G5_EDITOR_PATH);
+				for ($i=0; $i<count($arr); $i++) {
+					if ($i == 0) echo "<option value=\"\">사용안함</option>";
+					echo "<option value=\"".$arr[$i]."\"".get_selected($config['cf_editor'], $arr[$i]).">".$arr[$i]."</option>\n";
+				}
+				?>
+				</select>
 			</td>
 		</tr>
 		</tbody>
 		</table>
 	</div>
-</section>
-
-<?php echo $frm_submit; ?>
-
-
-<section id="anc_002">
-	<h2 class="h2_frm">기능 설정</h2>
-	<?php echo $pg_anchor ?>
-
-	<div class="tbl_frm01 tbl_wrap">
-		<table>
-		<colgroup>
-			<col style="width: 150px;">
-			<col>
-			<col style="width: 150px;">
-			<col>
-		</colgroup>
-		<tbody>
-		<tr>
-			<th scope="row">기능설정</th>
-			<td colspan="3">
-				<input type="checkbox" name="cf_4" value="1" id="cf_4" <?php echo $config['cf_4']?'checked':''; ?>>
-				<label for="cf_4">탐색사용</label>
-				&nbsp;&nbsp;
-				<input type="checkbox" name="cf_6" value="1" id="cf_6" <?php echo $config['cf_6']?'checked':''; ?>>
-				<label for="cf_6">탐색 수행 가능</label>
-				&nbsp;&nbsp;
-				<input type="checkbox" name="cf_5" value="1" id="cf_5" <?php echo $config['cf_5']?'checked':''; ?>>
-				<label for="cf_5">조합(레시피)사용</label>
-			</td>
-		</tr>
-		<tr>
-			<th scope="row">캐릭터 최대 생성 갯수</th>
-			<td>		
-				<input type="text" name="cf_character_count" value="<?php echo get_text($config['cf_character_count']) ?>" id="cf_character_count" class="taC" size="5">
-			</td>
-			<th scope="row">하루 탐색 횟수</th>
-			<td>		
-				<input type="text" name="cf_search_count" value="<?php echo get_text($config['cf_search_count']) ?>" id="cf_search_count" class="taC" size="5">
-			</td>
-		</tr>
-		<tr>
-			<th scope="row">최초 스탯 포인트</th>
-			<td colspan="3">
-				<?php echo help('스탯 사용 설정 시, 캐릭터가 최초로 획득하는 스탯 포인트를 설정합니다.') ?>
-				<input type="text" name="cf_status_point" value="<?php echo get_text($config['cf_status_point']) ?>" id="cf_status_point" class="taC" size="5">
-			</td>
-		</tr>
-		
-		</tbody>
-		</table>
-	</div>
-</section>
-
-<?php echo $frm_submit; ?>
-
-<section id="anc_004">
-	<h2 class="h2_frm">카테고리 설정</h2>
-	<?php echo $pg_anchor ?>
-	<div class="tbl_frm01 tbl_wrap">
-		<table>
-		<colgroup>
-			<col style="width:165px;">
-			<col>
-		</colgroup>
-		<tbody>
-		<tr style="display:none;">
-			<th scope="row" class="pad vT">
-				<span class="lb">프로필 항목</span>
-				<button type="button" onclick="fn_add_repeatFrom('profileAddTable');" class="btn_small_add"><span class="material-symbols-outlined">add</span></button>
-			</th>
-			<td>
-				<ul id="profileAddTable" class="repeatFormArea fit">
-					<li class="repeat-original">
-						<div class="form">
-							<input type="text" name="cf_profile_group_spr[]" value="" class="full" />
-						</div>
-						<div class="control">
-							<button type="button" onclick="fn_del_itemFrom(this);" class="btn_small_del"><span class="material-symbols-outlined">remove</span></button>
-						</div>
-					</li>
-					<?
-						$repeat_item = explode("||", $config['cf_profile_group']);
-						for($i=0; $i < count($repeat_item); $i++) { 
-					?>
-						<li>
-							<div class="form">
-								<input type="text" name="cf_profile_group_spr[]" value="<?=$repeat_item[$i]?>" class="full" />
-							</div>
-							<div class="control">
-								<button type="button" onclick="fn_del_itemFrom(this);" class="btn_small_del"><span class="material-symbols-outlined">remove</span></button>
-							</div>
-						</li>
-					<? } ?>
-				</ul>
-
-			</td>
-		</tr>
-
-		<tr>
-			<th scope="row" class="pad vT">
-				<span class="lb">상점 분류</span>
-				<button type="button" onclick="fn_add_repeatFrom('shopAddTable');" class="btn_small_add"><span class="material-symbols-outlined">add</span></button>
-			</th>
-			<td>
-				<ul id="shopAddTable" class="repeatFormArea fit">
-					<li class="repeat-original">
-						<div class="form">
-							<input type="text" name="cf_shop_category_spr[]" value="" class="full" />
-						</div>
-						<div class="control">
-							<button type="button" onclick="fn_del_itemFrom(this);" class="btn_small_del"><span class="material-symbols-outlined">remove</span></button>
-						</div>
-					</li>
-					<?
-						$repeat_item = explode("||", $config['cf_shop_category']);
-						for($i=0; $i < count($repeat_item); $i++) { 
-					?>
-						<li>
-							<div class="form">
-								<input type="text" name="cf_shop_category_spr[]" value="<?=$repeat_item[$i]?>" class="full" />
-							</div>
-							<div class="control">
-								<button type="button" onclick="fn_del_itemFrom(this);" class="btn_small_del"><span class="material-symbols-outlined">remove</span></button>
-							</div>
-						</li>
-					<? } ?>
-				</ul>
-
-			</td>
-		</tr>
-		<tr>
-			<th scope="row" class="pad vT">
-				<span class="lb">아이템 기능</span>
-				<button type="button" onclick="fn_add_repeatFrom('itemAddTable');" class="btn_small_add"><span class="material-symbols-outlined">add</span></button>
-			</th>
-			<td>
-				<ul id="itemAddTable" class="repeatFormArea fit">
-					<li class="repeat-original">
-						<div class="form">
-							<input type="text" name="cf_item_category_spr[]" value="" class="full" />
-						</div>
-						<div class="control">
-							<button type="button" onclick="fn_del_itemFrom(this);" class="btn_small_del"><span class="material-symbols-outlined">remove</span></button>
-						</div>
-					</li>
-					<?
-						$repeat_item = explode("||", $config['cf_item_category']);
-						for($i=0; $i < count($repeat_item); $i++) { 
-					?>
-						<li>
-							<div class="form">
-								<input type="text" name="cf_item_category_spr[]" value="<?=$repeat_item[$i]?>" class="full" />
-							</div>
-							<div class="control">
-								<button type="button" onclick="fn_del_itemFrom(this);" class="btn_small_del"><span class="material-symbols-outlined">remove</span></button>
-							</div>
-						</li>
-					<? } ?>
-				</ul>
-
-			</td>
-		</tr>
-
-		</tbody>
-		</table>
-	</div>
-
 </section>
 
 <?php echo $frm_submit; ?>
@@ -297,15 +150,7 @@ $frm_submit = '<div class="btn_confirm01 btn_confirm">
 		</colgroup>
 		<tbody>
 		<tr>
-			<th scope="row"><?=$config['cf_money']?></th>
-			<td>명칭/단위</td>
-			<td>		
-				<input type="text" name="cf_money" value="<?php echo get_text($config['cf_money']) ?>" id="cf_money" size="5" placeholder="명칭"> <input type="text" name="cf_money_pice" value="<?php echo get_text($config['cf_money_pice']) ?>" id="cf_money_pice" size="5" placeholder="단위">
-			</td>
-		</tr>
-
-		<tr>
-			<th scope="row"><?=$config['cf_exp_name']?></th>
+			<th scope="row"><?php echo $config['cf_exp_name']?></th>
 			<td>명칭/단위</td>
 			<td>		
 				<input type="text" name="cf_exp_name" value="<?php echo get_text($config['cf_exp_name']) ?>" id="cf_exp_name" size="5" placeholder="명칭">
@@ -314,7 +159,7 @@ $frm_submit = '<div class="btn_confirm01 btn_confirm">
 		</tr>
 
 		<tr>
-			<th scope="row"><?=$config['cf_rank_name']?></th>
+			<th scope="row"><?php echo $config['cf_rank_name']?></th>
 			<td>명칭</td>
 			<td>		
 				<input type="text" name="cf_rank_name" value="<?php echo get_text($config['cf_rank_name']) ?>" id="cf_rank_name" size="30">
@@ -322,7 +167,7 @@ $frm_submit = '<div class="btn_confirm01 btn_confirm">
 		</tr>
 
 		<tr>
-			<th scope="row"><?=$config['cf_side_title']?> (선택A)</th>
+			<th scope="row"><?php echo $config['cf_side_title']?> (선택A)</th>
 			<td>명칭</td>
 			<td>
 				<?php echo help('명칭이 입력되지 않을 시, 프로필에 출력되지 않습니다.') ?>
@@ -330,11 +175,128 @@ $frm_submit = '<div class="btn_confirm01 btn_confirm">
 			</td>
 		</tr>
 		<tr>
-			<th scope="row"><?=$config['cf_class_title']?> (선택B)</th>
+			<th scope="row"><?php echo $config['cf_class_title']?> (선택B)</th>
 			<td>명칭</td>
 			<td>
 				<?php echo help('명칭이 입력되지 않을 시, 프로필에 출력되지 않습니다.') ?>
 				<input type="text" name="cf_class_title" value="<?php echo get_text($config['cf_class_title']) ?>" id="cf_class_title" size="30">
+			</td>
+		</tr>
+		</tbody>
+		</table>
+	</div>
+</section>
+
+<?php echo $frm_submit; ?>
+
+<section id="anc_007">
+	<h2 class="h2_frm">여분 필드 (cf_1 ~ cf_10)</h2>
+	<?php echo $pg_anchor ?>
+	<div class="local_desc02 local_desc">
+		<p>config 테이블의 <strong>cf_1 ~ cf_10</strong> 컬럼은 일부가 코어 기능에 의해 사용되고, 나머지는 자유 사용 여분 필드입니다.<br>
+		아래에서 모두 직접 수정 가능합니다. (<em>이미 사용중인 항목은 라벨에 용도 표시</em>)</p>
+	</div>
+	<div class="tbl_frm01 tbl_wrap">
+		<table>
+		<colgroup>
+			<col style="width: 200px;">
+			<col>
+		</colgroup>
+		<tbody>
+		<?php
+		// cf_N 별 라벨 + 안내 — 코어 검색 결과 기준
+		$cf_extra_meta = array(
+			3  => array('label' => 'cf_3 — 여분 필드', 'help' => '현재 코어에서 사용되는 곳이 없습니다. 자유롭게 사용 가능.', 'type' => 'text'),
+			5  => array('label' => 'cf_5 — 여분 필드', 'help' => '현재 코어에서 사용되는 곳이 없습니다. 자유롭게 사용 가능.', 'type' => 'text'),
+			6  => array('label' => 'cf_6 — 여분 필드', 'help' => '현재 코어에서 사용되는 곳이 없습니다. 자유롭게 사용 가능.', 'type' => 'text'),
+			8  => array('label' => 'cf_8 — 여분 필드', 'help' => '현재 코어에서 사용되는 곳이 없습니다. 자유롭게 사용 가능.', 'type' => 'text'),
+			9  => array('label' => 'cf_9 — 여분 필드', 'help' => '현재 코어에서 사용되는 곳이 없습니다. 자유롭게 사용 가능.', 'type' => 'text'),
+			10 => array('label' => 'cf_10 — MMB 메인 상단 공지(한줄 롤링)', 'help' => 'skin/board/mmb/list.skin.php 의 marquee 영역에 출력됩니다. (HTML 일부 가능)', 'type' => 'textarea'),
+		);
+		foreach ($cf_extra_meta as $n => $meta) {
+			$key = 'cf_'.$n;
+			$val = isset($config[$key]) ? $config[$key] : '';
+			echo '<tr>';
+			echo '<th scope="row"><label for="'.$key.'">'.htmlspecialchars($meta['label'], ENT_QUOTES).'</label></th>';
+			echo '<td>';
+			if ($meta['help']) echo '<p style="margin:0 0 4px 0; font-size:12px; color:#666;">'.htmlspecialchars($meta['help'], ENT_QUOTES).'</p>';
+			if ($meta['type'] === 'check') {
+				$chk = !empty($val) ? ' checked' : '';
+				echo '<input type="checkbox" name="'.$key.'" id="'.$key.'" value="1"'.$chk.'> <label for="'.$key.'">사용</label>';
+			} elseif ($meta['type'] === 'textarea') {
+				echo '<textarea name="'.$key.'" id="'.$key.'" rows="3" style="width:100%;">'.get_text((string)$val).'</textarea>';
+			} else {
+				echo '<input type="text" name="'.$key.'" id="'.$key.'" value="'.htmlspecialchars((string)$val, ENT_QUOTES).'" size="60">';
+			}
+			echo '</td></tr>';
+		}
+		?>
+		</tbody>
+		</table>
+	</div>
+</section>
+
+<?php echo $frm_submit; ?>
+
+<section id="anc_008">
+	<h2 class="h2_frm">접속 제한 설정</h2>
+	<?php echo $pg_anchor ?>
+	<div class="local_desc02 local_desc">
+		<p>특정 IP 대역의 접속을 허용하거나 차단하는 설정입니다.</p>
+	</div>
+	<div class="tbl_frm01 tbl_wrap">
+		<table>
+		<colgroup>
+			<col style="width: 150px;">
+			<col>
+		</colgroup>
+		<tbody>
+		<tr>
+			<th scope="row"><label for="cf_possible_ip">접근가능 IP</label></th>
+			<td>
+				<?php echo help('입력된 IP의 컴퓨터만 접근할 수 있습니다. 123.123.+ 도 입력 가능. (엔터로 구분)') ?>
+				<textarea name="cf_possible_ip" id="cf_possible_ip" rows="4" style="width:100%;"><?php echo $config['cf_possible_ip'] ?></textarea>
+			</td>
+		</tr>
+		<tr>
+			<th scope="row"><label for="cf_intercept_ip">접근차단 IP</label></th>
+			<td>
+				<?php echo help('입력된 IP의 컴퓨터는 접근할 수 없음. 123.123.+ 도 입력 가능. (엔터로 구분)') ?>
+				<textarea name="cf_intercept_ip" id="cf_intercept_ip" rows="4" style="width:100%;"><?php echo $config['cf_intercept_ip'] ?></textarea>
+			</td>
+		</tr>
+		</tbody>
+		</table>
+	</div>
+</section>
+
+<?php echo $frm_submit; ?>
+
+<section id="anc_010">
+	<h2 class="h2_frm">레이아웃 추가설정</h2>
+	<?php echo $pg_anchor ?>
+	<div class="local_desc02 local_desc">
+		<p>기본 설정된 파일 경로 및 script, css 를 추가하거나 변경할 수 있습니다.</p>
+	</div>
+	<div class="tbl_frm01 tbl_wrap">
+		<table>
+		<colgroup>
+			<col style="width: 150px;">
+			<col>
+		</colgroup>
+		<tbody>
+		<tr>
+			<th scope="row"><label for="cf_add_script">추가 script, css</label></th>
+			<td>
+				<?php echo help('HTML의 &lt;/HEAD&gt; 태그위로 추가될 JavaScript와 css 코드를 설정합니다.<br>관리자 페이지에서는 이 코드를 사용하지 않습니다.') ?>
+				<textarea name="cf_add_script" id="cf_add_script" style="width:100%; height:300px;"><?php echo get_text($config['cf_add_script']); ?></textarea>
+			</td>
+		</tr>
+		<tr>
+			<th scope="row"><label for="cf_add_fonts">추가 폰트 (head)</label></th>
+			<td>
+				<?php echo help('Google Fonts 등 외부 폰트 link/style 태그를 HTML &lt;HEAD&gt; 내부에 추가합니다.') ?>
+				<textarea name="cf_add_fonts" id="cf_add_fonts" style="width:100%; height:140px;"><?php echo get_text($config['cf_add_fonts'] ?? ''); ?></textarea>
 			</td>
 		</tr>
 		</tbody>
@@ -350,8 +312,6 @@ $frm_submit = '<div class="btn_confirm01 btn_confirm">
 function fconfigform_submit(f)
 {
 	f.action = "./community_form_update.php";
-	<?php echo get_editor_js("cf_menu_text"); ?>
-	<?php echo get_editor_js("cf_mobile_menu_text"); ?>
 	return true;
 }
 </script>

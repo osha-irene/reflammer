@@ -1,5 +1,5 @@
 <?php
-$sub_menu = "300200";
+$sub_menu = "300010";
 include_once('./_common.php');
 
 //print_r2($_POST); exit;
@@ -27,7 +27,7 @@ for ($i=0; $i<$count; $i++)
                         gr_admin      = '{$_POST['gr_admin'][$k]}',
                         gr_order      = '{$_POST['gr_order'][$k]}'
                   where gr_id         = '{$gr_id}' ";
-        if ($is_admin != 'super')
+        if (!$is_admin)
             $sql .= " and gr_admin    = '{$_POST['gr_admin'][$k]}' ";
         sql_query($sql);
     } else if($_POST['act_button'] == '선택삭제') {

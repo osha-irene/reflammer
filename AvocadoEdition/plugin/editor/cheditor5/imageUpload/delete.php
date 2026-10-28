@@ -5,7 +5,7 @@ if(!function_exists('ft_nonce_is_valid')){
     include_once('../editor.lib.php');
 }
 
-$filesrc = isset($_POST["filesrc"]) ? $_POST["filesrc"] : '';
+$filesrc = $_POST['filesrc'] ?? '';
 
 if( !$filesrc ){
     die( false );

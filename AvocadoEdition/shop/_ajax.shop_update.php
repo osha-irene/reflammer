@@ -1,4 +1,4 @@
-<?
+<?php 
 include_once("./_common.php");
 
 if($character['ch_id'] && $character['ch_state'] == '승인') { 
@@ -165,16 +165,24 @@ if($character['ch_id'] && $character['ch_state'] == '승인') {
 			}
 
 			$msg = "《 ".$item['it_name']." 》 구매 되었습니다.";
+
+			if (function_exists('mdl_do_action')) mdl_do_action('shop_purchase_after', $item['it_id'], $character['ch_id'], $member['mb_id']);
 		}
 	}
 } else {
 	$msg = "<p style='color:red; padding-top:5px;'>부정사용 적발 시, 접근 차단이 될 수 있습니다.</p>";
 }
 
-if(defined('G5_THEME_PATH') && is_file(G5_THEME_PATH."/shop/shop.result.skin.php")) {
-	include(G5_THEME_PATH."/shop/shop.result.skin.php");
-} else {
-	include(G5_PATH."/shop/skin/shop.result.skin.php");
+$_shop_skin_dir = G5_PATH.'/shop/skin';
+if (function_exists('get_slot_theme') && function_exists('theme_resolve_base')) {
+    $_th = get_slot_theme('shop');
+    if ($_th !== '' && $_th !== 'default') {
+        $_tb = theme_resolve_base($_th);
+        if ($_tb['abs'] !== '' && is_file($_tb['abs'].'/shop/skin/shop.result.skin.php')) {
+            $_shop_skin_dir = $_tb['abs'].'/shop/skin';
+        }
+    }
 }
+include($_shop_skin_dir."/shop.result.skin.php");
 
 ?>

@@ -26,11 +26,7 @@ if(!$config['cf_side_title'] || count($side) < 2) {
 $g5['title'] = "멤버란";
 include_once(G5_PATH.'/head.php');
 
-if(defined('G5_THEME_PATH') && is_file(G5_THEME_PATH."/member/list.skin.php")) {
-	include(G5_THEME_PATH."/member/list.skin.php");
-} else {
-	include(G5_PATH."/member/skin/list.skin.php");
-}
+include(function_exists('theme_dir_file') ? theme_dir_file('member/skin/list.skin.php') : (G5_PATH."/member/skin/list.skin.php"));
 
 unset($ch);
 unset($list);

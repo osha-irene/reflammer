@@ -1,5 +1,5 @@
 <?php
-$sub_menu = "400400";
+$sub_menu = "410100";
 include_once('./_common.php');
 
 auth_check($auth[$sub_menu], 'r');
@@ -46,7 +46,7 @@ $pg_anchor = '<ul class="anchor">
 ?>
 
 <section id="anc_001">
-	<h2 class="h2_frm"><?=$config['cf_rank_name']?> 설정 목록</h2>
+	<h2 class="h2_frm"><?php echo $config['cf_rank_name']?> 설정 목록</h2>
 	<?php echo $pg_anchor ?>
 
 	<div class="local_ov01 local_ov">
@@ -75,11 +75,11 @@ $pg_anchor = '<ul class="anchor">
 		<thead>
 		<tr>
 			<th scope="col">
-				<label for="chkall" class="sound_only"><?=$config['cf_rank_name']?>설정 내역 전체</label>
+				<label for="chkall" class="sound_only"><?php echo $config['cf_rank_name']?>설정 내역 전체</label>
 				<input type="checkbox" name="chkall" value="1" id="chkall" onclick="check_all(this.form)">
 			</th>
-			<th scope="col"><?=$config['cf_rank_name']?>명</th>
-			<th scope="col">요구<?=$config['cf_exp_name']?></th>
+			<th scope="col"><?php echo $config['cf_rank_name']?>명</th>
+			<th scope="col">요구<?php echo $config['cf_exp_name']?></th>
 			<th scope="col">추가 스텟 포인트</th>
 			<th>&nbsp;</th>
 		</tr>
@@ -131,7 +131,7 @@ $pg_anchor = '<ul class="anchor">
 
 
 <section id="anc_002">
-	<h2 class="h2_frm"><?=$config['cf_rank_name']?> 설정 등록</h2>
+	<h2 class="h2_frm"><?php echo $config['cf_rank_name']?> 설정 등록</h2>
 	<?php echo $pg_anchor ?>
 
 	<form name="fpointlist2" method="post" id="fpointlist2" action="./level_form_update.php" autocomplete="off" enctype="multipart/form-data">
@@ -154,9 +154,9 @@ $pg_anchor = '<ul class="anchor">
 		</colgroup>
 		<tbody>
 		<tr>
-			<th scope="row"><label for="lv_name"><?=$config['cf_rank_name']?>명<strong class="sound_only">필수</strong></label></th>
+			<th scope="row"><label for="lv_name"><?php echo $config['cf_rank_name']?>명<strong class="sound_only">필수</strong></label></th>
 			<td><input type="text" name="lv_name" id="lv_name" class="required frm_input" required></td>
-			<th scope="row"><label for="lv_exp">요구<?=$config['cf_exp_name']?><strong class="sound_only">필수</strong></label></th>
+			<th scope="row"><label for="lv_exp">요구<?php echo $config['cf_exp_name']?><strong class="sound_only">필수</strong></label></th>
 			<td><input type="text" name="lv_exp" id="lv_exp" class="required frm_input" required></td>
 			<th scope="row"><label for="lv_add_state">추가스텟포인트<strong class="sound_only">필수</strong></label></th>
 			<td><input type="text" name="lv_add_state" id="lv_add_state" class="required frm_input"></td>

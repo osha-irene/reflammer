@@ -730,7 +730,9 @@ class UploadHandler
                 return $write_func($src_img, $new_file_path, $image_quality);
             }
             if ($file_path !== $new_file_path) {
-                return copy($file_path, $new_file_path);
+                $result = copy($file_path, $new_file_path);
+                if ($result && function_exists('cdn_after_upload')) cdn_after_upload($new_file_path);
+                return $result;
             }
             return true;
         }
@@ -867,7 +869,9 @@ class UploadHandler
         }
         if (!($image_oriented || $max_width < $img_width || $max_height < $img_height)) {
             if ($file_path !== $new_file_path) {
-                return copy($file_path, $new_file_path);
+                $result = copy($file_path, $new_file_path);
+                if ($result && function_exists('cdn_after_upload')) cdn_after_upload($new_file_path);
+                return $result;
             }
             return true;
         }
@@ -924,7 +928,9 @@ class UploadHandler
             .(empty($options['max_height']) ? '' : 'X'.$options['max_height']);
         if (!$resize && empty($options['auto_orient'])) {
             if ($file_path !== $new_file_path) {
-                return copy($file_path, $new_file_path);
+                $result = copy($file_path, $new_file_path);
+                if ($result && function_exists('cdn_after_upload')) cdn_after_upload($new_file_path);
+                return $result;
             }
             return true;
         }
@@ -1041,7 +1047,7 @@ class UploadHandler
         }
         if (count($failed_versions)) {
             $file->error = $this->get_error_message('image_resize')
-                    .' ('.implode($failed_versions,', ').')';
+                    .' ('.implode(', ', $failed_versions).')';
         }
         // Free memory:
         $this->destroy_image_object($file_path);
@@ -1146,6 +1152,8 @@ class UploadHandler
                     $append_file ? FILE_APPEND : 0
                 );
             }
+            // CDN: 에디터 업로드 미러링
+            if (function_exists('cdn_after_upload')) cdn_after_upload($file_path);
             $file_size = $this->get_file_size($file_path, $append_file);
 
             try {

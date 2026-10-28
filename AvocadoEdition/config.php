@@ -4,8 +4,8 @@
     상수 선언
 ********************/
 
-define('G5_VERSION', '아보카도 에디션');
-define('G5_GNUBOARD_VER', '2.2.2');
+define('G5_VERSION', '아보카도 8');
+define('G5_GNUBOARD_VER', '1.0.1');
 
 // 이 상수가 정의되지 않으면 각각의 개별 페이지는 별도로 실행될 수 없음
 define('_GNUBOARD_', true);
@@ -38,6 +38,8 @@ define('G5_COOKIE_DOMAIN',  '');
 define('G5_DBCONFIG_FILE',  'dbconfig.php');
 
 define('G5_ADMIN_DIR',      'adm');
+define('G5_MDL_ADMIN_DIR',  'adm_module');
+define('G5_MDL_DIR',        'module');
 define('G5_BBS_DIR',        'bbs');
 define('G5_CSS_DIR',        'css');
 define('G5_DATA_DIR',       'data');
@@ -47,19 +49,12 @@ define('G5_JS_DIR',         'js');
 define('G5_LIB_DIR',        'lib');
 define('G5_PLUGIN_DIR',     'plugin');
 define('G5_SKIN_DIR',       'skin');
-define('G5_CAPTCHA_DIR',    'kcaptcha');
 define('G5_EDITOR_DIR',     'editor');
 define('G5_MOBILE_DIR',     'mobile');
-define('G5_OKNAME_DIR',     'okname');
 
-define('G5_KCPCERT_DIR',    'kcpcert');
-define('G5_LGXPAY_DIR',     'lgxpay');
-
-define('G5_SNS_DIR',        'sns');
-define('G5_SYNDI_DIR',      'syndi');
-define('G5_PHPMAILER_DIR',  'PHPMailer');
 define('G5_SESSION_DIR',    'session');
 define('G5_THEME_DIR',      'theme');
+define('G5_WORLD_DIR',      'world');
 
 // URL 은 브라우저상에서의 경로 (도메인으로 부터의)
 if (G5_DOMAIN) {
@@ -78,6 +73,8 @@ if (isset($g5_path['path'])) {
 }
 
 define('G5_ADMIN_URL',      G5_URL.'/'.G5_ADMIN_DIR);
+define('G5_MDL_ADMIN_URL',  G5_URL.'/'.G5_MDL_ADMIN_DIR);
+define('G5_MDL_URL',        G5_URL.'/'.G5_MDL_DIR);
 define('G5_BBS_URL',        G5_URL.'/'.G5_BBS_DIR);
 define('G5_CSS_URL',        G5_URL.'/'.G5_CSS_DIR);
 define('G5_DATA_URL',       G5_URL.'/'.G5_DATA_DIR);
@@ -85,35 +82,24 @@ define('G5_IMG_URL',        G5_URL.'/'.G5_IMG_DIR);
 define('G5_JS_URL',         G5_URL.'/'.G5_JS_DIR);
 define('G5_SKIN_URL',       G5_URL.'/'.G5_SKIN_DIR);
 define('G5_PLUGIN_URL',     G5_URL.'/'.G5_PLUGIN_DIR);
-define('G5_CAPTCHA_URL',    G5_PLUGIN_URL.'/'.G5_CAPTCHA_DIR);
-define('G5_EDITOR_URL',     G5_PLUGIN_URL.'/'.G5_EDITOR_DIR);
-define('G5_OKNAME_URL',     G5_PLUGIN_URL.'/'.G5_OKNAME_DIR);
-define('G5_KCPCERT_URL',    G5_PLUGIN_URL.'/'.G5_KCPCERT_DIR);
-define('G5_LGXPAY_URL',     G5_PLUGIN_URL.'/'.G5_LGXPAY_DIR);
-define('G5_SNS_URL',        G5_PLUGIN_URL.'/'.G5_SNS_DIR);
-define('G5_SYNDI_URL',      G5_PLUGIN_URL.'/'.G5_SYNDI_DIR);
 define('G5_MOBILE_URL',     G5_URL.'/'.G5_MOBILE_DIR);
-
+define('G5_EDITOR_URL',     G5_PLUGIN_URL.'/'.G5_EDITOR_DIR);
 // PATH 는 서버상에서의 절대경로
 define('G5_ADMIN_PATH',     G5_PATH.'/'.G5_ADMIN_DIR);
+define('G5_MDL_ADMIN_PATH', G5_PATH.'/'.G5_MDL_ADMIN_DIR);
+define('G5_MDL_PATH',       G5_PATH.'/'.G5_MDL_DIR);
 define('G5_BBS_PATH',       G5_PATH.'/'.G5_BBS_DIR);
 define('G5_DATA_PATH',      G5_PATH.'/'.G5_DATA_DIR);
+define('G5_IMG_PATH',       G5_PATH.'/'.G5_IMG_DIR);
 define('G5_EXTEND_PATH',    G5_PATH.'/'.G5_EXTEND_DIR);
 define('G5_LIB_PATH',       G5_PATH.'/'.G5_LIB_DIR);
 define('G5_PLUGIN_PATH',    G5_PATH.'/'.G5_PLUGIN_DIR);
 define('G5_SKIN_PATH',      G5_PATH.'/'.G5_SKIN_DIR);
 define('G5_MOBILE_PATH',    G5_PATH.'/'.G5_MOBILE_DIR);
 define('G5_SESSION_PATH',   G5_DATA_PATH.'/'.G5_SESSION_DIR);
-define('G5_CAPTCHA_PATH',   G5_PLUGIN_PATH.'/'.G5_CAPTCHA_DIR);
 define('G5_EDITOR_PATH',    G5_PLUGIN_PATH.'/'.G5_EDITOR_DIR);
-define('G5_OKNAME_PATH',    G5_PLUGIN_PATH.'/'.G5_OKNAME_DIR);
-
-define('G5_KCPCERT_PATH',   G5_PLUGIN_PATH.'/'.G5_KCPCERT_DIR);
-define('G5_LGXPAY_PATH',    G5_PLUGIN_PATH.'/'.G5_LGXPAY_DIR);
-
-define('G5_SNS_PATH',       G5_PLUGIN_PATH.'/'.G5_SNS_DIR);
-define('G5_SYNDI_PATH',     G5_PLUGIN_PATH.'/'.G5_SYNDI_DIR);
-define('G5_PHPMAILER_PATH', G5_PLUGIN_PATH.'/'.G5_PHPMAILER_DIR);
+define('G5_WORLD_URL',      G5_URL.'/'.G5_WORLD_DIR);
+define('G5_WORLD_PATH',     G5_PATH.'/'.G5_WORLD_DIR);
 //==============================================================================
 
 
@@ -157,10 +143,7 @@ define('G5_FILE_PERMISSION', 0644); // 파일 생성시 퍼미션
 // 모바일 인지 결정 $_SERVER['HTTP_USER_AGENT']
 define('G5_MOBILE_AGENT',   'phone|samsung|lgtel|mobile|[^A]skt|nokia|blackberry|android|sony');
 
-// SMTP
-// lib/mailer.lib.php 에서 사용
-define('G5_SMTP',      '127.0.0.1');
-define('G5_SMTP_PORT', '25');
+
 
 
 /********************
@@ -202,11 +185,6 @@ define('G5_IS_MOBILE_DHTML_USE', false);
 // MySQLi 사용여부를 설정합니다.
 define('G5_MYSQLI_USE', true);
 
-// Browscap 사용여부를 설정합니다.
-define('G5_BROWSCAP_USE', true);
-
-// 접속자 기록 때 Browscap 사용여부를 설정합니다.
-define('G5_VISIT_BROWSCAP_USE', false);
 
 // ip 숨김방법 설정
 /* 123.456.789.012 ip의 숨김 방법을 변경하는 방법은
@@ -216,9 +194,4 @@ define('G5_VISIT_BROWSCAP_USE', false);
 */
 define('G5_IP_DISPLAY', '\\1.♡.\\3.\\4');
 
-if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') {   //https 통신일때 daum 주소 js
-    define('G5_POSTCODE_JS', '<script src="https://spi.maps.daum.net/imap/map_js_init/postcode.v2.js"></script>');
-} else {  //http 통신일때 daum 주소 js
-    define('G5_POSTCODE_JS', '<script src="http://dmaps.daum.net/map_js_init/postcode.v2.js"></script>');
-}
 ?>

@@ -1,5 +1,5 @@
 <?php
-$sub_menu = "100280";
+$sub_menu = "110200";
 include_once('./_common.php');
 include_once(G5_LIB_PATH.'/json.lib.php');
 
@@ -42,36 +42,6 @@ if($type == 'board') {
 
     if($i == 0)
         $data['error'] = '적용할 게시판 이미지 설정이 없습니다.';
-} else if($type == 'conf_skin') {
-    $keys = run_replace('theme_config_load_keys', array('cf_new_skin', 'cf_mobile_new_skin', 'cf_search_skin', 'cf_mobile_search_skin', 'cf_connect_skin', 'cf_mobile_connect_skin', 'cf_faq_skin', 'cf_mobile_faq_skin'), $type);
-
-    $tconfig = get_theme_config_value($config['cf_theme'], implode(',', $keys));
-
-    $i = 0;
-    foreach($keys as $val) {
-        if($tconfig[$val]) {
-            $data[$val] = preg_match('#^theme/.+$#', $tconfig[$val]) ? $tconfig[$val] : 'theme/'.$tconfig[$val];
-            $i++;
-        }
-    }
-
-    if($i == 0)
-        $data['error'] = '적용할 기본환경 스킨 설정이 없습니다.';
-} else if($type == 'conf_member') {
-    $keys = run_replace('theme_config_load_keys', array('cf_member_skin', 'cf_mobile_member_skin'), $type);
-
-    $tconfig = get_theme_config_value($config['cf_theme'], implode(',', $keys));
-
-    $i = 0;
-    foreach($keys as $val) {
-        if($tconfig[$val]) {
-            $data[$val] = preg_match('#^theme/.+$#', $tconfig[$val]) ? $tconfig[$val] : 'theme/'.$tconfig[$val];
-            $i++;
-        }
-    }
-
-    if($i == 0)
-        $data['error'] = '적용할 기본환경 회원스킨 설정이 없습니다.';
 } else if($type == 'shop_skin') {
     $keys = run_replace('theme_config_load_keys', array('de_shop_skin', 'de_shop_mobile_skin'), $type);
 

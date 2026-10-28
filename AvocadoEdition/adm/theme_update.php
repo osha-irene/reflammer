@@ -1,13 +1,13 @@
 <?php
-$sub_menu = "100280";
+$sub_menu = "110200";
 include_once('./_common.php');
 
-if ($is_admin != 'super')
-	die('최고관리자만 접근 가능합니다.');
+if (!$is_admin)
+	die('관리자만 접근 가능합니다.');
 
 admin_referer_check();
 
-$theme = isset($_POST['theme']) ? trim($_POST['theme']) : '';
+$theme = trim($_POST['theme'] ?? '');
 $post_type = isset($_POST['type']) ? clean_xss_tags($_POST['type'], 1, 1) : '';
 $post_set_default_skin = isset($_POST['set_default_skin']) ? clean_xss_tags($_POST['set_default_skin'], 1, 1) : '';
 
@@ -28,7 +28,9 @@ sql_query($sql);
 
 // 테마 설정 스킨 적용
 if($post_set_default_skin == 1) {
-	$keys = 'set_default_skin, cf_member_skin, cf_mobile_member_skin, cf_new_skin, cf_mobile_new_skin, cf_search_skin, cf_mobile_search_skin, cf_connect_skin, cf_mobile_connect_skin, cf_faq_skin, cf_mobile_faq_skin, qa_skin, qa_mobile_skin, de_shop_skin, de_shop_mobile_skin';
+	// avo8.0: cf_*_skin 컬럼들은 제거되었음 — 슬롯 매핑은 avo_theme_preset_slot 테이블에서 관리.
+	// qa_skin / de_shop_skin 은 각각 avo_qa_config / avo_default 테이블 컬럼으로 유지.
+	$keys = 'set_default_skin, qa_skin, qa_mobile_skin, de_shop_skin, de_shop_mobile_skin';
 
 	$tconfig = get_theme_config_value($theme, $keys);
 
@@ -79,15 +81,6 @@ if($post_set_default_skin == 1) {
 			sql_query($sql);
 		}
 
-		if(!empty($qa_sql_common)) {
-			$sql = " update {$g5['qa_config_table']} set " . implode(', ', $qa_sql_common);
-			sql_query($sql);
-		}
-
-		if(!empty($de_sql_common)) {
-			$sql = " update {$g5['g5_shop_default_table']} set " . implode(', ', $de_sql_common);
-			sql_query($sql);
-		}
 	}
 }
 

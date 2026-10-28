@@ -11,8 +11,6 @@ if ($w == '')
 	$required_mb_password = 'required';
 	$sound_only = '<strong class="sound_only">필수</strong>';
 
-	$mb['mb_mailling'] = 1;
-	$mb['mb_open'] = 1;
 	$mb['mb_level'] = $config['cf_register_level'];
 	$html_title = '추가';
 }
@@ -22,7 +20,7 @@ else if ($w == 'u')
 	if (!$mb['mb_id'])
 		alert('존재하지 않는 회원자료입니다.');
 
-	if ($is_admin != 'super' && $mb['mb_level'] >= $member['mb_level'])
+	if (!$is_admin && $mb['mb_level'] >= $member['mb_level'])
 		alert('자신보다 권한이 높거나 같은 회원은 수정할 수 없습니다.');
 
 	$required_mb_id = 'readonly';
@@ -31,17 +29,6 @@ else if ($w == 'u')
 
 	$mb['mb_name'] = get_text($mb['mb_name']);
 	$mb['mb_nick'] = get_text($mb['mb_nick']);
-	$mb['mb_email'] = get_text($mb['mb_email']);
-	$mb['mb_homepage'] = get_text($mb['mb_homepage']);
-	$mb['mb_birth'] = get_text($mb['mb_birth']);
-	$mb['mb_tel'] = get_text($mb['mb_tel']);
-	$mb['mb_hp'] = get_text($mb['mb_hp']);
-	$mb['mb_addr1'] = get_text($mb['mb_addr1']);
-	$mb['mb_addr2'] = get_text($mb['mb_addr2']);
-	$mb['mb_addr3'] = get_text($mb['mb_addr3']);
-	$mb['mb_signature'] = get_text($mb['mb_signature']);
-	$mb['mb_recommend'] = get_text($mb['mb_recommend']);
-	$mb['mb_profile'] = get_text($mb['mb_profile']);
 	$mb['mb_1'] = get_text($mb['mb_1']);
 	$mb['mb_2'] = get_text($mb['mb_2']);
 	$mb['mb_3'] = get_text($mb['mb_3']);
@@ -56,88 +43,12 @@ else if ($w == 'u')
 else
 	alert('제대로 된 값이 넘어오지 않았습니다.');
 
-// 본인확인방법
-switch($mb['mb_certify']) {
-	case 'hp':
-		$mb_certify_case = '휴대폰';
-		$mb_certify_val = 'hp';
-		break;
-	case 'ipin':
-		$mb_certify_case = '아이핀';
-		$mb_certify_val = 'ipin';
-		break;
-	case 'admin':
-		$mb_certify_case = '관리자 수정';
-		$mb_certify_val = 'admin';
-		break;
-	default:
-		$mb_certify_case = '';
-		$mb_certify_val = 'admin';
-		break;
-}
-
-// 본인확인
-$mb_certify_yes  =  $mb['mb_certify'] ? 'checked="checked"' : '';
-$mb_certify_no   = !$mb['mb_certify'] ? 'checked="checked"' : '';
-
-// 성인인증
-$mb_adult_yes       =  $mb['mb_adult']      ? 'checked="checked"' : '';
-$mb_adult_no        = !$mb['mb_adult']      ? 'checked="checked"' : '';
-
-//메일수신
-$mb_mailling_yes    =  $mb['mb_mailling']   ? 'checked="checked"' : '';
-$mb_mailling_no     = !$mb['mb_mailling']   ? 'checked="checked"' : '';
-
-// SMS 수신
-$mb_sms_yes         =  $mb['mb_sms']        ? 'checked="checked"' : '';
-$mb_sms_no          = !$mb['mb_sms']        ? 'checked="checked"' : '';
-
-// 정보 공개
-$mb_open_yes        =  $mb['mb_open']       ? 'checked="checked"' : '';
-$mb_open_no         = !$mb['mb_open']       ? 'checked="checked"' : '';
-
-if (isset($mb['mb_certify'])) {
-	// 날짜시간형이라면 drop 시킴
-	if (preg_match("/-/", $mb['mb_certify'])) {
-		sql_query(" ALTER TABLE `{$g5['member_table']}` DROP `mb_certify` ", false);
-	}
-} else {
-	sql_query(" ALTER TABLE `{$g5['member_table']}` ADD `mb_certify` TINYINT(4) NOT NULL DEFAULT '0' AFTER `mb_hp` ", false);
-}
-
-if(isset($mb['mb_adult'])) {
-	sql_query(" ALTER TABLE `{$g5['member_table']}` CHANGE `mb_adult` `mb_adult` TINYINT(4) NOT NULL DEFAULT '0' ", false);
-} else {
-	sql_query(" ALTER TABLE `{$g5['member_table']}` ADD `mb_adult` TINYINT NOT NULL DEFAULT '0' AFTER `mb_certify` ", false);
-}
-
-// 지번주소 필드추가
-if(!isset($mb['mb_addr_jibeon'])) {
-	sql_query(" ALTER TABLE {$g5['member_table']} ADD `mb_addr_jibeon` varchar(255) NOT NULL DEFAULT '' AFTER `mb_addr2` ", false);
-}
-
-// 건물명필드추가
-if(!isset($mb['mb_addr3'])) {
-	sql_query(" ALTER TABLE {$g5['member_table']} ADD `mb_addr3` varchar(255) NOT NULL DEFAULT '' AFTER `mb_addr2` ", false);
-}
-
-// 중복가입 확인필드 추가
-if(!isset($mb['mb_dupinfo'])) {
-	sql_query(" ALTER TABLE {$g5['member_table']} ADD `mb_dupinfo` varchar(255) NOT NULL DEFAULT '' AFTER `mb_adult` ", false);
-}
-
-// 이메일인증 체크 필드추가
-if(!isset($mb['mb_email_certify2'])) {
-	sql_query(" ALTER TABLE {$g5['member_table']} ADD `mb_email_certify2` varchar(255) NOT NULL DEFAULT '' AFTER `mb_email_certify` ", false);
-}
 
 if ($mb['mb_intercept_date']) $g5['title'] = "차단된 ";
 else $g5['title'] .= "";
 $g5['title'] .= '회원 '.$html_title;
 include_once('./admin.head.php');
 
-// add_javascript('js 구문', 출력순서); 숫자가 작을 수록 먼저 출력됨
-add_javascript(G5_POSTCODE_JS, 0);    //다음 주소 js
 ?>
 
 <form name="fmember" id="fmember" action="./member_form_update.php" onsubmit="return fmember_submit(this);" method="post" enctype="multipart/form-data">
@@ -170,23 +81,36 @@ add_javascript(G5_POSTCODE_JS, 0);    //다음 주소 js
 	</tr>
 	<tr>
 		<th scope="row"><label for="mb_name">닉네임<strong class="sound_only">필수</strong></label></th>
-		<td><input type="text" name="mb_name" value="<?php echo $mb['mb_name'] ?>" id="mb_name" required class="required frm_input" size="15" minlength="2" maxlength="20"></td>
+		<td>
+			<?php
+			$_nick_min = function_exists('register_nick_min') ? register_nick_min() : 2;
+			$_nick_max = function_exists('register_nick_max') ? register_nick_max() : 20;
+			$_nick_filter = function_exists('register_nick_filter') ? register_nick_filter() : '';
+			$_nick_pattern = '';
+			if ($_nick_filter === 'ko')   $_nick_pattern = '[\uAC00-\uD7A3\u3131-\u318E\\s]+';
+			if ($_nick_filter === 'koen') $_nick_pattern = '[\uAC00-\uD7A3\u3131-\u318E A-Za-z\\s]+';
+			?>
+			<input type="text" name="mb_name" value="<?php echo $mb['mb_name'] ?>" id="mb_name" required class="required frm_input" size="15"
+				<?php if ($_nick_min > 0) echo ' minlength="'.$_nick_min.'"'; ?>
+				<?php if ($_nick_max > 0) echo ' maxlength="'.$_nick_max.'"'; ?>
+				<?php if ($_nick_pattern) echo ' pattern="'.$_nick_pattern.'"'; ?>>
+			<?php
+			if (function_exists('register_field_help')) {
+				$_h = register_field_help('mb_name');
+				if ($_h !== '') echo '<div class="reg-help" style="font-size:12px;color:#888;margin-top:3px;">'.htmlspecialchars($_h, ENT_QUOTES).'</div>';
+			}
+			?>
+		</td>
 		<th scope="row"><label for="mb_level">회원 권한</label></th>
 		<td><?php echo get_member_level_select('mb_level', 1, $member['mb_level'], $mb['mb_level']) ?></td>
 	</tr>
 	<tr>
-		<th scope="row"><label for="mb_email">E-mail<strong class="sound_only">필수</strong></label></th>
-		<td><input type="text" name="mb_email" value="<?php echo $mb['mb_email'] ?>" id="mb_email" maxlength="100" required class="required frm_input email" size="30"></td>
-		<th scope="row"><label for="mb_birth">생년<strong class="sound_only">필수</strong></label></th>
-		<td><input type="text" name="mb_birth" value="<?php echo $mb['mb_birth'] ?>" id="mb_birth" maxlength="100" class="frm_input" size="5"></td>
-	</tr>
-	<tr>
-		<th scope="row"><label for="mb_open">정보 공개</label></th>
+		<th scope="row"><label for="mb_birth">생년</label></th>
 		<td colspan="3">
-			<input type="radio" name="mb_open" value="1" id="mb_open_yes" <?php echo $mb_open_yes; ?>>
-			<label for="mb_open_yes">예</label>
-			<input type="radio" name="mb_open" value="0" id="mb_open_no" <?php echo $mb_open_no; ?>>
-			<label for="mb_open_no">아니오</label>
+			<input type="text" name="mb_birth" value="<?php echo isset($mb['mb_birth']) ? htmlspecialchars($mb['mb_birth'], ENT_QUOTES) : ''; ?>" id="mb_birth" maxlength="100" class="frm_input" size="20" placeholder="자유 입력 (예: 1990, 1990-05, 1990-05-12)">
+			<div class="reg-help" style="font-size:12px;color:#888;margin-top:3px;">
+				관리자 수정 폼은 형식 제한 없이 자유 입력입니다. 회원가입 폼 정책(연도만/안 받음 등) 과 무관하게 기존 값을 그대로 보존·수정할 수 있습니다.
+			</div>
 		</td>
 	</tr>
 	<tr>
@@ -204,27 +128,6 @@ add_javascript(G5_POSTCODE_JS, 0);    //다음 주소 js
 	<tr>
 		<th scope="row">IP</th>
 		<td colspan="3"><?php echo $mb['mb_ip'] ?></td>
-	</tr>
-	<?php if ($config['cf_use_email_certify']) { ?>
-	<tr>
-		<th scope="row">인증일시</th>
-		<td colspan="3">
-			<?php if ($mb['mb_email_certify'] == '0000-00-00 00:00:00') { ?>
-			<?php echo help('회원님이 메일을 수신할 수 없는 경우 등에 직접 인증처리를 하실 수 있습니다.') ?>
-			<input type="checkbox" name="passive_certify" id="passive_certify">
-			<label for="passive_certify">수동인증</label>
-			<?php } else { ?>
-			<?php echo $mb['mb_email_certify'] ?>
-			<?php } ?>
-		</td>
-	</tr>
-	<?php } ?>
-	<?php } ?>
-
-	<?php if ($config['cf_use_recommend']) { // 추천인 사용 ?>
-	<tr>
-		<th scope="row">추천인</th>
-		<td colspan="3"><?php echo ($mb['mb_recommend'] ? get_text($mb['mb_recommend']) : '없음'); // 081022 : CSRF 보안 결함으로 인한 코드 수정 ?></td>
 	</tr>
 	<?php } ?>
 
@@ -257,6 +160,15 @@ this.form.mb_intercept_date.value=this.form.mb_intercept_date.defaultValue; }">
 	</table>
 </div>
 
+<?php
+// 회원가입 추가 입력폼 (cf_register_extra_fields) — 어드민에서도 동일 노출
+if (function_exists('register_extra_render')) {
+	echo '<div class="tbl_frm01 tbl_wrap" style="margin-top:10px;"><h3 style="padding:8px 12px;background:#f5f5f5;margin:0;">추가 입력 항목</h3>';
+	register_extra_render($mb);
+	echo '</div>';
+}
+?>
+
 <div class="btn_confirm01 btn_confirm">
 	<input type="submit" value="확인" class="btn_submit" accesskey='s'>
 	<a href="./member_list.php?<?php echo $qstr ?>">목록</a>
@@ -266,11 +178,6 @@ this.form.mb_intercept_date.value=this.form.mb_intercept_date.defaultValue; }">
 <script>
 function fmember_submit(f)
 {
-	if (!f.mb_icon.value.match(/\.gif$/i) && f.mb_icon.value) {
-		alert('아이콘은 gif 파일만 가능합니다.');
-		return false;
-	}
-
 	return true;
 }
 </script>

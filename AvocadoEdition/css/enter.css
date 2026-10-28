@@ -15,6 +15,10 @@
 
 html, body {height:100%; margin:0; padding:0;}
 
+/* standalone(모바일 include / 직접 진입)에서도 디자인 배경 박스가 생기도록.
+   본 규칙은 css/style.css 와 동일. head.sub.php 를 안 타는 경로 보완용. */
+html.single:before {content:""; display:block; position:fixed; top:0; left:0; right:0; bottom:0; z-index:-1;}
+
 .wrapper {display:table; width:100%; height:100%; position:relative; z-index:1;}
 .wrapper > .inner {display:table-cell; vertical-align:middle; text-align:center;}
 

@@ -27,17 +27,17 @@ $from_record = ($page - 1) * $rows; // 시작 열을 구함
 <div id="member_view_point">
 	<div class="ui-profile">
 		<em>
-			<img src="<?=$ch['ch_thumb']?>" />
+			<img src="<?php echo $ch['ch_thumb']?>" />
 		</em>
 		
-		<p class="name txt-point"><?=$ch['ch_name']?></p>
-	<? if($config['cf_side_title']) { ?>
-		<p><?=$config['cf_side_title']?> : <?=get_side_name($ch['ch_side'])?></p>
-	<? } ?>
-	<? if($config['cf_class_title']) { ?>
-		<p><?=$config['cf_class_title']?> : <?=get_class_name($ch['ch_class'])?></p>
-	<? } ?>
-		<p><?=$config['cf_exp_name']?> : <?=$ch['ch_exp']?><?=$config['cf_exp_pice']?></p>
+		<p class="name txt-point"><?php echo $ch['ch_name']?></p>
+	<?php  if($config['cf_side_title']) { ?>
+		<p><?php echo $config['cf_side_title']?> : <?php echo get_side_name($ch['ch_side'])?></p>
+	<?php  } ?>
+	<?php  if($config['cf_class_title']) { ?>
+		<p><?php echo $config['cf_class_title']?> : <?php echo get_class_name($ch['ch_class'])?></p>
+	<?php  } ?>
+		<p><?php echo $config['cf_exp_name']?> : <?php echo $ch['ch_exp']?><?php echo $config['cf_exp_pice']?></p>
 	</div>
 </div>
 
@@ -46,7 +46,7 @@ $from_record = ($page - 1) * $rows; // 시작 열을 구함
 		<tr>
 			<th scope="col">일자</th>
 			<th scope="col">내용</th>
-			<th scope="col"><?=$config['cf_exp_name']?></th>
+			<th scope="col"><?php echo $config['cf_exp_name']?></th>
 		</tr>
 	</thead>
 	<tbody>
@@ -73,7 +73,7 @@ $from_record = ($page - 1) * $rows; // 시작 열을 구함
 				<?php echo date('Y-m-d', strtotime($row['ex_datetime'])); ?>
 			</td>
 			<td><?php echo $ex_content; ?></td>
-			<td class="txt-right" style="padding-right: 15px;"><?php echo $point1; ?> <?=$config['cf_exp_pice']?></td>
+			<td class="txt-right" style="padding-right: 15px;"><?php echo $point1; ?> <?php echo $config['cf_exp_pice']?></td>
 		</tr>
 	<?php
 	}

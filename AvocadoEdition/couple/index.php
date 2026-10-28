@@ -13,8 +13,15 @@ $list = array();
 for($i=0; $co = sql_fetch_array($result); $i++) {
 	$list[$i] = $co;
 
-	$ch_left = sql_fetch("select ch_name, ch_thumb, mb_id from {$g5['character_table']} where ch_id = '{$co['co_left']}'");
-	$ch_right = sql_fetch("select ch_name, ch_thumb, mb_id from {$g5['character_table']} where ch_id = '{$co['co_right']}'");
+	$ch_left = sql_fetch("select ch_id, ch_name, ch_thumb, mb_id from {$g5['character_table']} where ch_id = '{$co['co_left']}'");
+	$ch_right = sql_fetch("select ch_id, ch_name, ch_thumb, mb_id from {$g5['character_table']} where ch_id = '{$co['co_right']}'");
+
+	// 시기 적용
+	if (function_exists('apply_character_time')) {
+		$_t = get_current_time();
+		if (is_array($ch_left))  apply_character_time($ch_left,  $_t);
+		if (is_array($ch_right)) apply_character_time($ch_right, $_t);
+	}
 
 	$ch_left['ch_name'] = explode(' ', $ch_left['ch_name']);
 	$ch_left['ch_name'] = $ch_left['ch_name'][0];
@@ -32,11 +39,11 @@ for($i=0; $co = sql_fetch_array($result); $i++) {
 
 	$list[$i]['left']['idx'] = $co['co_left'];
 	$list[$i]['left']['name'] = $ch_left['ch_name'];
-	$list[$i]['left']['thumb'] = $ch_left['ch_thumb'];
+	$list[$i]['left']['thumb'] = function_exists('cdn_resolve_url') ? cdn_resolve_url($ch_left['ch_thumb']) : $ch_left['ch_thumb'];
 
 	$list[$i]['right']['idx'] = $co['co_right'];
 	$list[$i]['right']['name'] = $ch_right['ch_name'];
-	$list[$i]['right']['thumb'] = $ch_right['ch_thumb'];
+	$list[$i]['right']['thumb'] = function_exists('cdn_resolve_url') ? cdn_resolve_url($ch_right['ch_thumb']) : $ch_right['ch_thumb'];
 
 	$list[$i]['dday'] = $day;
 }
@@ -45,11 +52,7 @@ for($i=0; $co = sql_fetch_array($result); $i++) {
 $g5['title'] = "커플";
 include_once('./_head.php');
 
-if(defined('G5_THEME_PATH') && is_file(G5_THEME_PATH."/couple/list.skin.php")) {
-	include(G5_THEME_PATH."/couple/list.skin.php");
-} else {
-	include(G5_PATH."/couple/skin/list.skin.php");
-}
+include(G5_PATH."/couple/skin/list.skin.php");
 
 include_once(G5_PATH.'/tail.php');
 ?>

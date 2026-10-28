@@ -1,5 +1,5 @@
 <?php
-$sub_menu = "500400";
+$sub_menu = "510400";
 include_once('./_common.php');
 
 auth_check($auth[$sub_menu], 'r');
@@ -121,7 +121,7 @@ $colspan = 5;
 					<td><?php echo get_text($ch['ch_name']); ?></td>
 					<td><?php echo get_text($mb['mb_nick']); ?></td>
 					<td>
-						<img src="<?=$it['it_img']?>" style="max-width: 30px;"/>
+						<img src="<?php echo $it['it_img']?>" style="max-width: 30px;"/>
 						<?php echo get_text($it['it_name']); ?>
 					</td>
 					<td><?php echo ($row['or_datetime'] == '0000-00-00 00:00:00') ? '' : $row['or_datetime'] ?></td>

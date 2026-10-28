@@ -1,8 +1,14 @@
 <?php
-$sub_menu = "400420";
+$sub_menu = "410120";
 include_once('./_common.php');
 
-auth_check($auth[$sub_menu], 'r');
+// 최초 스탯 포인트 저장 (community_form 에서 이전)
+if (isset($_POST['init_point_update']) && check_admin_token()) {
+    $cf_status_point = (int)($_POST['cf_status_point'] ?? 0);
+    if ($cf_status_point < 0) $cf_status_point = 0;
+    sql_query("UPDATE `{$g5['config_table']}` SET cf_status_point = '{$cf_status_point}'");
+    goto_url('./status_list.php');
+}
 
 $token = get_token();
 
@@ -46,8 +52,28 @@ $pg_anchor = '<ul class="anchor">
 ?>
 
 <div class="local_desc02 local_desc">
-	<p>캐릭터 생성 시 지급되는 전체 스탯포인트 설정은 [ <a href="./community_form.php">환경설정 > 커뮤니티 설정</a> ] 에서 설정해 주시길 바랍니다.</p>
+	<p>캐릭터 생성 시 지급되는 전체 스탯포인트는 아래에서 직접 설정합니다.</p>
 </div>
+
+<details class="adm-panel" open>
+<summary>최초 스탯 포인트 설정</summary>
+<div class="adm-panel-body">
+<form method="post" action="">
+<?php echo get_admin_token_field(); ?>
+<input type="hidden" name="init_point_update" value="1">
+<p class="adm-panel-help">스탯 사용 설정 시, <strong>캐릭터가 최초로 획득하는 스탯 포인트</strong>를 지정합니다.</p>
+<div class="adm-opt-grid">
+	<label class="adm-opt-label" for="cf_status_point">최초 스탯 포인트</label>
+	<div>
+		<input type="number" name="cf_status_point" id="cf_status_point" value="<?php echo (int)($config['cf_status_point'] ?? 0); ?>" min="0" max="9999" class="frm_input" size="5"> 포인트
+	</div>
+</div>
+<div class="adm-panel-actions">
+	<button type="submit" class="btn_submit">최초 스탯 포인트 저장</button>
+</div>
+</form>
+</div>
+</details>
 
 <section id="anc_001">
 	<h2 class="h2_frm">스탯 설정 목록</h2>
@@ -119,8 +145,8 @@ $pg_anchor = '<ul class="anchor">
 				<input type="text" name="st_help[<?php echo $i ?>]" value="<?php echo $row['st_help'] ?>" style="width: 98%;"> 
 			</td>
 			<td>
-				<input type="checkbox" name="st_use_max[<?php echo $i ?>]" id="st_use_max_<?=$i?>" value="1" <?=$row['st_use_max'] ? "checked" : ""?>/>
-				<label for="st_use_max_<?=$i?>"></label>
+				<input type="checkbox" name="st_use_max[<?php echo $i ?>]" id="st_use_max_<?php echo $i?>" value="1" <?php echo $row['st_use_max'] ? "checked" : ""?>/>
+				<label for="st_use_max_<?php echo $i?>"></label>
 			</td>
 
 		</tr>

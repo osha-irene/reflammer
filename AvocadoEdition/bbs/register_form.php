@@ -1,6 +1,5 @@
 <?php
 include_once('./_common.php');
-include_once(G5_CAPTCHA_PATH.'/captcha.lib.php');
 include_once(G5_LIB_PATH.'/register.lib.php');
 
 if(!$is_add_register && $w == '') {
@@ -93,50 +92,33 @@ if ($w == "") {
 
 	$g5['title'] = '회원 정보 수정';
 
-	set_session("ss_reg_mb_name", $member['mb_name']);
-	set_session("ss_reg_mb_hp", $member['mb_hp']);
+	set_session("ss_reg_mb_name", $member['mb_name'] ?? '');
+	if (array_key_exists('mb_hp', $member)) {
+		set_session("ss_reg_mb_hp", $member['mb_hp']);
+	}
 
-	$member['mb_email']       = get_text($member['mb_email']);
-	$member['mb_homepage']    = get_text($member['mb_homepage']);
-	$member['mb_birth']       = get_text($member['mb_birth']);
-	$member['mb_tel']         = get_text($member['mb_tel']);
-	$member['mb_hp']          = get_text($member['mb_hp']);
-	$member['mb_addr1']       = get_text($member['mb_addr1']);
-	$member['mb_addr2']       = get_text($member['mb_addr2']);
-	$member['mb_signature']   = get_text($member['mb_signature']);
-	$member['mb_recommend']   = get_text($member['mb_recommend']);
-	$member['mb_profile']     = get_text($member['mb_profile']);
-	$member['mb_1']           = get_text($member['mb_1']);
-	$member['mb_2']           = get_text($member['mb_2']);
-	$member['mb_3']           = get_text($member['mb_3']);
-	$member['mb_4']           = get_text($member['mb_4']);
-	$member['mb_5']           = get_text($member['mb_5']);
-	$member['mb_6']           = get_text($member['mb_6']);
-	$member['mb_7']           = get_text($member['mb_7']);
-	$member['mb_8']           = get_text($member['mb_8']);
-	$member['mb_9']           = get_text($member['mb_9']);
-	$member['mb_10']          = get_text($member['mb_10']);
+	foreach (array(
+		'mb_email', 'mb_homepage', 'mb_birth', 'mb_tel', 'mb_hp',
+		'mb_addr1', 'mb_addr2', 'mb_signature', 'mb_recommend', 'mb_profile',
+		'mb_1', 'mb_2', 'mb_3', 'mb_4', 'mb_5', 'mb_6', 'mb_7', 'mb_8', 'mb_9', 'mb_10',
+	) as $_mk) {
+		if (array_key_exists($_mk, $member)) {
+			$member[$_mk] = get_text($member[$_mk]);
+		}
+	}
 } else {
 	alert('w 값이 제대로 넘어오지 않았습니다.');
 }
 
 include_once('./_head.php');
 
-// 회원아이콘 경로
-$mb_icon_path = G5_DATA_PATH.'/member/'.substr($member['mb_id'],0,2).'/'.$member['mb_id'].'.gif';
-$mb_icon_url  = G5_DATA_URL.'/member/'.substr($member['mb_id'],0,2).'/'.$member['mb_id'].'.gif';
-
 $register_action_url = G5_HTTPS_BBS_URL.'/register_form_update.php';
-$req_nick = !isset($member['mb_nick_date']) || (isset($member['mb_nick_date']) && $member['mb_nick_date'] <= date("Y-m-d", G5_SERVER_TIME - ($config['cf_nick_modify'] * 86400)));
+$req_nick = true;
 $required = ($w=='') ? 'required' : '';
 $readonly = ($w=='u') ? 'readonly' : '';
 
 $agree  = preg_replace('#[^0-9]#', '', $agree);
 $agree2 = preg_replace('#[^0-9]#', '', $agree2);
-
-// add_javascript('js 구문', 출력순서); 숫자가 작을 수록 먼저 출력됨
-if ($config['cf_use_addr'])
-	add_javascript(G5_POSTCODE_JS, 0);    //다음 주소 js
 
 include_once($member_skin_path.'/register_form.skin.php');
 include_once('./_tail.php');

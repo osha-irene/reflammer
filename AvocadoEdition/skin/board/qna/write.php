@@ -1,7 +1,6 @@
 <?php
 include_once('./_common.php');
 include_once(G5_EDITOR_LIB);
-include_once(G5_CAPTCHA_PATH.'/captcha.lib.php');
 
 if (!$board['bo_table']) {
     alert('존재하지 않는 게시판입니다.', G5_URL);
@@ -168,7 +167,7 @@ if (!empty($group['gr_use_access'])) {
         alert("접근 권한이 없습니다.\\n\\n회원이시라면 로그인 후 이용해 보십시오.", 'login.php?'.$qstr.'&amp;url='.urlencode($_SERVER['SCRIPT_NAME'].'?bo_table='.$bo_table));
     }
 
-    if ($is_admin == 'super' || $group['gr_admin'] == $member['mb_id'] || $board['bo_admin'] == $member['mb_id']) {
+    if ($is_admin || $group['gr_admin'] == $member['mb_id'] || $board['bo_admin'] == $member['mb_id']) {
         ; // 통과
     } else {
         // 그룹접근
@@ -176,30 +175,6 @@ if (!empty($group['gr_use_access'])) {
         $row = sql_fetch($sql);
         if (!$row['gr_id'])
             alert('접근 권한이 없으므로 글쓰기가 불가합니다.\\n\\n궁금하신 사항은 관리자에게 문의 바랍니다.');
-    }
-}
-
-// 본인확인을 사용한다면
-if ($config['cf_cert_use'] && !$is_admin) {
-    // 인증된 회원만 가능
-    if ($board['bo_use_cert'] != '' && $is_guest) {
-        alert('이 게시판은 본인확인 하신 회원님만 글쓰기가 가능합니다.\\n\\n회원이시라면 로그인 후 이용해 보십시오.', 'login.php?'.$qstr.'&amp;url='.urlencode($_SERVER['SCRIPT_NAME'].'?bo_table='.$bo_table));
-    }
-
-    if ($board['bo_use_cert'] == 'cert' && !$member['mb_certify']) {
-        alert('이 게시판은 본인확인 하신 회원님만 글쓰기가 가능합니다.\\n\\n회원정보 수정에서 본인확인을 해주시기 바랍니다.', G5_URL);
-    }
-
-    if ($board['bo_use_cert'] == 'adult' && !$member['mb_adult']) {
-        alert('이 게시판은 본인확인으로 성인인증 된 회원님만 글쓰기가 가능합니다.\\n\\n성인인데 글쓰기가 안된다면 회원정보 수정에서 본인확인을 다시 해주시기 바랍니다.', G5_URL);
-    }
-
-    if ($board['bo_use_cert'] == 'hp-cert' && $member['mb_certify'] != 'hp') {
-        alert('이 게시판은 휴대폰 본인확인 하신 회원님만 글읽기가 가능합니다.\\n\\n회원정보 수정에서 휴대폰 본인확인을 해주시기 바랍니다.', G5_URL);
-    }
-
-    if ($board['bo_use_cert'] == 'hp-adult' && (!$member['mb_adult'] || $member['mb_certify'] != 'hp')) {
-        alert('이 게시판은 휴대폰 본인확인으로 성인인증 된 회원님만 글읽기가 가능합니다.\\n\\n현재 성인인데 글읽기가 안된다면 회원정보 수정에서 휴대폰 본인확인을 다시 해주시기 바랍니다.', G5_URL);
     }
 }
 
@@ -240,7 +215,7 @@ if ($member['mb_level'] >= $board['bo_html_level'])
 $is_secret = $board['bo_use_secret'];
 
 $is_mail = false;
-if ($config['cf_email_use'] && $board['bo_use_email'])
+if (false && $board['bo_use_email'])
     $is_mail = true;
 
 $recv_email_checked = '';
@@ -293,8 +268,6 @@ if ($w == "" || $w == "r") {
         if (isset($write['wr_name'])) {
             $name = get_text(cut_str(stripslashes($write['wr_name']),20));
         }
-        $email = get_email_address($member['mb_email']);
-        $homepage = get_text(stripslashes($member['mb_homepage']));
     }
 }
 
@@ -316,8 +289,6 @@ if ($w == '') {
     }
 
     $name = get_text(cut_str(stripslashes($write['wr_name']),20));
-    $email = get_email_address($write['wr_email']);
-    $homepage = get_text(stripslashes($write['wr_homepage']));
 
     for ($i=1; $i<=G5_LINK_COUNT; $i++) {
         $write['wr_link'.$i] = get_text($write['wr_link'.$i]);
@@ -384,12 +355,6 @@ if ($width <= 100)
 else
     $width .= 'px';
 
-$captcha_html = '';
-$captcha_js   = '';
-if ($is_guest) {
-    $captcha_html = captcha_html();
-    $captcha_js   = chk_captcha_js();
-}
 
 $is_dhtml_editor = false;
 $is_dhtml_editor_use = false;

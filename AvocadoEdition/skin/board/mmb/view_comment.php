@@ -10,17 +10,15 @@ if ($member['mb_level'] >= $board['bo_comment_level'])
 
 // 코멘트 출력
 //$sql = " select * from {$write_table} where wr_parent = '{$wr_id}' and wr_is_comment = 1 order by wr_comment desc, wr_comment_reply ";
-$sql = " select * from $write_table where wr_parent = '{$list_item['wr_id']}' and wr_content != '' order by wr_datetime asc ";
+$sql = " select * from $write_table where wr_parent = '{$list_item['wr_id']}' and wr_is_comment = 1 and wr_content != '' order by wr_datetime asc ";
 $result = sql_query($sql);
 for ($c_i=0; $c_row=sql_fetch_array($result); $c_i++)
 {
 	$comment[$c_i] = $c_row;
 
-	//$comment[$c_i]['name'] = get_sideview($c_row['mb_id'], cut_str($c_row['wr_name'], 20, ''), $c_row['wr_email'], $c_row['wr_homepage']);
-
 	$tmp_name = get_text(cut_str($c_row['wr_name'], $config['cf_cut_name'])); // 설정된 자리수 만큼만 이름 출력
 	if ($board['bo_use_sideview'])
-		$comment[$c_i]['name'] = get_sideview($c_row['mb_id'], $tmp_name, $c_row['wr_email'], $c_row['wr_homepage']);
+		$comment[$c_i]['name'] = get_sideview($c_row['mb_id'], $tmp_name);
 	else
 		$comment[$c_i]['name'] = '<span class="'.($c_row['mb_id']?'member':'guest').'">'.$tmp_name.'</span>';
 
@@ -111,7 +109,23 @@ else
 	$comment_max = (int)$board['bo_comment_max'];
 }
 
-//array_unshift($comment, $list_item);
+// 원글 wr_content 는 이미지 옆 댓글 칸에 댓글과 같은 블록으로 출력한다.
+if (!isset($mmb_write_as_comment)) {
+	$mmb_write_as_comment = (isset($list_item['wr_content']) && trim((string)$list_item['wr_content']) !== '');
+}
+if (!empty($mmb_write_as_comment) && isset($list_item['wr_id'])) {
+	$mmb_write_row = $list_item;
+	$mmb_write_raw = isset($list_item['wr_content']) ? $list_item['wr_content'] : '';
+	$mmb_write_row['content1'] = $mmb_write_raw;
+	$mmb_write_row['content'] = conv_content($mmb_write_raw, 0, 'wr_content');
+	$mmb_write_row['content'] = search_font(isset($stx) ? $stx : '', $mmb_write_row['content']);
+	$mmb_write_row['is_reply'] = false;
+	$mmb_write_row['is_edit'] = false;
+	$mmb_write_row['is_del'] = false;
+	$mmb_write_row['del_link'] = '';
+	array_unshift($comment, $mmb_write_row);
+}
+
 include($board_skin_path.'/view_comment.skin.php');
 
 ?>

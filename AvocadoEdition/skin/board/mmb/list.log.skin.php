@@ -21,7 +21,15 @@ else if (!$list_item['mb_id']) { // 회원이 쓴 글이 아니라면
 $is_favorite = sql_fetch("select count(*) as cnt from {$g5['scrap_table']} where mb_id = '{$member['mb_id']}' and wr_id = '{$list_item['wr_id']}' and bo_table = '{$bo_table}'");
 $is_favorite = $is_favorite['cnt'] > 0 ? true : false;
 
-if($list_item['wr_type'] == 'UPLOAD') { 
+// ── 로그 이미지/클래스 계산 ──
+//   래퍼 div(.item / .ui-pic / .pic-data)의 class·속성에 반영되어야 하므로
+//   HTML 출력 전(여기, 컨트롤러 영역)에서 미리 끝낸다.
+//   (출력은 template/list_log_img.tpl.php 가 담당)
+$image_url = '';
+$image_width = 0;
+$image_height = 0;
+
+if($list_item['wr_type'] == 'UPLOAD') {
 	// Upload 형태로 로그를 등록 하였을 때
 	$thumb = get_mmb_image($bo_table, $list_item['wr_id']);
 	$image_url = '<img src="'.$thumb['src'].'" />';
@@ -33,16 +41,22 @@ if($list_item['wr_type'] == 'UPLOAD') {
 	$image_width = $list_item['wr_width'];
 	$image_height = $list_item['wr_height'];
 }
+// 그 외(모듈이 추가한 wr_type)는 list_log_img.tpl.php 의 모듈 훅이 출력을 담당한다.
+//   단, 갤러리 레이아웃(data_width / bo_gallery_height 접기)을 위해 저장된
+//   wr_width/wr_height 를 대표 이미지 크기로 사용한다.
+if($image_url === '' && $list_item['wr_width']) {
+	$image_width = $list_item['wr_width'];
+	$image_height = $list_item['wr_height'];
+}
 
 $log_class = '';
-$blind_class ='';
+$blind_class = '';
 $h_class = '';
 
 // 멤버공개 데이터일 시
 $is_viewer = true;
 $data_width = 300;
 $no_member_class = '';
-
 if($list_item['wr_secret'] == '1' && !$is_member) {
 	$is_viewer = false;
 	$no_member_class = ' empty ';
@@ -50,11 +64,11 @@ if($list_item['wr_secret'] == '1' && !$is_member) {
 	$data_width = $image_width < 300 ? 300 : $image_width;
 }
 
-if($is_viewer) { 
+if($is_viewer) {
 
 	// 접기 여부 설정
-	if($board['bo_gallery_height'] && ($image_height >= $board['bo_gallery_height'] || $list_item['wr_plip'] == '1')) { 
-		if(G5_IS_MOBILE) { 
+	if($board['bo_gallery_height'] && ($image_height >= $board['bo_gallery_height'] || $list_item['wr_plip'] == '1')) {
+		if(G5_IS_MOBILE) {
 			$log_class .= "ui-slide-mobile";
 			if($list_item['wr_type'] == 'UPLOAD') {
 				$thumb = get_list_thumbnail($bo_table, $list_item['wr_id'], $image_width, 200, true, true);
@@ -75,88 +89,94 @@ if($is_viewer) {
 		}
 	}
 	// 블라인드 (19금 필터링) 여부 설정
-	if($list_item['wr_adult'] == '1') { 
+	if($list_item['wr_adult'] == '1') {
 		$blind_class = "ui-blind";
 	}
 	// 리플 아래로 내리기 여부 설정
-	if($list_item['wr_wide'] == '1') { 
+	if($list_item['wr_wide'] == '1') {
 		$h_class = "ui-wrap";
 	}
 }
 
+if (!empty($list_item['wr_k_raid_admin'])) {
+	$h_class = 'raid_admin';
+}
 
+$mmb_row_extra_ctx = array(
+	'bo_table'        => isset($bo_table) ? $bo_table : '',
+	'board_skin_url'  => isset($board_skin_url) ? $board_skin_url : '',
+	'board_skin_path' => isset($board_skin_path) ? $board_skin_path : '',
+	'scope'           => 'post',
+);
+$mmb_row_has_raid = !empty($list_item['wr_k_raid_log']) || !empty($list_item['wr_k_raid_admin']);
 
-
-
-// 알람 내역이 있을 경우, 확인으로체크
+// 알람 내역이 있을 경우, 확인으로 체크
 sql_query("update {$g5['call_table']} set bc_check = 1 where re_mb_id = '{$member['mb_id']}' and bo_table ='{$bo_table}' and wr_id = '{$list_item['wr_id']}'");
+
+// 로그 이미지 출력 템플릿(list_log_img.tpl.php) 에 전달할 모듈 훅 컨텍스트
+$mmb_log_ctx = array(
+	'bo_table'     => $bo_table,
+	'list_item'    => $list_item,
+	'wr_type'      => $list_item['wr_type'],
+	'image_url'    => $image_url,
+	'image_width'  => $image_width,
+	'image_height' => $image_height,
+	'log_class'    => $log_class,
+	'blind_class'  => $blind_class,
+	'is_viewer'    => $is_viewer,
+	'board'        => $board,
+);
 ?>
 
-<div class="item <?=$h_class?>" id="log_<?=$list_item['wr_id']?>">
+<div class="item <?php echo $h_class?>" id="log_<?php echo $list_item['wr_id']?>">
 	<div class="item-inner">
 	<!--  로그 이미지 출력 부분 -->
-		<div class="ui-pic <?=$no_member_class?>" data-width="<?=$data_width?>">
+		<div class="ui-pic <?php echo $no_member_class?>" data-width="<?php echo $data_width?>">
 
 			<!-- 로그 상단 영역 -->
 			<div class="pic-header">
 				<p class="no">
 					
-					<? // 로그 넘버링 출력 ?>
-					No. <?=($list_item['wr_num'] * -1)?>
+					<?php  // 로그 넘버링 출력 ?>
+					No. <?php echo ($list_item['wr_num'] * -1)?>
 
-					<? if($list_item['ca_name']){ 
+					<?php  if($list_item['ca_name']){ 
 						// 카테고리 출력
 					?>
-					<span data-category="<?=$list_item['ca_name']?>" class="ico-category">
-						<?=$list_item['ca_name']?>
+					<span data-category="<?php echo $list_item['ca_name']?>" class="ico-category">
+						<?php echo $list_item['ca_name']?>
 					</span>
-					<? } ?>
-					<? if($list_item['wr_adult']) {
+					<?php  } ?>
+					<?php  if($list_item['wr_adult']) {
 						// 19금 필터링 마크
 					?>
 					<span style="color:#d3393d;">■</span>
-					<? } ?>
+					<?php  } ?>
 				</p>
 
-				<? if($is_viewer) { 
+				<?php  if($is_viewer) { 
 					// 보기 권한이 존재 할 경우 (멤버의 경우)
 					// -- 버튼 영역 출력
-					if ($delete_href)		{ ?><a href="<?php echo $delete_href ?>" class="del" onclick="del(this.href); return false;">삭제</a><?	} ?>
-												<a href="?bo_table=<?=$bo_table?>&log=<?=$list_item['wr_num'] * -1?>&single=Y" target="_blank" class="new">로그링크</a>
-					<? if($is_member)		{ ?><a href="#" data-idx='<?=$list_item['wr_id']?>' data-function="favorite" class="fav <?=$is_favorite ? "on" : ""?>">관심</a><? } ?>
-					<? if ($update_href)	{ ?><a href="<?php echo $update_href ?>" class="mod">수정</a><? } ?>
-				<? } ?>
+					if ($delete_href)		{ ?><a href="<?php echo $delete_href ?>" class="del" onclick="del(this.href); return false;">삭제</a><?php 	} ?>
+												<a href="?bo_table=<?php echo $bo_table?>&log=<?php echo $list_item['wr_num'] * -1?>&single=Y" target="_blank" class="new">로그링크</a>
+					<?php  if($is_member)		{ ?><a href="#" data-idx='<?php echo $list_item['wr_id']?>' data-function="favorite" class="fav <?php echo $is_favorite ? "on" : ""?>">관심</a><?php  } ?>
+					<?php  if ($update_href)	{ ?><a href="<?php echo $update_href ?>" class="mod">수정</a><?php  } ?>
+				<?php  } ?>
 			</div>
 			<!-- // 로그 상단 영역 -->
 
 			<!-- 로그 이미지 -->
-			<div class="pic-data <?=$log_class?> <?=!$member['mb_adult'] ? $blind_class : ""?>">
-			<? if(!$is_viewer) { 
+			<div class="pic-data <?php echo $log_class?> <?php echo !$member['mb_adult'] ? $blind_class : ""?>">
+			<?php  if(!$is_viewer) { 
 				// 비공개 이미지
 			?>
 				<div>
-					<img src="<?=$board_skin_url?>/img/img_lock.png" alt="비공개" />
+					<img src="<?php echo $board_skin_url?>/img/img_lock.png" alt="비공개" />
 				</div>
-			<? } else { ?>
-
-				<? if($image_url) { ?>
-					<div data-height="<?=$image_height?>">
-						<?=$image_url?>
-					</div>
-					<?	if($log_class  && !G5_IS_MOBILE) { 
-						// 접기 기능 (펼치기)
-					?>
-					<a href="#" class="ui-open-log ui-btn">OPEN</a>
-					<? } ?>
-					<?	if($blind_class) { 
-						// 블라인드 (19금 필터링)
-					?>
-					<a href="#" class="ui-remove-blind"><span>해당 로그는 필터 된 로그 입니다.<br />확인을 원하실 경우 클릭해주세요.</span></a>
-					<? } ?>
-				<? } ?>
-
-			<? } ?>
-			</div>
+			<?php  } else { 
+				include(G5_BBS_PATH.'/mmb/template/list_log_img.tpl.php');
+			 } ?>
+			</div>	
 			<!-- // 로그 상단 영역 -->
 
 		</div>
@@ -164,16 +184,23 @@ sql_query("update {$g5['call_table']} set bc_check = 1 where re_mb_id = '{$membe
 
 	<!--  로그 코멘트 출력 부분 -->
 		<div class="ui-comment">
-		<? if($is_viewer) {  ?>
+		<?php  if($is_viewer) {  ?>
 			<div class="item-comment-box">
-				<? include($board_skin_path."/view_comment.php");?>
+				<?php
+				$mmb_write_as_comment = (isset($list_item['wr_content']) && trim((string)$list_item['wr_content']) !== '');
+				// 원글 본문이 댓글 칸에 나가면 액션 로그도 그쪽에서 그린다 (댓글과 동일 구조).
+				if (!$mmb_write_as_comment && function_exists('bbs_render_row_extra')) {
+					bbs_render_row_extra($list_item, $mmb_row_extra_ctx);
+				}
+				include($board_skin_path."/view_comment.php");
+				?>
 			</div>
 			<div class="item-comment-form-box">
-				<? include($board_skin_path."/write_comment.php");?>
+				<?php  include($board_skin_path."/write_comment.php");?>
 			</div>
-		<? } else { ?>
+		<?php  } else { ?>
 			멤버 공개용 로그 입니다.
-		<? } ?>
+		<?php  } ?>
 		</div>
 	<!-- // 로그 코멘트 출력 부분 -->
 	</div>

@@ -1,7 +1,9 @@
 @charset "utf-8";
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100..900&display=swap');
+/* 공유 프리셋(/css/preset.css) — 프론트와 동일한 구조 룰 (색/배경 제외) */
+@import url('../../css/preset.css');
 
-* {box-sizing:border-box; font-family:"Noto Sans KR", sans-serif; outline:0;}
+* {box-sizing:border-box; font-family:"Noto Sans KR", sans-serif; outline:0; font-size:12px;}
 
 html {overflow-y:scroll;}
 html,
@@ -115,10 +117,12 @@ input[type="checkbox"]:checked + label:after {left:19px; background:#81c9c9;}
 
 .index-gnb {display:block; font-size:13px;}
 .index-gnb .gnb_1dli {border:1px solid #ddd; border-radius:10px; padding:10px;}
-.index-gnb .gnb_1dli > div {display:table; width:100%; table-layout:fixed; overflow:hidden;}
+.index-gnb .gnb_1dli > .gnb_row {display:table; width:100%; table-layout:fixed; overflow:hidden;}
 .index-gnb .gnb_1dli + .gnb_1dli {margin-top:10px;}
-.index-gnb .gnb_1dli > div > * {display:table-cell;}
-.index-gnb .gnb_1dli > div > a {width:130px; background:#4e5e79; border-radius:10px; color:#fff; text-align:center; vertical-align:middle; font-size:14px;}
+.index-gnb .gnb_1dli > .gnb_row > * {display:table-cell;}
+.index-gnb .gnb_1dli > .gnb_row > a.gnb_1da {width:130px; background:#4e5e79; border-radius:10px; color:#fff; text-align:center; vertical-align:middle; font-size:14px;}
+.index-gnb .gnb_1dli > .gnb_row > a.gnb_readme_open {width:72px; color:#4e5e79; text-align:center; vertical-align:middle; font-size:12px; font-weight:700; text-decoration:underline;}
+.index-gnb .gnb_1dli > .gnb_row > a.gnb_readme_open:hover {color:#24324a;}
 .index-gnb .gnb_2dul {padding-left:15px;}
 .index-gnb .gnb_2dul ul {display:flex; flex-wrap:wrap;}
 .index-gnb .gnb_2dul ul li {display:block; position:relative;}
@@ -126,6 +130,26 @@ input[type="checkbox"]:checked + label:after {left:19px; background:#81c9c9;}
 .index-gnb .gnb_2dul a {display:block; position:relative; padding:4px 10px;}
 .index-gnb .gnb_2dul a:hover,
 .index-gnb .gnb_2dul a:focus {color:#ffa8a8; font-weight:800;}
+
+.adm-md {line-height:1.65; color:#333;}
+.adm-md h1 {font-size:20px; margin:0 0 12px; font-weight:700;}
+.adm-md h2 {font-size:16px; margin:22px 0 10px; padding-bottom:6px; border-bottom:1px solid #eaeaea; font-weight:700;}
+.adm-md h3 {font-size:14px; margin:16px 0 8px; color:#555; font-weight:700;}
+.adm-md h4, .adm-md h5, .adm-md h6 {font-size:13px; margin:12px 0 6px; font-weight:700;}
+.adm-md p {margin:0 0 8px;}
+.adm-md ul, .adm-md ol {margin:0 0 10px; padding-left:1.4em;}
+.adm-md li {list-style:disc; margin:3px 0;}
+.adm-md ol > li {list-style:decimal;}
+.adm-md hr {display:block; border:0; border-top:1px solid #e5e5e5; margin:14px 0;}
+.adm-md table {width:100%; margin:8px 0 12px; table-layout:auto; border-collapse:collapse;}
+.adm-md th, .adm-md td {border:1px solid #e0e0e0; padding:6px 8px; text-align:left; vertical-align:top; color:#444; word-break:keep-all !important;}
+.adm-md th {background:#f4f6f9; font-weight:600; color:#333;}
+.adm-md code {font-family:Consolas, Monaco, monospace; font-size:11px; background:#f4f4f4; padding:1px 4px; border-radius:3px;}
+.adm-md pre {background:#f7f7f7; border:1px solid #ddd; padding:10px; overflow:auto; margin:8px 0 12px;}
+.adm-md pre code {background:none; padding:0;}
+.adm-md a {color:#2a6ea8; text-decoration:underline;}
+.adm-md a:hover {color:#1a4e78;}
+.adm-md strong {font-weight:700;}
 
 
 /****************************************
@@ -145,7 +169,7 @@ input[type="checkbox"]:checked + label:after {left:19px; background:#81c9c9;}
 	Guide Box
 *****************************************/
 
-.frm_info {display:block; position:relative; margin-bottom:10px; color:#ffa8a8;}
+.frm_info {display:block;position:relative;margin-bottom:10px;color:#ffa8a8;font-size: 12px;}
 * ~ .frm_info {margin-top:10px; margin-bottom:0;}
 
 .local_desc {display:block; position:relative; font-size:13px; margin-bottom:10px; background:#e6edf7; padding:10px; border-radius:5px; color:#4b4b4b;}
@@ -224,7 +248,7 @@ table * {word-break:break-all !important;}
 input[class*="btn_"],
 a[class*="btn_"],
 button[class*="btn_"] {display:inline-block; position:relative; vertical-align:middle; height:30px; padding:0 20px; border-radius:9em; font-size:1em; border:2px solid #81c9c9; background:#fff; color:#81c9c9; cursor:pointer;}
-a[class*="btn_"] {line-height:26px;}
+a[class*="btn_"]:not(.preset-admin .btn-mini) {line-height:26px;}
 
 .btn_confirm input[class*="btn_"],
 .btn_confirm a,
@@ -330,3 +354,11 @@ label[for="cf_dungeon_map"] {text-indent:-999px;}
 
 #itemAddTable thead th {background:#000; color:#fff; height:30px;}
 #itemAddTable tbody tr > * {padding:4px; border-bottom:1px solid #ddd; text-align:center;}
+
+/* .inven-popup-viewer / .item-box 구조 룰은 /css/preset.css 로 이전됨.
+   관리자에서 보이는 팝업 기본 색/아이템 테두리는
+   디자인 설정의 fallback 으로 이동 (adm/design_form_css.php). */
+
+.title-list p {padding:5px;}
+.title-list .item {display:inline-block; min-width:25%; padding: 5px; box-sizing:border-box; text-align:left; vertical-align:middle;}
+

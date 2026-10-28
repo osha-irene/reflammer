@@ -1,5 +1,5 @@
 <?php
-$sub_menu = "400300";
+$sub_menu = "500500";
 include_once('./_common.php');
 
 auth_check($auth[$sub_menu], 'r');
@@ -57,7 +57,7 @@ $frm_submit = '<div class="btn_confirm01 btn_confirm">
 	<input type="submit" value="확인" class="btn_submit" accesskey="s">
 </div>';
 
-$colspan = 5;
+$colspan = 7;
 ?>
 
 <section id="anc_001">
@@ -83,11 +83,12 @@ $colspan = 5;
 		<caption><?php echo $g5['title']; ?> 목록</caption>
 		<colgroup>
 			<col style="width: 45px;" />
+			<col style="width: 100px;" />
 			<col style="width: 200px;" />
 			<col style="width: 200px;" />
+			<col />
 			<col />
 			<col style="width: 80px;" />
-			<col />
 		</colgroup>
 		<thead>
 		<tr>
@@ -95,9 +96,11 @@ $colspan = 5;
 				<label for="chkall" class="sound_only">현재 페이지 타이틀 전체</label>
 				<input type="checkbox" name="chkall" value="1" id="chkall" onclick="check_all(this.form)">
 			</th>
+			<th>타입</th>
 			<th>이미지</th>
 			<th>이미지 수정</th>
 			<th>타이틀명</th>
+			<th>미리보기</th>
 			<th>사용유무</th>
 		</tr>
 		</thead>
@@ -113,16 +116,27 @@ $colspan = 5;
 				<input type="checkbox" name="chk[]" value="<?php echo $i ?>" id="chk_<?php echo $i ?>">
 			</td>
 			<td>
-				<? if($ti['ti_img']) { ?>
-					<img src="<?=$ti['ti_img']?>" />
-					<input type="hidden" name="old_ti_img[<?=$i?>]" value="<?=$ti['ti_img']?>" />
-				<? } ?>
+				<select name="ti_type[<?php echo $i; ?>]">
+					<option value="img" <?php echo $ti['ti_type']=='img'?'selected':''; ?>>이미지</option>
+					<option value="text" <?php echo $ti['ti_type']=='text'?'selected':''; ?>>텍스트</option>
+					<option value="both" <?php echo $ti['ti_type']=='both'?'selected':''; ?>>둘다</option>
+				</select>
 			</td>
 			<td>
-				<input type="file" name="ti_img[<?=$i?>]" id="ti_img<?=$i?>" />
+				<?php  if($ti['ti_img']) { ?>
+					<img src="<?php echo $ti['ti_img']?>" />
+					<input type="hidden" name="old_ti_img[<?php echo $i?>]" value="<?php echo $ti['ti_img']?>" />
+				<?php  } ?>
 			</td>
 			<td>
-				<input type="text" name="ti_title[<?php echo $i ?>]" value="<?php echo $ti['ti_title'] ?>" class="frm_input" style="width: 98%;">
+				<input type="file" name="ti_img[<?php echo $i?>]" id="ti_img<?php echo $i?>" />
+			</td>
+			<td>
+				<input type="text" name="ti_title[<?php echo $i ?>]" value="<?php echo $ti['ti_title'] ?>" class="frm_input" style="width: 98%;"><br>
+				<input type="text" name="ti_style[<?php echo $i ?>]" value="<?php echo $ti['ti_style'] ?>" class="frm_input" style="width: 98%;" placeholder="텍스트 사용시 스타일 입력 (예: color:red; font-size:14px;)" />
+			</td>
+			<td>
+				<?php echo get_title_value($ti['ti_id']); ?>
 			</td>
 			<td style="text-align: center;">
 				<select name="ti_use[<?php echo $i; ?>]">
@@ -177,7 +191,7 @@ $colspan = 5;
 	<input type="hidden" name="sod" value="<?php echo $sod ?>">
 	<input type="hidden" name="page" value="<?php echo $page ?>">
 	<input type="hidden" name="token" value="<?php echo $token ?>">
-	<input type="hidden" name="ch_id" id="ch_id" value="<?=$ch_id?>" />
+	<input type="hidden" name="ch_id" id="ch_id" value="<?php echo $ch_id?>" />
 	<input type="hidden" name="mb_id" value="<?php echo $ch['mb_id'] ?>">
 
 	<h2 class="h2_frm">타이틀 신규 등록</h2>
@@ -197,9 +211,25 @@ $colspan = 5;
 			</td>
 		</tr>
 		<tr>
-			<th scope="row"><label for="ti_img">타이틀 이미지<strong class="sound_only">필수</strong></label></th>
+			<th scope="row"><label for="ti_type">타입</label></th>
+			<td>
+				<select name="ti_type" id="ti_type">
+					<option value="img">이미지</option>
+					<option value="text">텍스트</option>
+					<option value="both">둘다</option>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<th scope="row"><label for="ti_img">타이틀 이미지</label></th>
 			<td>
 				<input type="file" name="ti_img" id="ti_img" />
+			</td>
+		</tr>
+		<tr>
+			<th scope="row"><label for="ti_style">텍스트 스타일</label></th>
+			<td>
+				<input type="text" name="ti_style" id="ti_style" class="frm_input" placeholder="텍스트 사용시 스타일 입력 (예: color:red; font-size:14px;)" />
 			</td>
 		</tr>
 		<tr>

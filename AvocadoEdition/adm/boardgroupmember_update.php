@@ -1,8 +1,6 @@
 <?php
-$sub_menu = "300200";
+$sub_menu = "300010";
 include_once('./_common.php');
-
-sql_query(" ALTER TABLE {$g5['group_member_table']} CHANGE `gm_id` `gm_id` INT( 11 ) DEFAULT '0' NOT NULL AUTO_INCREMENT ", false);
 
 if ($w == '')
 {

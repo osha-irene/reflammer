@@ -1,12 +1,12 @@
 <?php
-$sub_menu = "100250";
+$sub_menu = "100200";
 include_once('./_common.php');
 include_once(G5_EDITOR_LIB);
 
 auth_check($auth[$sub_menu], 'r');
 
-if ($is_admin != 'super')
-	alert('최고관리자만 접근 가능합니다.');
+if (!$is_admin)
+	alert('관리자만 접근 가능합니다.');
 
 $g5['title'] = '화면 설정';
 include_once ('./admin.head.php');
@@ -32,6 +32,11 @@ $frm_submit = '<div class="btn_confirm01 btn_confirm">
 	<input type="submit" value="확인" class="btn_submit" accesskey="s">
 </div>';
 
+$menu_co['co_content']=isset($menu_co['co_content'])?$menu_co['co_content']:'';
+$menu_co['co_mobile_content']=isset($menu_co['co_mobile_content'])?$menu_co['co_mobile_content']:'';
+
+$main_co['co_content']=isset($main_co['co_content'])?$main_co['co_content']:'';
+$main_co['co_mobile_content']=isset($main_co['co_mobile_content'])?$main_co['co_mobile_content']:'';
 ?>
 
 
@@ -197,18 +202,6 @@ $frm_submit = '<div class="btn_confirm01 btn_confirm">
 					</td>
 				</tr>
 				<tr>
-					<td>트위터 타임라인</td>
-					<td>
-						<input type="text" readonly value="{{TWITTER}}" style="width: 100%;"/>
-					</td>
-					<td class="txt-left">
-						templete/txt.twitter.php
-					</td>
-					<td class="txt-left">
-						관리자 환경설정에서 설정한 트위터의 타임라인을 출력합니다.
-					</td>
-				</tr>
-				<tr>
 					<td>메인 슬라이드</td>
 					<td>
 						<input type="text" readonly value="{{VISUAL_SLIDE}}" style="width: 100%;"/>
@@ -230,6 +223,19 @@ $frm_submit = '<div class="btn_confirm01 btn_confirm">
 					</td>
 					<td class="txt-left">
 						배경음악을 컨트롤 하는 버튼을 출력합니다. 접속기기가 모바일일 경우, 출력되지 않습니다.
+					</td>
+				</tr>
+				<tr>
+					<td>공지 위젯</td>
+					<td>
+						<input type="text" readonly value="{{NOTICE}}" style="width: 100%;"/>
+					</td>
+					<td class="txt-left">
+						get_widget('notice')<br />
+						notice/skin/widget.skin.php
+					</td>
+					<td class="txt-left">
+						위젯 사용이 켜진 공지의 제목·본문을 세로로 쌓아 출력합니다. 공지 문서 디자인은 적용되지 않습니다.
 					</td>
 				</tr>
 			</tbody>

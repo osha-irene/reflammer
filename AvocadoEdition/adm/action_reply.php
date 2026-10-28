@@ -1,5 +1,5 @@
 <?php
-$sub_menu = "200200";
+$sub_menu = "200110";
 include_once('./_common.php');
 auth_check($auth[$sub_menu], 'r');
 
@@ -17,7 +17,7 @@ $to_date = $s_year."-".$s_month."-"."32";
 	p > a:hover { color: yellow; }
 </style>
 
-<?
+<?php 
 $reply_count = array();
 $reply_index = 0;
 $log = sql_query("select mu_id from g5_mmb_upload where mu_datetime > '{$fr_date}' and mu_datetime < '{$to_date}' and (mu_id > '5599' or mu_id < '5370') and (mu_id > '6576' or mu_id < '6369') and mb_id = '{$mb_id}'");
@@ -42,15 +42,15 @@ for ($j=0; $row=sql_fetch_array($log); $j++) {
 	}
 }
 ?>
-<? for($i=0; $i < count($reply_count); $i++) { 
+<?php  for($i=0; $i < count($reply_count); $i++) { 
 	if($reply_count[$i]['mu_id']) { 
 ?>
 <p>
-	<a href="/mmb/index.php?mu_id=<?=$reply_count[$i]['mu_id']?>" target="_blank">
-		<?=$reply_count[$i]['mu_id']?>번 로그 (<?=3 - $reply_count[$i]['mc_no_count']?>/3)
+	<a href="/mmb/index.php?mu_id=<?php echo $reply_count[$i]['mu_id']?>" target="_blank">
+		<?php echo $reply_count[$i]['mu_id']?>번 로그 (<?php echo 3 - $reply_count[$i]['mc_no_count']?>/3)
 	</a>
 </p>
-<? }
+<?php  }
 } ?>
 
 <?php

@@ -4,6 +4,9 @@ include_once('./_common.php');
 
 auth_check($auth[$sub_menu], 'r');
 
+$sch_it_id =isset($sch_it_id )?$sch_it_id :'';
+$sch_it_name =isset($sch_it_name )?$sch_it_name :'';
+
 $sql_common = " from {$g5['explorer_table']} ";
 
 $sql_search = " where (1) ";
@@ -81,12 +84,12 @@ if($sch_it_id) {
 		등록된 뽑기 설정 수 <?php echo number_format($total_count) ?>개
 	</div>
 
-<? if($sch_it_name) { ?>
+<?php  if($sch_it_name) { ?>
 	<div style="padding-bottom: 10px;">
-		<img src="<?=$sch_it_img?>" style="width: 50px;"/>
-		[ <?=$sch_it_name?> ] 뽑기 설정
+		<img src="<?php echo $sch_it_img?>" style="width: 50px;"/>
+		[ <?php echo $sch_it_name?> ] 뽑기 설정
 	</div>
-<? } ?>
+<?php  } ?>
 
 	<form name="ftitlelist" id="ftitlelist" action="./explorer_list_update.php" method="post" enctype="multipart/form-data">
 	<input type="hidden" name="sst" value="<?php echo $sst ?>">
@@ -134,25 +137,25 @@ if($sch_it_id) {
 				<input type="checkbox" name="chk[]" value="<?php echo $i ?>" id="chk_<?php echo $i ?>">
 			</td>
 			<td>
-				<? if($it['it_img']) { ?>
-				<img src="<?=$it['it_img']?>" style="max-width: 50px;"/>
-				<? } else { ?>
+				<?php  if($it['it_img']) { ?>
+				<img src="<?php echo htmlspecialchars($it['it_img'], ENT_QUOTES, 'UTF-8')?>" style="max-width: 50px;"/>
+				<?php  } else { ?>
 				이미지 없음
-				<? } ?>
+				<?php  } ?>
 			</td>
 			<td>
-				<a href="?sch_it_id=<?=$it['it_id']?>"><?=$it['it_name']?></a>
+				<a href="?sch_it_id=<?php echo $it['it_id']?>"><?php echo $it['it_name']?></a>
 			</td>
 
 			<td>
-				<? if($re_it['it_img']) { ?>
-				<img src="<?=$re_it['it_img']?>" style="max-width: 50px;"/>
-				<? } else { ?>
+				<?php  if($re_it['it_img']) { ?>
+				<img src="<?php echo htmlspecialchars($re_it['it_img'], ENT_QUOTES, 'UTF-8')?>" style="max-width: 50px;"/>
+				<?php  } else { ?>
 				이미지 없음
-				<? } ?>
+				<?php  } ?>
 			</td>
 			<td>
-				<?=$re_it['it_name']?>
+				<?php echo $re_it['it_name']?>
 			</td>
 
 			<td>
@@ -198,7 +201,7 @@ if($sch_it_id) {
 	</script>
 </section>
 
-<?
+<?php 
 if(!$sch_it_id || $sch_it['it_type'] == '뽑기') { 
 ?>
 <section id="anc_002" style="margin-top: 0; margin-bottom: 50px;">
@@ -224,17 +227,17 @@ if(!$sch_it_id || $sch_it['it_type'] == '뽑기') {
 				<tr>
 					<th scope="row">뽑기 아이템</th>
 					<td>
-					<? if($sch_it_name) { ?>
-						<input type="hidden" name="it_id" value="<?=$sch_it_id?>" />
-						<input type="hidden" name="it_name" value="<?=$sch_it_name?>" />
-						<img src="<?=$sch_it_img?>" alt="" style="max-width: 50px;" /> <?=$sch_it_name?>
+					<?php  if($sch_it_name) { ?>
+						<input type="hidden" name="it_id" value="<?php echo $sch_it_id?>" />
+						<input type="hidden" name="it_name" value="<?php echo $sch_it_name?>" />
+						<img src="<?php echo $sch_it_img?>" alt="" style="max-width: 50px;" /> <?php echo $sch_it_name?>
 
-					<? } else { ?>
+					<?php  } else { ?>
 						<?php echo help("※ [ 아이템 기능 - 뽑기 아이템 ] 이 설정되어 있어야 적용됩니다.") ?>
-						<input type="hidden" name="it_id" id="it_id" value="<?=$sch_it_id?>" />
-						<input type="text" name="it_name" value="<?=$sch_it_name?>" id="it_name" onkeyup="get_ajax_item(this, 'item_list', 'it_id', '뽑기');" />
+						<input type="hidden" name="it_id" id="it_id" value="<?php echo $sch_it_id?>" />
+						<input type="text" name="it_name" value="<?php echo $sch_it_name?>" id="it_name" onkeyup="get_ajax_item(this, 'item_list', 'it_id', '뽑기');" />
 						<div id="item_list" class="ajax-list-box"><div class="list"></div></div>
-					<? } ?>
+					<?php  } ?>
 					</td>
 				</tr>
 				<tr>
@@ -265,7 +268,7 @@ if(!$sch_it_id || $sch_it['it_type'] == '뽑기') {
 	</form>
 
 </section>
-<? } ?>
+<?php  } ?>
 
 
 <?php

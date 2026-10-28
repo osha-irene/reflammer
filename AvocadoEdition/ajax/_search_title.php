@@ -1,4 +1,4 @@
-<?
+<?php 
 include_once("./_common.php");
 
 
@@ -14,16 +14,16 @@ if(!$is_member) {
 		for($i=0; $row = sql_fetch_array($result); $i++) {
 	?>
 				<li>
-					<a href="#" onclick="select_item('<?=$list_obj?>', '<?=$input_obj?>', '<?=$row['ti_title']?>', '<?=$output_obj?>', '<?=$row['ti_id']?>'); return false;">
+					<a href="#" onclick="select_item('<?php echo $list_obj?>', '<?php echo $input_obj?>', '<?php echo $row['ti_title']?>', '<?php echo $output_obj?>', '<?php echo $row['ti_id']?>'); return false;">
 						<div class="ui-thumb">
-							<img src="<?=$row['ti_img']?>">
+							<img src="<?php echo $row['ti_img']?>">
 						</div>
 						<div class="ui-info">
-							<p class="point"><strong>타이틀명</strong>: <?=$row['ti_title']?></p>
+							<p class="point"><strong>타이틀명</strong>: <?php echo $row['ti_title']?></p>
 						</div>
 					</a>
 				</li>
-	<?
+	<?php 
 		}
 		if($i==0) { 
 			echo "<li class='no-data'>[ ".$keyword." ]에 대한 검색결과가 존재하지 않습니다.</li>";

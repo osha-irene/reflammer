@@ -1,7 +1,7 @@
 <?php
-define('G5_CAPTCHA', true);
+
 include_once('./_common.php');
-include_once(G5_CAPTCHA_PATH.'/captcha.lib.php');
+
 
 // 토큰체크
 $comment_token = trim(get_session('ss_comment_token'));
@@ -19,16 +19,11 @@ if (substr_count($wr_content, "&#") > 50) {
 
 $w = $_POST["w"];
 $wr_name  = trim($_POST['wr_name']);
-$wr_email = '';
-if (!empty($_POST['wr_email']))
-    $wr_email = get_email_address(trim($_POST['wr_email']));
 
 // 비회원의 경우 이름이 누락되는 경우가 있음
 if ($is_guest) {
     if ($wr_name == '')
         alert('이름은 필히 입력하셔야 합니다.');
-    if(!chk_captcha())
-        alert('자동등록방지 숫자가 틀렸습니다.');
 }
 
 if ($w == "c" || $w == "cu") {
@@ -49,6 +44,67 @@ $wr = get_write($write_table, $wr_id);
 if (empty($wr['wr_id']))
     alert("글이 존재하지 않습니다.\\n글이 삭제되었거나 이동하였을 수 있습니다.");
 
+// ─── avo8.0 댓글 제한 (관리자 제외) ──────────────────────────────────
+if (!$is_admin) {
+    // 1) 작성 가능 시간 (시간 단위) — 새 댓글 작성 시에만
+    if ($w == 'c') {
+        $_climit_time = (int)($board['bo_comment_limit_time'] ?? 0);
+        if ($_climit_time > 0) {
+            $_parent_ts = strtotime($wr['wr_datetime']);
+            if ($_parent_ts !== false && (G5_SERVER_TIME - $_parent_ts) > ($_climit_time * 3600)) {
+                alert('이 글은 작성된 지 '.$_climit_time.'시간이 지나 더 이상 댓글을 달 수 없습니다.');
+            }
+        }
+        // 2) 멤버당 댓글 수 제한 (로그인 회원만 카운트 가능) — 원글도 1개로 카운트
+        $_climit_cnt = (int)($board['bo_comment_limit_count'] ?? 0);
+        if ($_climit_cnt > 0 && $is_member && !empty($member['mb_id'])) {
+            $_mb_id_q = sql_escape_string($member['mb_id']);
+            $_row = sql_fetch(" SELECT COUNT(*) AS cnt FROM {$write_table} WHERE wr_parent = '{$wr_id}' AND wr_is_comment = 1 AND mb_id = '{$_mb_id_q}' ");
+            $_used = (int)$_row['cnt'];
+            // 원글 작성자가 본인이면 +1
+            if (!empty($wr['mb_id']) && $wr['mb_id'] === $member['mb_id']) {
+                $_used += 1;
+            }
+            if ($_used >= $_climit_cnt) {
+                alert('이 글에는 1인당 '.$_climit_cnt.'개까지만 글(원글 포함)을 쓸 수 있습니다.');
+            }
+        }
+    }
+    // 3) 댓글 글자 수 제한 (작성/수정 모두 적용, 초과시 자동 절단)
+    $_climit_text = (int)($board['bo_comment_limit_text'] ?? 0);
+    if ($_climit_text > 0 && isset($wr_content)) {
+        $_exc = trim($board['bo_comment_limit_text_exc'] ?? '');
+        $_chars_exc = $_exc !== '' ? array_filter(array_map('trim', explode(',', $_exc)), 'strlen') : array();
+        $_raw = stripslashes($wr_content);
+        $_measure = $_raw;
+        foreach ($_chars_exc as $_ch) { $_measure = str_replace($_ch, '', $_measure); }
+        if (function_exists('mb_strlen') && mb_strlen($_measure, 'UTF-8') > $_climit_text) {
+            // 제외 문자를 유지하면서 일반 문자만 카운트해 자르기
+            $_kept = '';
+            $_count = 0;
+            $_len = mb_strlen($_raw, 'UTF-8');
+            for ($_i = 0; $_i < $_len; $_i++) {
+                $_c = mb_substr($_raw, $_i, 1, 'UTF-8');
+                $_kept .= $_c;
+                if (!in_array($_c, $_chars_exc, true)) {
+                    $_count++;
+                    if ($_count >= $_climit_text) {
+                        // 남은 제외 문자도 뒤따르면 보존
+                        for ($_j = $_i + 1; $_j < $_len; $_j++) {
+                            $_n = mb_substr($_raw, $_j, 1, 'UTF-8');
+                            if (in_array($_n, $_chars_exc, true)) { $_kept .= $_n; } else { break; }
+                        }
+                        break;
+                    }
+                }
+            }
+            $wr_content = addslashes($_kept);
+            $_POST['wr_content'] = $_kept;
+        }
+    }
+}
+// ─── /댓글 제한 ───────────────────────────────────────────────────────
+
 
 // "인터넷옵션 > 보안 > 사용자정의수준 > 스크립팅 > Action 스크립팅 > 사용 안 함" 일 경우의 오류 처리
 // 이 옵션을 사용 안 함으로 설정할 경우 어떤 스크립트도 실행 되지 않습니다.
@@ -60,8 +116,6 @@ if ($is_member)
     // 4.00.13 - 실명 사용일때 댓글에 닉네임으로 입력되던 오류를 수정
     $wr_name = addslashes(clean_xss_tags($board['bo_use_name'] ? $member['mb_name'] : $member['mb_nick']));
     $wr_password = $member['mb_password'];
-    $wr_email = addslashes($member['mb_email']);
-    $wr_homepage = addslashes(clean_xss_tags($member['mb_homepage']));
 }
 else
 {
@@ -159,8 +213,6 @@ if ($w == 'c') // 댓글 입력
                      mb_id = '$mb_id',
                      wr_password = '$wr_password',
                      wr_name = '$wr_name',
-                     wr_email = '$wr_email',
-                     wr_homepage = '$wr_homepage',
                      wr_datetime = '".G5_TIME_YMDHIS."',
                      wr_last = '',
                      wr_ip = '{$_SERVER['REMOTE_ADDR']}',
@@ -198,69 +250,6 @@ if ($w == 'c') // 댓글 입력
 
     // 포인트 부여
     insert_point($member['mb_id'], $board['bo_comment_point'], "{$board['bo_subject']} {$wr_id}-{$comment_id} 댓글쓰기", $bo_table, $comment_id, '댓글');
-
-    // 메일발송 사용
-    if ($config['cf_email_use'] && $board['bo_use_email'])
-    {
-        // 관리자의 정보를 얻고
-        $super_admin = get_admin('super');
-        $group_admin = get_admin('group');
-        $board_admin = get_admin('board');
-
-        $wr_content = nl2br(get_text(stripslashes("원글\n{$wr['wr_subject']}\n\n\n댓글\n$wr_content")));
-
-        $warr = array( ''=>'입력', 'u'=>'수정', 'r'=>'답변', 'c'=>'댓글 ', 'cu'=>'댓글 수정' );
-        $str = $warr[$w];
-
-        $subject = '['.$config['cf_title'].'] '.$board['bo_subject'].' 게시판에 '.$str.'글이 올라왔습니다.';
-        // 4.00.15 - 메일로 보내는 댓글의 바로가기 링크 수정
-        $link_url = G5_BBS_URL."/board.php?bo_table=".$bo_table."&amp;wr_id=".$wr_id."&amp;".$qstr."#c_".$comment_id;
-
-        include_once(G5_LIB_PATH.'/mailer.lib.php');
-
-        ob_start();
-        include_once ('./write_update_mail.php');
-        $content = ob_get_contents();
-        ob_end_clean();
-
-        $array_email = array();
-        // 게시판관리자에게 보내는 메일
-        if ($config['cf_email_wr_board_admin']) $array_email[] = $board_admin['mb_email'];
-        // 게시판그룹관리자에게 보내는 메일
-        if ($config['cf_email_wr_group_admin']) $array_email[] = $group_admin['mb_email'];
-        // 최고관리자에게 보내는 메일
-        if ($config['cf_email_wr_super_admin']) $array_email[] = $super_admin['mb_email'];
-
-        // 원글게시자에게 보내는 메일
-        if ($config['cf_email_wr_write']) $array_email[] = $wr['wr_email'];
-
-        // 댓글 쓴 모든이에게 메일 발송이 되어 있다면 (자신에게는 발송하지 않는다)
-        if ($config['cf_email_wr_comment_all']) {
-            $sql = " select distinct wr_email from {$write_table}
-                        where wr_email not in ( '{$wr['wr_email']}', '{$member['mb_email']}', '' )
-                        and wr_parent = '$wr_id' ";
-            $result = sql_query($sql);
-            while ($row=sql_fetch_array($result))
-                $array_email[] = $row['wr_email'];
-        }
-
-        // 중복된 메일 주소는 제거
-        $unique_email = array_unique($array_email);
-        $unique_email = array_values($unique_email);
-        for ($i=0; $i<count($unique_email); $i++) {
-            mailer($wr_name, $wr_email, $unique_email[$i], $subject, $content, 1);
-        }
-    }
-
-    // SNS 등록
-    include_once("./write_comment_update.sns.php");
-    if($wr_facebook_user || $wr_twitter_user) {
-        $sql = " update $write_table
-                    set wr_facebook_user = '$wr_facebook_user',
-                        wr_twitter_user  = '$wr_twitter_user'
-                    where wr_id = '$comment_id' ";
-        sql_query($sql);
-    }
 }
 else if ($w == 'cu') // 댓글 수정
 {
@@ -274,7 +263,7 @@ else if ($w == 'cu') // 댓글 수정
     $comment_reply = substr($reply_array['wr_comment_reply'], 0, $len);
     //print_r2($GLOBALS); exit;
 
-    if ($is_admin == 'super') // 최고관리자 통과
+    if ($is_admin) // 관리자 통과
         ;
     else if ($is_admin == 'group') { // 그룹관리자
         $mb = get_member($comment['mb_id']);
@@ -340,11 +329,15 @@ else if ($w == 'cu') // 댓글 수정
     sql_query($sql);
 }
 
+// inventory 등 게시판 공유 모듈은 표준 comment_after 훅에 등록 (코어에서 밄사하는 모듈 전용 훅 제거)
+
 // 사용자 코드 실행
 @include_once($board_skin_path.'/write_comment_update.skin.php');
 @include_once($board_skin_path.'/write_comment_update.tail.skin.php');
 
 delete_cache_latest($bo_table);
+
+if (function_exists('mdl_do_action')) mdl_do_action('comment_after', $bo_table, $comment_id, $wr['wr_id']);
 
 goto_url('./board.php?bo_table='.$bo_table.'&amp;wr_id='.$wr['wr_parent'].'&amp;'.$qstr.'&amp;#c_'.$comment_id);
 ?>

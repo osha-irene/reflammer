@@ -77,6 +77,8 @@ if($_POST['js'] == "on") {
             // 내역 생성
             sql_query(" insert {$g5['board_good_table']} set bo_table = '{$bo_table}', wr_id = '{$wr_id}', mb_id = '{$member['mb_id']}', bg_flag = '{$good}', bg_datetime = '".G5_TIME_YMDHIS."' ");
 
+            if (function_exists('mdl_do_action')) mdl_do_action('write_good_after', $bo_table, $wr_id, $good);
+
             $sql = " select wr_{$good} as count from {$g5['write_prefix']}{$bo_table} where wr_id = '$wr_id' ";
             $row = sql_fetch($sql);
 

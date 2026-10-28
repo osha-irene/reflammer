@@ -1,4 +1,4 @@
-<?
+<?php 
 if (!defined("_GNUBOARD_")) exit; // 개별 페이지 접근 불가 
 
 if($is_admin) set_session("ss_delete_token", $token = uniqid(time()));
@@ -14,35 +14,35 @@ if($is_member)  {
 <div id="page_board_content">
 
 <!-- 상단 공지 부분 -->
-<? if($board['bo_content_head']) { ?>
+<?php  if($board['bo_content_head']) { ?>
 	<div class="board-notice">
-		<?=stripslashes($board['bo_content_head']);?>
+		<?php echo stripslashes($board['bo_content_head']);?>
 	</div>
 	<hr class="padding" />
-<? } ?>
+<?php  } ?>
 
 	<!-- 버튼 링크 -->
 	<div class="search-box">
 		<form name=fsearch method=get style="margin:0px;">
-			<input type="hidden" name="bo_table" value="<?=$bo_table?>">
-			<input type="hidden" name="sca"      value="<?=$sca?>">
+			<input type="hidden" name="bo_table" value="<?php echo $bo_table?>">
+			<input type="hidden" name="sca"      value="<?php echo $sca?>">
 			<input type="hidden" name="sfl" value='wr_subject||wr_content'>
 			<input type="hidden" name="sop" value="and">
 			
-			<input type="text" name="stx" itemname="검색어" value="<?=$stx?>" >
+			<input type="text" name="stx" itemname="검색어" value="<?php echo $stx?>" >
 			<button type="submit" class="ui-btn">SEARCH</button>
 		</form>
 	</div>
 
-	<? if ($write_href) { ?>
+	<?php  if ($write_href) { ?>
 	<div class="ui-write-area">
-		<? include ($board_skin_path."/write.php"); ?>
+		<?php  include ($board_skin_path."/write.php"); ?>
 	</div>
-	<? } ?>
+	<?php  } ?>
 
 	<div class="ui-qna-list">
 		<ul>
-	<? 
+	<?php  
 		$lists = array();
 		for ($i=0; $i<count($list); $i++) { $lists[$i] = $list[$i]; } 
 		
@@ -57,58 +57,58 @@ if($is_member)  {
 			$lists[$ii]['content'] = search_font($stx, $lists[$ii]['content']);
 	?>
 				<li>
-					<form name="fboardlist" method="post" action="<?=$board_skin_url?>/password.php" style="margin:0">
-						<input type="hidden" name="bo_table" value="<?=$bo_table?>">
-						<input type="hidden" name="sfl"      value="<?=$sfl?>">
-						<input type="hidden" name="stx"      value="<?=$stx?>">
-						<input type="hidden" name="spt"      value="<?=$spt?>">
-						<input type="hidden" name="page"     value="<?=$page?>">
-						<input type="hidden" name="wr_idx"     value="<?=$lists[$ii]['wr_id']?>">
+					<form name="fboardlist" method="post" action="<?php echo $board_skin_url?>/password.php" style="margin:0">
+						<input type="hidden" name="bo_table" value="<?php echo $bo_table?>">
+						<input type="hidden" name="sfl"      value="<?php echo $sfl?>">
+						<input type="hidden" name="stx"      value="<?php echo $stx?>">
+						<input type="hidden" name="spt"      value="<?php echo $spt?>">
+						<input type="hidden" name="page"     value="<?php echo $page?>">
+						<input type="hidden" name="wr_idx"     value="<?php echo $lists[$ii]['wr_id']?>">
 						<input type="hidden" name="sw"       value="">
 						
 						<div  class="theme-box">
 							<p>
-							<? if($lists[$ii]['is_notice']) { ?>
+							<?php  if($lists[$ii]['is_notice']) { ?>
 								<i>NOTICE</i>
-							<? } else { ?>
-								<i>NO.<?=$lists[$ii]['num'];?></i>
-							<? } ?>
+							<?php  } else { ?>
+								<i>NO.<?php echo $lists[$ii]['num'];?></i>
+							<?php  } ?>
 								<em>
-									<?=$lists[$ii]['name']?> <? if($is_admin) { ?> [ <?=$lists[$ii]['wr_ip']?> ]<? } ?>
+									<?php echo $lists[$ii]['name']?> <?php  if($is_admin) { ?> [ <?php echo $lists[$ii]['wr_ip']?> ]<?php  } ?>
 								</em>
 								<strong>
-									<? if(($member['mb_id'] && ($member['mb_id'] == $lists[$ii]['mb_id'])) || $is_admin) { ?>
-										<a href="<?=$delete_href?>">D</a>
-									<? } else if (!$lists[$ii]['mb_id']) { ?>
-										<a href="<?=$delete_href?>">D</a>
-									<? } ?>
-									<? if($is_admin) { ?>
-										<a href="javascript:comment_wri('comment_write', '<?=$lists[$ii]['wr_id']?>');">R</a>
-									<? } ?>
+									<?php  if(($member['mb_id'] && ($member['mb_id'] == $lists[$ii]['mb_id'])) || $is_admin) { ?>
+										<a href="<?php echo $delete_href?>">D</a>
+									<?php  } else if (!$lists[$ii]['mb_id']) { ?>
+										<a href="<?php echo $delete_href?>">D</a>
+									<?php  } ?>
+									<?php  if($is_admin) { ?>
+										<a href="javascript:comment_wri('comment_write', '<?php echo $lists[$ii]['wr_id']?>');">R</a>
+									<?php  } ?>
 								</strong>
 								<span class="date">
-									<?=$lists[$ii]['datetime']?>
+									<?php echo $lists[$ii]['datetime']?>
 								</span>
 							</p>
 							<div class="qna-content">
-								<?
+								<?php 
 									if(strstr($lists[$ii]['wr_option'], 'secret') && !$is_admin && !$is_open) { 
 								?>
 								<fieldset class="ui-qna-list-password">
-									<input type="password" name="wr_password" id="wr_password_<?=$ii?>" value="" placeholder="PASSWORD"/>
+									<input type="password" name="wr_password" id="wr_password_<?php echo $ii?>" value="" placeholder="PASSWORD"/>
 									<button type="submit" class="ui-submit ui-btn">ENTER</button>
 								</fieldset>
-								<? } else { ?>
-								<? if(strstr($lists[$ii]['wr_option'], 'secret')) { ?>
+								<?php  } else { ?>
+								<?php  if(strstr($lists[$ii]['wr_option'], 'secret')) { ?>
 									<span style="color: #efb04e;">[SECRET]</span><br />
-								<? } ?>
-									<?= $lists[$ii]['content'] ?>
-									<? echo $secret_msg; ?>
-								<? } ?>
+								<?php  } ?>
+									<?php echo  $lists[$ii]['content'] ?>
+									<?php  echo $secret_msg; ?>
+								<?php  } ?>
 							</div>
 						</div>
 					</form>
-					<? 
+					<?php  
 						if(strstr($lists[$ii]['wr_option'], 'secret') && !$is_admin && !$is_open) { 
 
 						} else { 
@@ -117,19 +117,19 @@ if($is_member)  {
 						}
 					?>
 				</li>
-	<?	} 
+	<?php 	} 
 		// 필터
 		if (!$member['mb_id']) // 비회원일 경우에만
 			echo "<script language='javascript' src='{$g5['path']}/js/md5.js'></script>\n";
 	?>
-	<? if (count($lists) == 0) { echo "<li class='no-data'>질문 내역이 없습니다.</li>"; } ?>
+	<?php  if (count($lists) == 0) { echo "<li class='no-data'>질문 내역이 없습니다.</li>"; } ?>
 		</ul>
 
 		<!-- 페이지 -->
 
 		<div class="ui-page">
-			<? if ($prev_part_href) { echo "<a href='$prev_part_href'><img src='$board_skin_path/img/btn_search_prev.gif' border=0 align=absmiddle title='이전검색'></a>"; } ?>
-			<?
+			<?php  if ($prev_part_href) { echo "<a href='$prev_part_href'><img src='$board_skin_path/img/btn_search_prev.gif' border=0 align=absmiddle title='이전검색'></a>"; } ?>
+			<?php 
 			// 기본으로 넘어오는 페이지를 아래와 같이 변환하여 이미지로도 출력할 수 있습니다.
 			//echo $write_pages;
 			$write_pages = str_replace("처음", "<<", $write_pages);
@@ -139,18 +139,18 @@ if($is_member)  {
 			$write_pages = preg_replace("/<span>([0-9]*)<\/span>/", "$1", $write_pages);
 			$write_pages = preg_replace("/<b>([0-9]*)<\/b>/", "<b><font class=\"color_gold2\">$1</font></b>", $write_pages);
 			?>
-			<?=$write_pages?>
-			<? if ($next_part_href) { echo "<a href='$next_part_href'><img src='$board_skin_path/img/btn_search_next.gif' border=0 align=absmiddle title='다음검색'></a>"; } ?>
+			<?php echo $write_pages?>
+			<?php  if ($next_part_href) { echo "<a href='$next_part_href'><img src='$board_skin_path/img/btn_search_next.gif' border=0 align=absmiddle title='다음검색'></a>"; } ?>
 		</div>
 
 	</div>
 </div>
 
 <script language="JavaScript">
-//if ("<?=$sca?>") document.fcategory.sca.value = "<?=$sca?>";
-if ("<?=$stx?>") {
-	document.fsearch.sfl.value = "<?=$sfl?>";
-	document.fsearch.sop.value = "<?=$sop?>";
+//if ("<?php echo $sca?>") document.fcategory.sca.value = "<?php echo $sca?>";
+if ("<?php echo $stx?>") {
+	document.fsearch.sfl.value = "<?php echo $sfl?>";
+	document.fsearch.sop.value = "<?php echo $sop?>";
 }
 </script>
 
@@ -159,7 +159,7 @@ if ("<?=$stx?>") {
 function resize_image()
 {
 	var target = document.getElementsByName('target_resize_image[]');
-	var image_width = parseInt('<?=$board['bo_image_width']?>');
+	var image_width = parseInt('<?php echo $board['bo_image_width']?>');
 	var image_height = 0;
 
 	for(i=0; i<target.length; i++) { 
@@ -178,7 +178,7 @@ function resize_image()
 window.onload = resize_image;
 </script>
 
-<? if ($is_checkbox) { ?>
+<?php  if ($is_checkbox) { ?>
 <script language="JavaScript">
 function all_checked(sw)
 {
@@ -244,4 +244,4 @@ function select_copy(sw)
 	f.submit();
 }
 </script>
-<? } ?>
+<?php  } ?>

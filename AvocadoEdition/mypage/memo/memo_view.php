@@ -55,11 +55,11 @@ for($i=0; $row = sql_fetch_array($result); $i++) {
 </div>
 
 <div class="ui-chatting-memo view">
-<? if($total_page > 1) { ?>
+<?php  if($total_page > 1) { ?>
 	<a href="#" id="load_talk_prev" class="ui-btn small full etc">이전대화보기</a>
-<? } ?>
+<?php  } ?>
 	<div class="ui-chatting-list">
-<? for($i=($max_count-1); $i >= 0; $i--) { 
+<?php  for($i=($max_count-1); $i >= 0; $i--) { 
 	$me = $list[$i];
 	if($me['me_send_mb_id'] == $member['mb_id']) { 
 		$class = "me";
@@ -80,8 +80,8 @@ for($i=0; $row = sql_fetch_array($result); $i++) {
 	</div>
 
 	<form name="fmemoform" action="./memo_update.php" onsubmit="return fmemoform_submit(this);" method="post" autocomplete="off">
-		<input type="hidden" name="pop" value="<?=$pop?>" />
-		<input type="hidden" name="re_mb_id" value="<?=$re_mb['mb_id']?>" />
+		<input type="hidden" name="pop" value="<?php echo $pop?>" />
+		<input type="hidden" name="re_mb_id" value="<?php echo $re_mb['mb_id']?>" />
 		<div class="ui-memo-write">
 			<div class="textarea">
 				<textarea name="me_memo" id="me_memo" required class="required" tabindex="1"><?php echo $content ?></textarea>
@@ -105,7 +105,7 @@ $('#load_talk_prev').on('click', function() {
 	$.ajax({
 		type: 'get'
 		, async: true
-		, url: "./ajax/ajax_prev_talk.php?re_mb_id=<?=$re_mb_id?>&page="+paging
+		, url: "./ajax/ajax_prev_talk.php?re_mb_id=<?php echo $re_mb_id?>&page="+paging
 		, beforeSend: function() {
 			
 		  }
@@ -130,12 +130,12 @@ $(function(){
 	setInterval(function(){load_comment_list()},5000);
 });
 
-var last_cmcode = <?=$last_me_id?>;
+var last_cmcode = <?php echo $last_me_id?>;
 function load_comment_list () {
 	$.ajax({
 		type: 'get'
 		, async: true
-		, url: "./ajax/ajax_latest_talk.php?re_mb_id=<?=$re_mb_id?>&me_id="+last_cmcode
+		, url: "./ajax/ajax_latest_talk.php?re_mb_id=<?php echo $re_mb_id?>&me_id="+last_cmcode
 		, beforeSend: function() {
 		  }
 		, success: function(data) {
@@ -163,6 +163,6 @@ function fmemoform_submit(f)
 }
 </script>
 
-<?
+<?php 
 include_once('./_tail.php');
 ?>

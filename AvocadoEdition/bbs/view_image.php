@@ -27,9 +27,9 @@ if(is_file($filepath)) {
     $height = $size[1];
 
     if($editor_file)
-        $fileurl = G5_DATA_URL.'/'.$editor_file;
+        $fileurl = function_exists('cdn_data_url') ? cdn_data_url($editor_file) : G5_DATA_URL.'/'.$editor_file;
     else
-        $fileurl = G5_DATA_URL.'/file/'.$bo_table.'/'.$filename;
+        $fileurl = function_exists('cdn_data_url') ? cdn_data_url('file/'.$bo_table.'/'.$filename) : G5_DATA_URL.'/file/'.$bo_table.'/'.$filename;
 
     $img = '<img src="'.$fileurl.'" alt="" width="'.$width.'" height="'.$height.'" class="draggable" style="position:relative;top:0;left:0;cursor:move;">';
 } else {

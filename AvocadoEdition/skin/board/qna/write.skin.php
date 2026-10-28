@@ -1,4 +1,4 @@
-<?
+<?php 
 if (!defined("_GNUBOARD_")) exit; // 개별 페이지 접근 불가
 
 $option = '';
@@ -46,20 +46,20 @@ echo $option_hidden;
 	<input type="hidden" name="sod" value="<?php echo $sod ?>">
 	<input type="hidden" name="page" value="<?php echo $page ?>">
 	<input type="hidden" name="wr_subject" value="QNA 문의글">
-	<?= $option_hidden ?>
+	<?php echo  $option_hidden ?>
 	
 	<div class="ui-write-box">
-		<textarea id="content" name="wr_content" rows=6 itemname="내용" required><?=$content?></textarea>
+		<textarea id="content" name="wr_content" rows=6 itemname="내용" required><?php echo $content?></textarea>
 	</div>
 
 	<div class="ui-control">
 	<?php if ($option) { ?>
 		<?php echo $option ?>&nbsp;&nbsp;
 	<?php } ?>
-	<? if(!$is_member){ ?>
-		<input type="text" maxlength="20" name="wr_name" id="wr_name" placeholder="NAME" itemname="이름" required value="<?=$name?>" />
-		<input type="password" maxlength="20" id="wr_password" name="wr_password" placeholder="PASSWORD" itemname="패스워드" value="<?=$password?>" <?=$password_required?> />
-	<? } ?>
+	<?php  if(!$is_member){ ?>
+		<input type="text" maxlength="20" name="wr_name" id="wr_name" placeholder="NAME" itemname="이름" required value="<?php echo $name?>" />
+		<input type="password" maxlength="20" id="wr_password" name="wr_password" placeholder="PASSWORD" itemname="패스워드" value="<?php echo $password?>" <?php echo $password_required?> />
+	<?php  } ?>
 		<button type="submit" id="btn_submit" class="ui-btn" accesskey='s'>ENTER</button>
 	</div>
 </form>

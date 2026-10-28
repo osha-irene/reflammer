@@ -4,10 +4,10 @@ include_once('./_common.php');
 
 $g5['title'] = '관리자 로그인';
 include_once (G5_PATH.'/head.sub.php');
-add_stylesheet('<link rel="stylesheet" href="'.G5_ADMIN_URL.'/css/login.css">', 0);
+add_stylesheet('<link rel="stylesheet" href="'.G5_ACTIVE_ADMIN_URL.'/css/login.css">', 0);
 
-if ($is_admin) {goto_url(G5_ADMIN_URL);}
-$login_action_url = G5_ADMIN_URL."/login_check.php";
+if ($is_admin) {goto_url(G5_ACTIVE_ADMIN_URL);}
+$login_action_url = G5_ACTIVE_ADMIN_URL."/login_check.php";
 ?>
 
 <div class="loginLayout">
@@ -16,13 +16,13 @@ $login_action_url = G5_ADMIN_URL."/login_check.php";
 		<div class="loginWrap">
 			<div class="desc">
 				<h1>Administrator</h1>
-				<p><?=$config['cf_title']?> Management</p>
+				<p><?php echo $config['cf_title']?> Management</p>
 				<ul>
 					<li>관리자 비번을 잊을 시, DB 접속을 통해 직접 변경 하여야 합니다.</li>
 					<li>최대한 비밀번호를 잊지 않도록 조심해 주시길 바랍니다.</li>
 					<li>DB 관리툴은 호스팅 업체에 문의해 주시길 바랍니다.</li>
 				</ul>
-				<div class="copy">AVOCADO EDITION Ver.<?=G5_GNUBOARD_VER?> &copy; 2017</div>
+				<div class="copy">AVOCADO EDITION Ver.<?php echo G5_GNUBOARD_VER?> &copy; 2017</div>
 			</div>
 			<div class="loginForm">
 				<div class="frame">
@@ -60,6 +60,6 @@ $(function() {
 function flogin_submit(f) { return true; }
 </script>
 
-<?
+<?php 
 include_once (G5_PATH.'/tail.sub.php');
 ?>

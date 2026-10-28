@@ -1,20 +1,12 @@
 <?php
-$sub_menu = "200200";
+$sub_menu = "200110";
 include_once('./_common.php');
 auth_check($auth[$sub_menu], 'r');
 
-$check_member = sql_fetch("select * from {$g5['member_table']} limit 0, 1");
-if(!isset($check_member['mb_error_cnt'])) {
-	sql_query(" ALTER TABLE `{$g5['member_table']}`
-					ADD `mb_error_cnt` int(11) NOT NULL DEFAULT '0' AFTER `mb_10` ", true);
-}
-if(!isset($check_member['mb_error_content'])) {
-	sql_query(" ALTER TABLE `{$g5['member_table']}`
-					ADD `mb_error_content` varchar(255) NOT NULL DEFAULT '' AFTER `mb_error_cnt` ", true);
-}
-
-
 $now_board = "";
+$s_board = isset($_GET['s_board']) ? $_GET['s_board'] : '';
+$s_date  = isset($_GET['s_date'])  ? $_GET['s_date']  : '';
+$e_date  = isset($_GET['e_date'])  ? $_GET['e_date']  : '';
 $search_board_sql = " select bo.bo_table, bo.bo_subject, gr.gr_id, gr.gr_subject from {$g5['board_table']} bo, {$g5['group_table']} gr where bo.gr_id = gr.gr_id order by gr.gr_id asc, bo.bo_subject asc ";
 $search_board = sql_query($search_board_sql);
 $board_select_option = "";
@@ -44,7 +36,7 @@ if(!$e_date) $e_date = date('Y-m-d', strtotime("next Sunday"));
 // 회원 정렬 부터 시작한다./
 
 
-$sql_common = " from {$g5['member_table']} mb LEFT JOIN (select *, count(if(wr_id = wr_parent, wr_id, null)) as wr_log, count(if(wr_id != wr_parent, wr_id, null)) as wr_cm from {$g5['board_new_table']} where bo_table = '{$s_board}' and bn_datetime >= '$s_date' and bn_datetime <= '$e_date' group by mb_id ) bo ON mb.mb_id = bo.mb_id ";
+$sql_common = " from {$g5['member_table']} mb LEFT JOIN (select mb_id, count(if(wr_id = wr_parent, wr_id, null)) as wr_log, count(if(wr_id != wr_parent, wr_id, null)) as wr_cm from {$g5['board_new_table']} where bo_table = '{$s_board}' and bn_datetime >= '{$s_date}' and bn_datetime < date_add('{$e_date}', interval 1 day) group by mb_id ) bo ON mb.mb_id = bo.mb_id ";
 $sql_search = " where mb.mb_level > 1 and mb.mb_leave_date = '' and mb.mb_id != '{$config['cf_admin']}' and mb.ch_id != '' and mb.mb_level > 1 ";
 
 if (!$sst) {
@@ -80,7 +72,6 @@ $colspan = 10;
 ?>
 
 <div class="local_ov01 local_ov">
-    <?php echo $listall ?>
     총 회원 수 <?php echo number_format($total_count) ?>명
 </div>
 
@@ -89,15 +80,15 @@ $colspan = 10;
 <div class="sch_last" style="float: left; margin-right: 10px;">
 	<strong>게시판 지정&nbsp;</strong>
 	<select name="s_board">
-		<?=$board_select_option?>
+		<?php echo $board_select_option?>
 	</select>
 
 	&nbsp;&nbsp;&nbsp;
 
     <strong>기간별검색&nbsp;</strong>
-	<input type="text" name="s_date" value="<?=$s_date?>" />
+	<input type="text" name="s_date" value="<?php echo $s_date?>" />
 	~
-	<input type="text" name="e_date" value="<?=$e_date?>" />
+	<input type="text" name="e_date" value="<?php echo $e_date?>" />
 </div>
 <input type="submit" class="btn_submit" value="검색">
 
@@ -145,12 +136,12 @@ $colspan = 10;
 	<input type="hidden" name="mb_id[<?php echo $i ?>]" value="<?php echo $row['mb_id'] ?>" id="mb_id_<?php echo $i ?>">
 	<input type="hidden" name="chk[]" value="<?php echo $i ?>" id="chk_<?php echo $i ?>">
     <tr class="<?php echo $bg; ?>">
-       <td><?=$row['mb_id']?></td>
-	   <td><?=$row['mb_name']?></td>
-	   <td><a href="./character_form.php?w=u&amp;ch_id=<?=$row['ch_id']?>" target="_blank"><?=get_character_name($row['ch_id'])?></a></td>
-	   <td style="text-align: center;"><?=number_format($row['wr_log'])?></td>
-	   <td style="text-align: center;"><?=number_format($row['wr_cm'])?></td>
-	   <td style="text-align: center; color: #999;"><?=$row['mb_today_login']?></td>
+       <td><?php echo $row['mb_id']?></td>
+	   <td><?php echo $row['mb_name']?></td>
+	   <td><a href="./character_form.php?w=u&amp;ch_id=<?php echo $row['ch_id']?>" target="_blank"><?php echo get_character_name($row['ch_id'])?></a></td>
+	   <td style="text-align: center;"><?php echo number_format($row['wr_log'])?></td>
+	   <td style="text-align: center;"><?php echo number_format($row['wr_cm'])?></td>
+	   <td style="text-align: center; color: #999;"><?php echo $row['mb_today_login']?></td>
 	   <td style="text-align: center;">
 			<input type="text" name="mb_error_cnt[<?php echo $i ?>]" value="<?php echo $row['mb_error_cnt'] ?>" size="3"> 회
 	   </td>

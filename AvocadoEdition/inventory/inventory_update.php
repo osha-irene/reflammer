@@ -44,8 +44,13 @@ if($in['in_id'] && $re_ch['ch_id']) {
 	$recv_mb_id   = $re_ch['mb_id'];
 	$memo_content = "[ ".$se_ch['ch_name']."님이 보내신 《".$in['it_name']."》아이템이 도착 하였습니다. ] 캐릭터 인벤토리를 확인하세요.";
 
-	// 쪽지 보내기
-	send_memo($member['mb_id'], $recv_mb_id, $memo_content);
+	// 선물 알림 발송
+	push_call('present',
+		['mb_id' => $member['mb_id'], 'mb_name' => $se_ch['ch_name']],
+		[$recv_mb_id],
+		$memo_content);
+
+	if (function_exists('mdl_do_action')) mdl_do_action('inventory_send_after', $in_id, $se_ch['ch_id'], $re_ch['ch_id']);
 
 	alert($re_ch['ch_name'].'님께 선물이 배송되었습니다.',$return_url, FALSE);
 }

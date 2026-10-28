@@ -10,7 +10,34 @@ if (!defined('_GNUBOARD_')) exit; // 개별 페이지 접근 불가
 </div>
 
 <script>
-var request_url = "<?=urlencode($_SERVER['REQUEST_URI'])?>";
+var request_url = "<?php echo urlencode($_SERVER['REQUEST_URI'])?>";
+
+window.avoAddItemReuseToggle = function(sel) {
+	if (!sel || !sel.form) return;
+	var form = sel.form;
+	var reuse = (parseInt(sel.value, 10) || 0) > 0;
+	var box = form.querySelector('.add-item-form');
+	var btn = form.querySelector('.js-add-item-submit');
+	if (box) {
+		if (reuse) box.setAttribute('hidden', 'hidden');
+		else box.removeAttribute('hidden');
+		var fields = box.querySelectorAll('input, select, textarea');
+		for (var i = 0; i < fields.length; i++) {
+			var f = fields[i];
+			if (reuse) {
+				if (f.required) f.setAttribute('data-was-required', '1');
+				f.required = false;
+				f.disabled = true;
+			} else {
+				f.disabled = false;
+				if (f.getAttribute('data-was-required') === '1' || (f.classList && f.classList.contains('required'))) {
+					f.required = true;
+				}
+			}
+		}
+	}
+	if (btn) btn.textContent = reuse ? '지급하기' : '등록하기';
+};
 
 $('.inven-open-popup').on('click', function() {
 	var idx = $(this).data('idx');
@@ -69,6 +96,8 @@ function fn_inven_link_event(idx, type) {
 						$('#inven_popup_viewer .inner-content').html(data);
 						$('#inven_popup_viewer').fadeIn();
 						$('body').addClass('inven-popup-on');
+						var reuseSel = document.querySelector('#inven_popup_viewer .add-item-reuse-select');
+						if (reuseSel && window.avoAddItemReuseToggle) window.avoAddItemReuseToggle(reuseSel);
 					}
 				}
 			}

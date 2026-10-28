@@ -25,12 +25,12 @@
 	캐릭터 작성 폼
 ***************************************************************/
 
-.list-character-box  {display:block; position:relative; margin:10px 0; overflow:hidden;}
+.list-character-box  {display:block;position:relative;margin:10px 0;/* overflow:hidden; */}
 .list-character-box .item  {display:block; position:relative; color:#fff; margin:10px 0; padding:0;}
 .list-character-box .item a  {display:block; position:relative; padding:10px 10px 10px 100px; min-height:100px; box-sizing:border-box;}
 .list-character-box .item a em  {display:block; position:absolute; width:80px; height:80px; top:10px; left:10px; background:no-repeat 50% 50%; background-size:cover;}
-.list-character-box .item strong  {display:block; position:relative; margin-bottom:5px; font-size:18px; line-height:1.5; font-weight:800; font-family:'HeirofLight';}
-.list-character-box .item span  {display:inline-block; font-size:13px; color:#fff;}
+.list-character-box .item strong  {display:block; position:relative; margin-bottom:5px; font-size:18px; line-height:1.5; font-weight:800;}
+.list-character-box .item span  {display:inline-block;font-size:13px;/* color:#fff; */}
 .list-character-box .item span:after  {content:" | "; margin:0 4px; opacity:.5;}
 .list-character-box .item span:last-child:after  {display:none;}
 .list-character-box .item span i  {margin-right:5px;}
@@ -63,7 +63,7 @@
 .mypage-log-list dl .comemnt-list li + li {padding-top:3px; border-top:1px dashed rgba(255, 255, 255, .2);}
 .mypage-log-list dl .comemnt-list li p {overflow:hidden; white-space:nowrap; text-overflow:ellipsis;}
 .mypage-log-list dl .comemnt-list li p.con {opacity:.8;}
-.mypage-log-list dl .comemnt-list li p .date {font-size:11px; font-family:'Dotum';}
+.mypage-log-list dl .comemnt-list li p .date {font-size:11px;}
 
 @media all and (max-width:500px)  {
 	.mypage-log-list dl {padding-left:0; font-size:12px;}
@@ -98,12 +98,12 @@
 ***************************************************************/
 
 .profile-viewer  {display:block; position:relative; padding-left:100px;}
-.profile-viewer .theme-box  {padding:0;}
+.profile-viewer .theme-box  {/* padding:0; */}
 .profile-viewer .body  {display:block; position:absolute; top:0; left:0; width:100px; bottom:0;}
 .profile-viewer .body em  {display:block; position:absolute; top:0; left:0; right:0; bottom:0; background:no-repeat 50% 0% rgba(0,0,0,.5);}
 .profile-viewer .data  {display:block; position:relative; margin-left:15px; padding-right:15px; padding-bottom:20px;}
 .profile-viewer .data > .control  {text-align:center; margin-bottom:20px; border-bottom:1px solid rgba(255,255,255,.5);}
-.profile-viewer .data > .control a  {display:inline-block; vertical-align:middle; padding:10px 0; color:#fff;}
+.profile-viewer .data > .control a  {display:inline-block;vertical-align:middle;padding:10px 0;/* color:#fff; */}
 .profile-viewer .data > .control a + a  {margin-left:-4px;}
 .profile-viewer .data > .control a + a:before  {content:" · "; margin:0 10px; font-size:15px; vertical-align:middle;}
 .profile-viewer .prof  {display:block; position:relative;}
@@ -120,7 +120,7 @@
 .profile-viewer .prof-data p strong  {display:block; position:relative; font-size:16px;}
 .profile-viewer .prof-data p + p  {margin-top:5px; opacity:.7;}
 
-.profile-viewer .comment  {padding:20px 0; text-align:center; font-size:18px; font-family:'HeirofLight';}
+.profile-viewer .comment  {padding:20px 0; text-align:center; font-size:18px;}
 .profile-viewer .comment:before,
 .profile-viewer .comment:after  {content:'"';}
 .profile-viewer .status-bar dd p  {padding-left:0;}
@@ -140,9 +140,6 @@
 #character_profile #profile_menu {display:block; position:absolute; top:20px; right:10px; z-index:10;}
 #character_profile #profile_menu a {display:block; position:relative; margin-bottom:5px;}
 
-.relation-member-list {margin-top:30px;}
-.relation-box .ui-btn {margin-top:10px;}
-
 .pattern-box .inner-wrap {}
 .pattern-box .inner-wrap h4 {line-height:1.2; font-size:16px; margin-bottom:10px; border-left:4px solid #fff; padding-left:.5em;}
 
@@ -150,17 +147,6 @@
 	.tbl-scroll  {overflow:auto;}
 	.tbl-scroll > table  {width:620px;}
 }
-
-.inventory-list {display:block; position:relative; overflow:hidden;}
-.inventory-list li {display:block; float:left; padding:5px;}
-.inventory-list a {display:block; position:relative; width:40px; height:40px; overflow:hidden;}
-.inventory-list a img {display:block; position:relative; margin:0 auto;}
-.inventory-list a i {display:block; position:absolute; right:1px; bottom:1px; background:rgba(0,0,0,.5); min-width:15px; height:15px; line-height:15px; color:#fff; font-size:10px; font-weight:800; padding:0 1px; text-align:center; z-index:2; box-sizing:border-box; border:none !important;}
-.inventory-list a i.present:before {content:"\e99f"; font-family:'icon'; font-weight:400;} 
-
-.title-list {display:block; position:relative; padding:20px 0;}
-.title-list p {padding:5px;}
-.title-list .item {display:inline-block; min-width:25%; padding: 5px; box-sizing:border-box; text-align:left; vertical-align:middle;}
 
 
 /********************************
@@ -172,7 +158,8 @@
 
 .message-item  {display:block; position:relative; max-width:90%; width:570px; box-sizing:border-box; clear:both; margin-top:10px; z-index: 1;}
 .message-item.index  {max-width:100%; width:100%;}
-.message-item .thumb  {display:block; position:absolute; top:0; width:80px; text-align:center;}
+.message-item .thumb  {display:block; position:absolute; top:0; width:80px; height:80px; display:flex; justify-content:center; align-items:center; overflow:hidden; text-align:center;}
+.message-item .thumb img{object-fit:cover;}
 .message-item .thumb em  {display:block; position:relative; padding-top:100%; background:no-repeat 50% 50%; background-size:cover; border:2px solid #656567;}
 .message-item .thumb strong  {display:block; padding-top:5px; font-size:13px; word-break:break-all;}
 .message-item .con {display:block; position:relative; min-height:70px; padding:15px; box-sizing:border-box;}
@@ -216,41 +203,3 @@
 	.message-item.me  {padding-right:75px;}
 }
 
-
-/******************************************
-	관계란 스타일
-*******************************************/
-
-.relation-member-list				{ position: relative; }
-.relation-member-list > li			{ position:relative; padding-left: 90px; min-height:120px; margin-bottom: 20px; }
-.relation-member-list .ui-thumb		{ position: absolute; top: 0; left: 0; width: 80px; overflow: hidden; }
-.relation-member-list .rm-name		{ font-size: 14px; font-weight: 800; padding-right: 150px; padding-left: 10px; }
-
-.relation-member-list .rm-like-style				{ position: absolute; right: 0; top: 0;width: 80px; }
-.relation-member-list .rm-like-style i				{ display: block; width: 13px; height: 15px; position: relative; float: left; margin: 0 1px;}
-.relation-member-list .rm-like-style i:before		{ content: "\e9da"; font-family: 'icon'; font-style: normal; display: block; position: absolute; top: 0; left: 0; right: 0; bottom: 0; font-family: 'icon'; }
-.relation-member-list .memo			{ font-family: 'Dotum'; padding:10px; margin: 5px 0; line-height: 1.2em; min-height: 30px; }
-
-.relation-member-list ol			{ display: block; position: relative; clear: both; text-align: right;padding-right: 10px; }
-.relation-member-list ol li					{ display: inline-block; }
-.relation-member-list ol li a.btn-log		{ display: block; position: relative; width: 20px; height: 20px; margin: 0 auto; }
-.relation-member-list ol li a.btn-log:before	{ content: "\e925"; font-family: 'icon'; font-size: 15px; font-style: normal; display: block; position: absolute; top: 0; left: 0; right: 0; bottom: 0; font-family: 'icon'; }
-
-
-
-.relation-member-list .modify-box						{ display: none; }
-.relation-member-list .state-modify						{ }
-.relation-member-list .state-modify .rm-like-style,
-.relation-member-list .state-modify .memo .ori-content,
-.relation-member-list .state-modify ol					{ display: none; }
-.relation-member-list .state-modify .modify-box			{ display: block; }
-
-
-@media all and (max-width: 500px) {
-	.relation-member-list .rm-name			{ padding-right: 0; font-size: 13px; }
-	.relation-member-list .rm-like-style	{ position: relative; width: auto;overflow: hidden; }
-	
-	.relation-member-list > li		{ padding-left:0px; }
-	.relation-member-list .ui-thumb	{ width: 50px; }
-	.relation-member-list .info		{ min-height: 62px; margin-left: 60px; }
-}

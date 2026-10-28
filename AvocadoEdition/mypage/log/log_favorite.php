@@ -85,7 +85,7 @@ $write_pages = get_paging(G5_IS_MOBILE ? $config['cf_mobile_pages'] : $config['c
 		<i class="style-line horizon"></i>
 
 		<div class="mypage-favorite-list">
-			<? for ($i=0; $i<count($list); $i++) {
+			<?php  for ($i=0; $i<count($list); $i++) {
 				$bo_subject = cut_str($list[$i]['bo_subject'], 20);
 				$ca_name = $list[$i]['ca_name'];
 				if($list[$i]['wr_type'] == 'UPLOAD') { 
@@ -115,19 +115,19 @@ $write_pages = get_paging(G5_IS_MOBILE ? $config['cf_mobile_pages'] : $config['c
 
 			<dl>
 				<dt>
-					<a href="<?=G5_BBS_URL?>/board.php?bo_table=<?php echo $list[$i]['bo_table'] ?>&amp;log=<?=$list[$i]['log_num']?>">
-						<img src="<?=$image_url?>" onerror="$(this).remove();"/>
+					<a href="<?php echo G5_BBS_URL?>/board.php?bo_table=<?php echo $list[$i]['bo_table'] ?>&amp;log=<?php echo $list[$i]['log_num']?>">
+						<img src="<?php echo $image_url?>" onerror="$(this).remove();"/>
 					</a>
 				</dt>
 				<dd>
-					<?=$log_name?>
+					<?php echo $log_name?>
 				</dd>
 			</dl>
-			<? } if($i==0) { ?>
+			<?php  } if($i==0) { ?>
 			<div class="no-data">
 					등록한 로그 내역이 없습니다.
 			</div>
-			<? } ?>
+			<?php  } ?>
 		</div>
 		<i class="style-line horizon"></i>
 

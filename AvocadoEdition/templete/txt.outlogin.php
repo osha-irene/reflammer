@@ -1,1 +1,1 @@
-<?=outlogin('basic')?>
+<?php echo outlogin('basic')?>

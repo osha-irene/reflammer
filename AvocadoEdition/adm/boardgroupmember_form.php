@@ -1,5 +1,5 @@
 <?php
-$sub_menu = "300200";
+$sub_menu = "300010";
 include_once('./_common.php');
 
 auth_check($auth[$sub_menu], 'w');
@@ -27,7 +27,7 @@ $colspan = 4;
                     from {$g5['group_table']}
                     where gr_use_access = 1 ";
         //if ($is_admin == 'group') {
-        if ($is_admin != 'super')
+        if (!$is_admin)
             $sql .= " and gr_admin = '{$member['mb_id']}' ";
         $sql .= " order by gr_id ";
         $result = sql_query($sql);
@@ -69,7 +69,7 @@ $colspan = 4;
     $sql = " select * from {$g5['group_member_table']} a, {$g5['group_table']} b
                 where a.mb_id = '{$mb['mb_id']}'
                 and a.gr_id = b.gr_id ";
-    if ($is_admin != 'super')
+    if (!$is_admin)
         $sql .= " and b.gr_admin = '{$member['mb_id']}' ";
     $sql .= " order by a.gr_id desc ";
     $result = sql_query($sql);

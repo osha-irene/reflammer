@@ -1,22 +1,22 @@
-<?
+<?php 
 if (!defined('_GNUBOARD_')) exit; // 개별 페이지 접근 불가 
 ?>
 
 <div class="info">
-	<div class="ui-thumb">
-		<img src="<?=$in['it_img']?>" />
+	<div>
+		<img src="<?php echo $in['it_img']?>" />
 	</div>
 </div>
 <div class="text">
 	<p class="title">
-		<?=$in['it_name']?>
-		<span><?=number_format($in['it_sell'])?><?=$config['cf_money_pice']?></span>
+		<?php echo $in['it_name']?>
+		<span><?php echo number_format($in['it_sell'])?><?php echo $config['cf_money_pice']?></span>
 	</p>
 </div>
-<form action="<?=G5_URL?>/inventory/inventory_update.php" method="post">
-	<input type="hidden" name="in_id" value="<?=$in['in_id']?>" />
-	<input type="hidden" name="ch_id" value="<?=$ch['ch_id']?>" />
-	<input type="hidden" name="url" value="<?=$url?>" />
+<form action="<?php echo G5_URL?>/inventory/inventory_update.php" method="post">
+	<input type="hidden" name="in_id" value="<?php echo $in['in_id']?>" />
+	<input type="hidden" name="ch_id" value="<?php echo $ch['ch_id']?>" />
+	<input type="hidden" name="url" value="<?php echo $url?>" />
 	<div class="send-item-form">
 		<div class="item-input">
 

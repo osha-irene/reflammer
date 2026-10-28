@@ -11,9 +11,6 @@ if ($me_recv_mb_id)
 	if (!$mb['mb_id'])
 		alert_close('회원정보가 존재하지 않습니다.\\n\\n탈퇴하였을 수 있습니다.');
 
-	if (!$mb['mb_open'] && $is_admin != 'super')
-		alert_close('정보공개를 하지 않았습니다.');
-
 	// 4.00.15
 	$row = sql_fetch(" select me_memo from {$g5['memo_table']} where me_id = '{$me_id}' and (me_recv_mb_id = '{$member['mb_id']}' or me_send_mb_id = '{$member['mb_id']}') ");
 	if ($row['me_memo'])
@@ -61,6 +58,6 @@ if ($me_recv_mb_id)
 </form>
 
 
-<?
+<?php 
 include_once('./_tail.php');
 ?>

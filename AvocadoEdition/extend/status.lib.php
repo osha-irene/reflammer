@@ -85,6 +85,10 @@ function set_status($ch_id, $st_id, $hunt, $msg='') {
 	} 
 	sql_query(" update {$g5['status_table']} set sc_value = '{$sc['sc_value']}' where sc_id = '{$sc['sc_id']}'"); 
 
+	if (function_exists('mdl_do_action')) {
+		mdl_do_action('status_set_after', $ch_id, $st_id, $hunt, $message);
+	}
+
 	return $message; 
 
 }
@@ -107,6 +111,10 @@ function set_status_by_name($ch_id, $st_name, $hunt, $msg='') {
 		$sc['sc_value'] = 0; 
 	} 
 	sql_query(" update {$g5['status_table']} set sc_value = '{$sc['sc_value']}' where sc_id = '{$sc['sc_id']}'"); 
+
+	if (function_exists('mdl_do_action')) {
+		mdl_do_action('status_set_after', $ch_id, $sl['st_id'], $hunt, $message);
+	}
 
 	return $message; 
 } 

@@ -30,4 +30,9 @@ delete_cache_latest($tmp_bo_table);
 
 // 게시판 폴더 전체 삭제
 rm_rf(G5_DATA_PATH.'/file/'.$tmp_bo_table);
+
+// 모듈 게시판별 on/off 상태 제거
+if (function_exists('mdl_delete_board_state')) {
+    mdl_delete_board_state($tmp_bo_table);
+}
 ?>

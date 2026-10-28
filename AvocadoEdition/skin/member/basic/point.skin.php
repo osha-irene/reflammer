@@ -15,7 +15,6 @@ add_stylesheet('<link rel="stylesheet" href="'.$member_skin_url.'/style.css">', 
         <tr>
             <th scope="col">일시</th>
             <th scope="col">내용</th>
-            <th scope="col">만료일</th>
             <th scope="col">지급포인트</th>
             <th scope="col">사용포인트</th>
         </tr>
@@ -42,17 +41,10 @@ add_stylesheet('<link rel="stylesheet" href="'.$member_skin_url.'/style.css">', 
             $po_content = $row['po_content'];
 
             $expr = '';
-            if($row['po_expired'] == 1)
-                $expr = ' txt_expired';
         ?>
         <tr>
             <td class="td_datetime"><?php echo $row['po_datetime']; ?></td>
             <td><?php echo $po_content; ?></td>
-            <td class="td_date<?php echo $expr; ?>">
-                <?php if ($row['po_expired'] == 1) { ?>
-                만료<?php echo substr(str_replace('-', '', $row['po_expire_date']), 2); ?>
-                <?php } else echo $row['po_expire_date'] == '9999-12-31' ? '&nbsp;' : $row['po_expire_date']; ?>
-            </td>
             <td class="td_numbig"><?php echo $point1; ?></td>
             <td class="td_numbig"><?php echo $point2; ?></td>
         </tr>

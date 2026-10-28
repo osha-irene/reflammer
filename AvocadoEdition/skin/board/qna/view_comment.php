@@ -1,10 +1,6 @@
 <?php
 if (!defined('_GNUBOARD_')) exit; // 개별 페이지 접근 불가
 
-$captcha_html = "";
-if ($is_guest && $board['bo_comment_level'] < 2) {
-	$captcha_html = captcha_html('_comment');
-}
 
 $list = array();
 
@@ -19,11 +15,9 @@ for ($i=0; $c_row=sql_fetch_array($result); $i++)
 {
 	$list[$i] = $c_row;
 
-	//$list[$i]['name'] = get_sideview($c_row['mb_id'], cut_str($c_row['wr_name'], 20, ''), $c_row['wr_email'], $c_row['wr_homepage']);
-
 	$tmp_name = get_text(cut_str($c_row['wr_name'], $config['cf_cut_name'])); // 설정된 자리수 만큼만 이름 출력
 	if ($board['bo_use_sideview'])
-		$list[$i]['name'] = get_sideview($c_row['mb_id'], $tmp_name, $c_row['wr_email'], $c_row['wr_homepage']);
+		$list[$i]['name'] = get_sideview($c_row['mb_id'], $tmp_name);
 	else
 		$list[$i]['name'] = '<span class="'.($c_row['mb_id']?'member':'guest').'">'.$tmp_name.'</span>';
 

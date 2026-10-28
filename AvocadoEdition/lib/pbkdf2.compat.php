@@ -46,7 +46,11 @@ function create_hash($password, $force_compat = false)
 {
     // Generate the salt.
     
-    if (function_exists('mcrypt_create_iv') && version_compare( PHP_VERSION, '7.2' , '<' ) ) {
+    if (function_exists('random_bytes')) {
+        $salt = base64_encode(random_bytes(PBKDF2_COMPAT_SALT_BYTES));
+    } elseif (function_exists('openssl_random_pseudo_bytes')) {
+        $salt = base64_encode(openssl_random_pseudo_bytes(PBKDF2_COMPAT_SALT_BYTES));
+    } elseif (function_exists('mcrypt_create_iv') && version_compare( PHP_VERSION, '7.2' , '<' ) ) {
         $salt = base64_encode(mcrypt_create_iv(PBKDF2_COMPAT_SALT_BYTES, MCRYPT_DEV_URANDOM));
     } elseif (@file_exists('/dev/urandom') && $fp = @fopen('/dev/urandom', 'r')) {
         $salt = base64_encode(fread($fp, PBKDF2_COMPAT_SALT_BYTES));

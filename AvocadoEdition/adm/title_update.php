@@ -1,5 +1,5 @@
 <?php
-$sub_menu = "400300";
+$sub_menu = "500500";
 include_once('./_common.php');
 
 auth_check($auth[$sub_menu], 'w');
@@ -25,6 +25,7 @@ if ($img = $_FILES['ti_img']['name']) {
 
 		$image_name = "tlt_".time().".".$exp;
 		upload_file($_FILES['ti_img']['tmp_name'], $image_name, $title_path);
+		// 칭호 자산은 로컬 전용 — cdn_after_upload 호출하지 않음
 		$sql_common .= " , ti_img = '".$title_url."/".$image_name."' ";
 	}
 }
@@ -32,7 +33,8 @@ if ($img = $_FILES['ti_img']['name']) {
 $sql = " insert into {$g5['title_table']}
 			set ti_title = '{$_POST['ti_title']}',
 				ti_use = '{$_POST['ti_use']}',
-				ti_value = '{$_POST['ti_value']}'
+				ti_type = '{$_POST['ti_type']}',
+				ti_style = '".sql_escape_string($_POST['ti_style'])."'
 				{$sql_common}
 		";
 sql_query($sql);

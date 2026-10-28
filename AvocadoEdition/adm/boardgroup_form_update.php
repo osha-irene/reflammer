@@ -1,5 +1,5 @@
 <?php
-$sub_menu = "300200";
+$sub_menu = "300010";
 include_once('./_common.php');
 
 if ($w == 'u')
@@ -7,7 +7,7 @@ if ($w == 'u')
 
 auth_check($auth[$sub_menu], 'w');
 
-if ($is_admin != 'super' && $w == '') alert('최고관리자만 접근 가능합니다.');
+if (!$is_admin && $w == '') alert('관리자만 접근 가능합니다.');
 
 check_admin_token();
 

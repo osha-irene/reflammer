@@ -1,5 +1,5 @@
 
-.board-list	{ width: 100%; text-align: left; border-bottom: 1px solid rgba(255, 255, 255, .4); }
+.board-list	{width: 100%;text-align: left;margin-top: 20px;}
 
 .empty_table	{ text-align: center; line-height: 150px; }
 
@@ -10,13 +10,12 @@
 	position: relative;
 	text-align: right;
 	padding: 0 20px;
-	font-family: 'Nanum Myeongjo';
 }
 .board-category li	{ display: inline-block; color: #fff; font-size: 14px; }
 .board-category li + li:before	{ content: " / "; padding: 0 10px; }
 .board-category li a			{ color: #fff; }
 
-.board-list thead th			{ font-family: 'Nanum Myeongjo'; background: rgba(0, 0, 0, .5); text-align: center; font-size: 13px; padding: 10px; }
+.board-list thead th			{ text-align: center; font-size: 13px; padding: 10px; }
 .board-list tbody .td_chk,
 .board-list tbody .td_num,
 .board-list tbody .td_name,
@@ -24,10 +23,7 @@
 .board-list tbody .td_date		{ text-align: center; }
 .board-list tbody td			{ padding: 10px; }
 
-.board-list tbody .bo_notice *	{ color: yellow; }
-
 .board-list tbody .bg-1 td		{ background: rgba(255, 255, 255, .1); }
-.board-list a					{ color: #fff; }
 
 .bo_fx	{ text-align: right; padding: 20px 0; }
 
@@ -94,6 +90,12 @@
 #bo_vc footer:after {display:block;visibility:hidden;clear:both;content:""}
 
 .bo_vc_act {float:right;margin:0;list-style:none;zoom:1}
+
+/* 모듈 액션 패널 (action 드롭다운/라디오 토글) — write 의 .bo_w_action_panels 와 comment 폼 내부 모두 적용 */
+.comment-data {display:none;padding:10px 0 10px 20px;border-left:1px solid #996c33;margin:8px 0 0 5px}
+.comment-data.on {display:block}
+.comment-data select,
+.comment-data input[type="text"] {width:100%;box-sizing:border-box}
 .bo_vc_act a		{ color: #fff; }
 .bo_vc_act:after {display:block;visibility:hidden;clear:both;content:""}
 .bo_vc_act li {float:left;margin-left:5px}

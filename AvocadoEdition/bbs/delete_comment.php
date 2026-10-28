@@ -16,7 +16,7 @@ $write = sql_fetch(" select * from {$write_table} where wr_id = '{$comment_id}' 
 if (!$write['wr_id'] || !$write['wr_is_comment'])
     alert('등록된 코멘트가 없거나 코멘트 글이 아닙니다.');
 
-if ($is_admin == 'super') // 최고관리자 통과
+if ($is_admin) // 관리자 통과
     ;
 else if ($is_admin == 'group') { // 그룹관리자
     $mb = get_member($write['mb_id']);
@@ -83,6 +83,8 @@ sql_query(" delete from {$g5['board_new_table']} where bo_table = '{$bo_table}' 
 @include_once($board_skin_path.'/delete_comment.tail.skin.php');
 
 delete_cache_latest($bo_table);
+
+if (function_exists('mdl_do_action')) mdl_do_action('comment_delete_after', $bo_table, $comment_id);
 
 goto_url('./board.php?bo_table='.$bo_table.'&amp;wr_id='.$write['wr_parent'].'&amp;page='.$page. $qstr);
 ?>
