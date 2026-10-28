@@ -2617,7 +2617,7 @@ document.addEventListener('DOMContentLoaded', function(){
 <script>
 function fconfigform_submit(f)
 {
-	f.action = "./design_form_update.php";
+	f.action = "./design_form_update.php?debug=1"; // 임시 진단용 — 확인 끝나면 ?debug=1 제거
 	return true;
 }
 </script>
