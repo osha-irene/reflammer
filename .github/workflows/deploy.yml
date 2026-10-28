@@ -28,6 +28,5 @@ jobs:
           mirror -R --verbose --ignore-time --loop --parallel=5 \
             -X '.git*' \
             -X 'data/' \
-            -X 'config.php' \
             ./AvocadoEdition/ ./html/;
           "
