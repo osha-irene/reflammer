@@ -2,6 +2,9 @@
 $sub_menu = "110300";
 include_once('./_common.php');
 
+auth_check($auth[$sub_menu], 'w');
+if (!$is_admin) alert('관리자만 접근 가능합니다.');
+
 // 적용되는 디자인 프리셋
 $pd_id = ses($_POST, 'pd_id', 1, 'int');
 if ($pd_id <= 0) $pd_id = 1;
