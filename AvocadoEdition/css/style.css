@@ -204,7 +204,7 @@ body {
 	background-color: #05070f;
 	background-image:
 		linear-gradient(180deg, rgba(5, 9, 20, .45) 0%, rgba(5, 9, 20, .55) 45%, rgba(5, 9, 20, .85) 100%),
-		url('../img/bg.png');
+		url('../img/bg.jpg');
 	background-repeat: no-repeat;
 	background-position: center bottom;
 	background-size: cover;
@@ -228,14 +228,17 @@ body {
 	  #no_design_gnb 구조를 그대로 살려 프레임 안에 넣는 방식.
 	  (모바일 슬라이드 메뉴는 기존 레이아웃 유지) */
 @media all and (min-width: 1025px) {
-	#gnb { display: flex; justify-content: center; }
+	#gnb {
+		display: flex;
+		justify-content: flex-start;
+		padding-left: 100px;
+		box-sizing: border-box;
+	}
 
 	#gnb #no_design_gnb {
-		position: relative;
-		left: 100px;
-		width: min(100%, 300px);
+		width: min(100%, 220px);
 		aspect-ratio: 779 / 1401;
-		margin: 10px auto 20px;
+		margin: 10px 0 20px;
 		padding: 22% 12%;
 		box-sizing: border-box;
 		background: url('../img/menu.png') center / contain no-repeat;
