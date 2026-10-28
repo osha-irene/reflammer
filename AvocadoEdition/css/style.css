@@ -196,12 +196,69 @@ html.single .bgm-player {display:none !important;}
 
 
 /*******************************************
+	사이트 배경 (야간 하늘) — 전 페이지 공통
+	  body(실제 태그)에 걸어서 헤더 사이드바/본문 구분 없이
+	  모든 페이지에서 동일한 배경이 유지되도록 함.
+********************************************/
+body {
+	background-color: #05070f;
+	background-image:
+		linear-gradient(180deg, rgba(5, 9, 20, .45) 0%, rgba(5, 9, 20, .55) 45%, rgba(5, 9, 20, .85) 100%),
+		url('../img/bg.png');
+	background-repeat: no-repeat;
+	background-position: center bottom;
+	background-size: cover;
+	background-attachment: fixed;
+}
+@media all and (max-width: 1024px) {
+	body { background-attachment: scroll; }
+}
+
+
+/*******************************************
 	헤더 레이아웃
 ********************************************/
 
 /** 디자인 설정 안할 시 */
 #no_design_gnb {padding:20px 0; text-align:center; line-height:1.5em;}
 #no_design_gnb li {display:block; margin-bottom:20px;}
+
+/** 금장 테두리 메뉴 패널 (img/menu.png) — PC 전용
+	  779:1401 비율의 세로 캡슐형 테두리라 세로로 쌓이는
+	  #no_design_gnb 구조를 그대로 살려 프레임 안에 넣는 방식.
+	  (모바일 슬라이드 메뉴는 기존 레이아웃 유지) */
+@media all and (min-width: 1025px) {
+	#gnb { display: flex; justify-content: center; }
+
+	#gnb #no_design_gnb {
+		position: relative;
+		left: 100px;
+		width: min(100%, 300px);
+		aspect-ratio: 779 / 1401;
+		margin: 10px auto 20px;
+		padding: 22% 12%;
+		box-sizing: border-box;
+		background: url('../img/menu.png') center / contain no-repeat;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		gap: 10px;
+		text-align: center;
+		line-height: 1.3;
+	}
+	#gnb #no_design_gnb li { margin: 0; }
+	#gnb #no_design_gnb li a {
+		display: block;
+		color: #f3dfa0;
+		font-size: 13px;
+		letter-spacing: .04em;
+		text-shadow: 0 0 6px rgba(243, 223, 160, .35);
+	}
+	#gnb #no_design_gnb li a:hover {
+		color: #ffffff;
+		text-shadow: 0 0 10px rgba(255, 255, 255, .6);
+	}
+}
 
 .close-header #header {width:0px !important;}
 .close-header #body {margin-left:0 !important;}
