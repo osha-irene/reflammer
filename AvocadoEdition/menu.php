@@ -46,14 +46,14 @@ if ($menu_content) {
 
         <div id="gnb">
            <ul id="no_design_gnb">
-                <li><a href="<?php echo G5_URL; ?>/notice" data-text="Notice">Notice</a></li>
-                <li><a href="<?php echo G5_URL; ?>/world" data-text="World">World</a></li>
-                <li><a href="<?php echo G5_URL; ?>/member" data-text="Members">Members</a></li>
-                <li><a href="<?php echo G5_URL; ?>/member/ready.php" data-text="Applicants">Applicants</a></li>
-                <li><a href="<?php echo G5_URL; ?>/bbs/board.php?bo_table=test" data-text="Test">Test</a></li>
-                <li><a href="<?php echo G5_URL; ?>/timeline" data-text="Timeline">Timeline</a></li>
-                <li><a href="<?php echo G5_URL; ?>/shop" data-text="Shop">Shop</a></li>
-                <li><a href="<?php echo G5_URL; ?>/mypage" data-text="My Page">My Page</a></li>
+                <li><a href="<?php echo G5_URL; ?>/notice">Notice</a></li>
+                <li><a href="<?php echo G5_URL; ?>/world">World</a></li>
+                <li><a href="<?php echo G5_URL; ?>/member">Members</a></li>
+                <li><a href="<?php echo G5_URL; ?>/member/ready.php">Applicants</a></li>
+                <li><a href="<?php echo G5_URL; ?>/bbs/board.php?bo_table=test">Test</a></li>
+                <li><a href="<?php echo G5_URL; ?>/timeline">Timeline</a></li>
+                <li><a href="<?php echo G5_URL; ?>/shop">Shop</a></li>
+                <li><a href="<?php echo G5_URL; ?>/mypage">My Page</a></li>
             </ul>
             <?php include G5_PATH.'/templete/txt.bgm.php'; ?>
         </div>
