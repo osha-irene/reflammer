@@ -70,11 +70,20 @@
     font-weight: 900;
     font-display: swap;
 }
+
+/* Necessary Language Demo (177Studio) — 개인/비상업 용도 무료 라이선스.
+   한글 글리프가 없어 한글은 자동으로 Pretendard로 폴백됨. */
+@font-face {
+    font-family: 'Necessary Language Demo';
+    src: url('fonts/necessary-language-demo.ttf') format('truetype');
+    font-weight: 400;
+    font-display: swap;
+}
 /*********************************
 	기본 스타일
 **********************************/
 *{
-	font-family: 'Pretendard';
+	font-family: 'Necessary Language Demo', 'Pretendard';
 }
 html,
 body {height:100%;}
