@@ -4,29 +4,95 @@ on:
   push:
     branches: [master]
 
+concurrency:
+  group: deploy-ftp
+  cancel-in-progress: true
+
 jobs:
   ftp-deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Install lftp
         run: sudo apt-get update && sudo apt-get install -y lftp
 
-      - name: Deploy via lftp mirror
+      - name: Deploy only changed files via lftp
         env:
           FTP_SERVER: ${{ secrets.FTP_SERVER }}
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
         run: |
+          set -e
+          MARKER_REMOTE="html/.deployed_sha.txt"
+
+          # Read the commit SHA that was deployed last time (if any).
           lftp -c "
-          set ftp:ssl-allow no;
-          set net:max-retries 3;
-          set mirror:use-pget-n 1;
-          open -u \"$FTP_USERNAME\",\"$FTP_PASSWORD\" \"$FTP_SERVER\";
-          mirror -R --verbose --ignore-time --transfer-all --loop --parallel=5 \
-            -X '.git*' \
-            -X 'data/' \
-            ./AvocadoEdition/ ./html/;
+            set ftp:ssl-allow no;
+            set net:max-retries 3;
+            open -u \"$FTP_USERNAME\",\"$FTP_PASSWORD\" \"$FTP_SERVER\";
+            cat \"$MARKER_REMOTE\";
+          " > /tmp/prev_sha.txt 2>/dev/null || true
+
+          PREV_SHA=$(tr -d '[:space:]' < /tmp/prev_sha.txt)
+
+          if [ -n "$PREV_SHA" ] && git cat-file -e "${PREV_SHA}^{commit}" 2>/dev/null; then
+            echo "Previous deployed commit: $PREV_SHA"
+            echo "Diffing $PREV_SHA..HEAD to find files that actually changed."
+
+            SCRIPT=/tmp/deploy.lftp
+            : > "$SCRIPT"
+
+            git diff --no-renames --name-status "$PREV_SHA" HEAD -- AvocadoEdition/ \
+              | grep -v '/data/' \
+              | while IFS=$'\t' read -r status file; do
+                  [ -z "$file" ] && continue
+                  remote="html/${file#AvocadoEdition/}"
+                  case "$status" in
+                    A|M)
+                      dir=$(dirname "$remote")
+                      printf 'mkdir -p "%s"\n' "$dir" >> "$SCRIPT"
+                      printf 'put -O "%s" "%s"\n' "$dir" "$file" >> "$SCRIPT"
+                      ;;
+                    D)
+                      printf 'rm -f "%s"\n' "$remote" >> "$SCRIPT"
+                      ;;
+                  esac
+                done
+
+            if [ -s "$SCRIPT" ]; then
+              echo "Changed files:"
+              cat "$SCRIPT"
+              {
+                echo 'set ftp:ssl-allow no;'
+                echo 'set net:max-retries 3;'
+                echo "open -u \"$FTP_USERNAME\",\"$FTP_PASSWORD\" \"$FTP_SERVER\";"
+                cat "$SCRIPT"
+              } > /tmp/deploy_full.lftp
+              lftp -f /tmp/deploy_full.lftp
+            else
+              echo "No changed files under AvocadoEdition/ (outside data/) - nothing to upload."
+            fi
+          else
+            echo "No usable deploy marker found on the server - doing one full upload to establish a known-good baseline."
+            lftp -c "
+              set ftp:ssl-allow no;
+              set net:max-retries 3;
+              set mirror:use-pget-n 1;
+              open -u \"$FTP_USERNAME\",\"$FTP_PASSWORD\" \"$FTP_SERVER\";
+              mirror -R --verbose --transfer-all --parallel=5 \
+                -X '.git*' \
+                -X 'data/' \
+                ./AvocadoEdition/ ./html/;
+            "
+          fi
+
+          echo -n "$GITHUB_SHA" > /tmp/.deployed_sha.txt
+          lftp -c "
+            set ftp:ssl-allow no;
+            open -u \"$FTP_USERNAME\",\"$FTP_PASSWORD\" \"$FTP_SERVER\";
+            put -O \"html\" \"/tmp/.deployed_sha.txt\";
           "
