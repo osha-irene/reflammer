@@ -22,10 +22,7 @@ function mdl_setting_table_ensure() {
     static $checked = false;
     if ($checked) return;
     $checked = true;
-    if (empty($GLOBALS['g5']['module_setting_table'])) {
-        // 구버전 dbconfig.php 에 이 별칭이 없을 수 있음 — 기본값으로 자가 치유.
-        $GLOBALS['g5']['module_setting_table'] = G5_TABLE_PREFIX.'module_setting';
-    }
+    if (empty($GLOBALS['g5']['module_setting_table'])) return;
     $t = $GLOBALS['g5']['module_setting_table'];
     sql_query("create table if not exists `{$t}` (
         `ms_module` varchar(64) not null default '',
