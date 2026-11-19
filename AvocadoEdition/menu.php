@@ -16,10 +16,15 @@ if ($_menu_html !== '') {
     return;
 }
 
+// "화면 설정 → 메뉴영역"에서 직접 입력한 내용이 있으면, 전체를 대체하지 않고
+// #gnb 안쪽(<ul id="no_design_gnb"> 내부)만 바꿔 끼운다 — 로고·금색 프레임
+// 디자인은 그대로 유지한 채 관리자가 링크만 자유롭게 편집할 수 있게 하기 위함.
+// 에디터는 보통 <li> 없이 <a> 태그만 남기므로, 찾아낸 <a> 하나당 <li>로 감싸준다.
 $menu_content = function_exists('get_site_content') ? get_site_content('site_menu') : '';
-if ($menu_content) {
-    echo $menu_content;
-} else {
+$menu_items = '';
+if ($menu_content && preg_match_all('/<a\b[^>]*>.*?<\/a>/is', $menu_content, $_menu_m)) {
+    foreach ($_menu_m[0] as $_menu_a) $menu_items .= '<li>'.$_menu_a.'</li>';
+}
 ?>
 <header id="header">
     <div class="fix-layout">
@@ -46,6 +51,9 @@ if ($menu_content) {
 
         <div id="gnb">
            <ul id="no_design_gnb">
+<?php if ($menu_items !== '') {
+    echo $menu_items;
+} else { ?>
                 <li><a href="<?php echo G5_URL; ?>/notice">Notice</a></li>
                 <li><a href="<?php echo G5_URL; ?>/world">World</a></li>
                 <li><a href="<?php echo G5_URL; ?>/member">Members</a></li>
@@ -55,10 +63,10 @@ if ($menu_content) {
                 <li><a href="<?php echo G5_URL; ?>/shop">Shop</a></li>
                 <li><a href="<?php echo G5_URL; ?>/mypage">My Page</a></li>
                 <li><a href="<?php echo G5_URL; ?>/module/reflammer_wiki/index.php">Wiki</a></li>
+<?php } ?>
             </ul>
             <?php include G5_PATH.'/templete/txt.bgm.php'; ?>
         </div>
     </div>
 </header>
-   
-<?php } ?>
+
