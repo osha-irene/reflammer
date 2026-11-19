@@ -25,3 +25,4 @@
 .rw-html-help input{width:16px;height:16px;padding:0}
 .rw-category-group{margin:0}.rw-category-main{font-size:14px;padding:5px 10px}.rw-category-label{font-weight:400}
 .rw-categories>.rw-all{font-size:16px}.rw-category-main{font-size:16px}.rw-categories .rw-sub{font-size:14px}.rw-secondary-nav{max-width:1420px;margin:-46px auto 32px;padding:0 22px;display:flex;justify-content:flex-end;pointer-events:none}.rw-secondary-nav a{pointer-events:auto;display:inline-block;padding:6px 10px;border:1px solid #806040;border-radius:6px;background:#38271f;color:#b99a78;font-size:12px;text-decoration:none;opacity:.78}.rw-secondary-nav a:hover{color:#ead7bd;opacity:1}@media(max-width:760px){.rw-secondary-nav{margin:-20px auto 24px;padding:0 12px}}
+.rw-results[aria-busy=true] .rw-list,.rw-results[aria-busy=true] .rw-pages{opacity:.55;transition:opacity .15s}

@@ -1,4 +1,6 @@
-# 펜시브 (The Pensieve)
+# 펜시브 v1.0 (The Pensieve)
+
+모듈 버전: `1.0.0` (v1.0)
 
 커뮤니티 내부 독립형 위키 모듈. 
 관리자 → 모듈에서 **펜시브 (The Pensieve)**를 켜면 전용 테이블과 기본 카테고리를 만들고, 사용자 페이지는 `/module/reflammer_wiki/index.php`, 관리 메뉴는 관리자 → 모듈 → 펜시브에 추가됩니다. 
