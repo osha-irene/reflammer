@@ -54,6 +54,7 @@ if ($menu_content) {
                 <li><a href="<?php echo G5_URL; ?>/timeline">Timeline</a></li>
                 <li><a href="<?php echo G5_URL; ?>/shop">Shop</a></li>
                 <li><a href="<?php echo G5_URL; ?>/mypage">My Page</a></li>
+                <li><a href="<?php echo G5_URL; ?>/module/reflammer_wiki/index.php">Wiki</a></li>
             </ul>
             <?php include G5_PATH.'/templete/txt.bgm.php'; ?>
         </div>
