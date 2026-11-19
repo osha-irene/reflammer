@@ -177,6 +177,83 @@ if (file_exists($dbconfig_file)) {
         sql_query("SET time_zone = '".G5_TIMEZONE."'");
     }
 
+    // 구버전 dbconfig.php 에 신규 기능이 추가한 테이블 별칭이 없을 수 있음 — 기본값으로 자가 치유.
+    // (install/install_db.php 가 신규 설치 시 기록하는 것과 동일한 값)
+    $g5_table_alias_defaults = array(
+        'write_prefix' => 'write_',
+        'config_table' => 'config',
+        'group_table' => 'group',
+        'group_member_table' => 'group_member',
+        'board_table' => 'board',
+        'board_file_table' => 'board_file',
+        'board_good_table' => 'board_good',
+        'board_new_table' => 'board_new',
+        'login_table' => 'login',
+        'member_table' => 'member',
+        'memo_table' => 'memo',
+        'point_table' => 'point',
+        'scrap_table' => 'scrap',
+        'uniqid_table' => 'uniqid',
+        'autosave_table' => 'autosave',
+        'content_table' => 'content',
+        'menu_table' => 'menu',
+        'banner_table' => 'banner',
+        'intro_table' => 'intro',
+        'character_table' => 'character',
+        'class_table' => 'character_class',
+        'side_table' => 'character_side',
+        'title_table' => 'character_title',
+        'title_has_table' => 'has_title',
+        'couple_table' => 'couple',
+        'emoticon_table' => 'emoticon',
+        'exp_table' => 'exp',
+        'inventory_table' => 'inventory',
+        'item_table' => 'item',
+        'recepi_table' => 'item_recepi',
+        'explorer_table' => 'item_explorer',
+        'relation_table' => 'relation_character',
+        'order_table' => 'order',
+        'closthes_table' => 'character_closthes',
+        'call_table' => 'call_board',
+        'call_board_table' => 'call_board',
+        'call_type_map_table' => 'call_type_map',
+        'hook_registry_table' => 'hook_registry',
+        'css_table' => 'css_config',
+        'article_table' => 'article',
+        'article_default_table' => 'article_default',
+        'value_table' => 'article_value',
+        'level_table' => 'level_setting',
+        'shop_table' => 'shop',
+        'status_config_table' => 'status',
+        'status_table' => 'status_character',
+        'module_setting_table' => 'module_setting',
+        'calc_preset_table' => 'calc_preset',
+        'reset_setting_table' => 'reset_setting',
+        'reset_manager_table' => 'reset_manager',
+        'notice_table' => 'notice',
+        'time_table' => 'character_time',
+        'time_value_table' => 'character_time_value',
+        'time_article_table' => 'character_time_article',
+        'side_time_table' => 'character_side_time',
+        'class_time_table' => 'character_class_time',
+        'npc_time_table' => 'character_npc_time',
+        'theme_preset_table' => 'theme_preset',
+        'theme_preset_slot_table' => 'theme_preset_slot',
+        'design_preset_table' => 'design_preset',
+        'content_preset_table' => 'content_preset',
+        'content_design_config_table' => 'content_design_config',
+        'world_table' => 'world',
+        'world_menu_table' => 'world_menu',
+        'world_preset_table' => 'world_preset',
+        'world_config_table' => 'world_config',
+    );
+    foreach ($g5_table_alias_defaults as $g5_alias_key => $g5_alias_suffix) {
+        if (empty($g5[$g5_alias_key])) {
+            $g5[$g5_alias_key] = G5_TABLE_PREFIX.$g5_alias_suffix;
+        }
+    }
+    unset($g5_table_alias_defaults, $g5_alias_key, $g5_alias_suffix);
+
 } else {
 
     ?>

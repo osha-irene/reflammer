@@ -108,8 +108,46 @@ $GLOBALS['DESIGN_PRESET_TYPES'] = array(
     ),
 );
 
-// 스키마(theme_preset / theme_preset_slot / design_preset / 관련 컬럼)는
-// install/gnuboard5.sql 에서 일괄 생성됩니다 (런타임 마이그레이션 없음).
+// 구버전 dbconfig.php/DB(신규 기능 추가 이전 설치)에는 theme_preset·theme_preset_slot
+// 테이블 자체가 없을 수 있음 — 최초 1회 조회 시 자가 치유(CREATE TABLE IF NOT EXISTS).
+// 이미 테이블이 있으면 손대지 않음(DROP 없음, 기존 데이터 보존).
+function theme_preset_table_ensure()
+{
+    global $g5;
+    static $checked = false;
+    if ($checked) return;
+    $checked = true;
+
+    $t = $g5['theme_preset_table'];
+    sql_query("CREATE TABLE IF NOT EXISTS `{$t}` (
+        `pr_id` int(11) NOT NULL AUTO_INCREMENT,
+        `pr_name` varchar(100) NOT NULL DEFAULT '',
+        `pr_design` varchar(64) NOT NULL DEFAULT '1',
+        `pr_world_design` varchar(64) NOT NULL DEFAULT '1',
+        `pr_content_design` varchar(64) NOT NULL DEFAULT '',
+        `pr_bgm_type` varchar(20) NOT NULL DEFAULT 'playlist',
+        `pr_bgm_id` varchar(64) NOT NULL DEFAULT '',
+        `pr_bgm_volume` tinyint NOT NULL DEFAULT '50',
+        `pr_font_family` varchar(200) NOT NULL DEFAULT '',
+        `pr_order` int(11) NOT NULL DEFAULT '0',
+        PRIMARY KEY (`pr_id`),
+        KEY `pr_order` (`pr_order`)
+    ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci", false);
+
+    if (!sql_fetch("SELECT pr_id FROM `{$t}` WHERE pr_id = 1", false)) {
+        sql_query("INSERT INTO `{$t}` (`pr_id`, `pr_name`, `pr_design`, `pr_world_design`, `pr_content_design`, `pr_order`) VALUES (1, 'default', '1', '1', '', 1)", false);
+    }
+
+    $ts = $g5['theme_preset_slot_table'];
+    sql_query("CREATE TABLE IF NOT EXISTS `{$ts}` (
+        `ps_id` int(11) NOT NULL AUTO_INCREMENT,
+        `pr_id` int(11) NOT NULL DEFAULT '0',
+        `ps_slot` varchar(64) NOT NULL DEFAULT '',
+        `ps_theme` varchar(64) NOT NULL DEFAULT 'default',
+        PRIMARY KEY (`ps_id`),
+        UNIQUE KEY `pr_slot` (`pr_id`, `ps_slot`)
+    ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci", false);
+}
 
 // =============================================================================
 // 헬퍼 함수
@@ -124,6 +162,7 @@ function get_active_preset_id()
     global $config, $g5, $is_admin;
     static $cache = null;
     if ($cache !== null) return $cache;
+    theme_preset_table_ensure();
 
     // 관리자 미리보기
     if (!empty($is_admin)) {
@@ -177,6 +216,7 @@ function get_preset($pr_id = 0)
 {
     global $g5;
     static $cache = array();
+    theme_preset_table_ensure();
     $pr_id = (int)$pr_id;
     if ($pr_id <= 0) $pr_id = get_active_preset_id();
     if (isset($cache[$pr_id])) return $cache[$pr_id];
