@@ -14,6 +14,13 @@
 - 현재 포커스는 **MyRoom 플러그인부터 시험적으로 통합**하는 것이다.
 - 저장소는 Avocado Edition 8을 표기하지만 일부 플러그인 문서는 Avocado Edition 2.2.2 기준이므로 버전/API 호환성을 확인해야 한다.
 
+## Battle / SkillManager / StatusExtra 상담 결정 (2026-11-20)
+
+- 기존 Battle 플러그인은 Avocado Edition 2.2.2 기반이며 StatusExtra 의존 및 MMB 스킨 수정이 있어 그대로 설치하지 않는다. 전투 흐름만 참고한다.
+- 현재 전투 기능은 독립 모듈 `bbs_duel`로 단계 구현한다. 대련/결투는 MMB ACTION 메뉴에서 선택하고, 에디션 8의 모듈 훅과 현재 멀린의 주사위를 활용한다.
+- 에너미는 NPC 캐릭터와 별개인 관리 엔티티로 운영한다. `bbs_duel`은 선택한 공통 스탯으로 양쪽의 멀린 D2를 자동 굴려 결과를 기록한다. HP·스킬 처리는 후속 단계다.
+- StatusExtra의 복잡한 수식 연동과 SkillManager의 광범위한 코어/DB 확장은 현재 설계에서 채택하지 않는다.
+
 ## 플러그인 목록과 의존성
 
 | ZIP | 기능 요약 | 참고 |

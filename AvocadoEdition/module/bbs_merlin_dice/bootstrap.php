@@ -20,9 +20,14 @@ function merlin_dice_form_html($ctx, $scope, $instance_id)
     if ($id === '') $id = 'merlin_dice_'.$scope;
     $options = '<option value="">스탯 선택</option>';
     $status_rows = array_values($statuses);
-    foreach ($status_rows as $index => $status) {
+    // /adm 스탯 순서대로 단일 스탯을 먼저 모두 나열한다.
+    foreach ($status_rows as $status) {
         $name = htmlspecialchars($status['name'], ENT_QUOTES, 'UTF-8');
         $options .= '<option value="'.$status['id'].'">'.$name.'</option>';
+    }
+    // 이후 앞에서부터 모든 2스탯 조합을 순서대로 추가한다.
+    for ($index = 0; $index < count($status_rows); $index++) {
+        $status = $status_rows[$index];
         for ($next = $index + 1; $next < count($status_rows); $next++) {
             $other = $status_rows[$next];
             $pair_name = htmlspecialchars($status['name'].' + '.$other['name'], ENT_QUOTES, 'UTF-8');

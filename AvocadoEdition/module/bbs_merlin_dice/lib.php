@@ -8,7 +8,7 @@ function merlin_dice_statuses($ch_id)
     $ch_id = (int)$ch_id;
     if ($ch_id <= 0 || empty($g5['status_config_table']) || empty($g5['status_table'])) return array();
     if (function_exists('get_status_by_name') && function_exists('get_status')) {
-        $result = sql_query("SELECT st_id, st_name FROM `{$g5['status_config_table']}` ORDER BY st_order ASC");
+        $result = sql_query("SELECT st_id, st_name FROM `{$g5['status_config_table']}` ORDER BY st_order ASC, st_id ASC");
         $statuses = array();
         while ($row = sql_fetch_array($result)) {
             $st_id = (int)$row['st_id'];
