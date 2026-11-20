@@ -10,6 +10,55 @@ $actor_roll = function_exists('merlin_dice_parse') ? merlin_dice_parse(isset($ro
 $target_roll = function_exists('merlin_dice_parse') ? merlin_dice_parse(isset($row['wr_duel_target_roll']) ? $row['wr_duel_target_roll'] : '') : array();
 $actor_score = isset($row['wr_duel_actor_score']) ? (int)$row['wr_duel_actor_score'] : 0;
 $target_score = isset($row['wr_duel_target_score']) ? (int)$row['wr_duel_target_score'] : 0;
+$actor_roll_initial = function_exists('merlin_dice_parse') ? merlin_dice_parse(isset($row['wr_duel_actor_roll_initial']) ? $row['wr_duel_actor_roll_initial'] : '') : array();
+$actor_dice_base = isset($row['wr_duel_actor_dice_base']) ? (int)$row['wr_duel_actor_dice_base'] : count($actor_roll);
+$actor_dice_modifier = isset($row['wr_duel_actor_dice_modifier']) ? (int)$row['wr_duel_actor_dice_modifier'] : 0;
+$actor_score_modifier = isset($row['wr_duel_actor_score_modifier']) ? (int)$row['wr_duel_actor_score_modifier'] : 0;
+$actor_reroll_value = isset($row['wr_duel_actor_reroll_value']) ? (int)$row['wr_duel_actor_reroll_value'] : 0;
+$actor_reroll_index = isset($row['wr_duel_actor_reroll_index']) ? (int)$row['wr_duel_actor_reroll_index'] : 0;
+$trait_name = isset($row['wr_duel_trait_name']) ? (string)$row['wr_duel_trait_name'] : '';
+$trait_icon = isset($row['wr_duel_trait_icon']) ? (string)$row['wr_duel_trait_icon'] : '';
+$trait_description = '';
+if (array_key_exists('wr_duel_trait_description', $row) && $row['wr_duel_trait_description'] !== null) {
+    $trait_description = (string)$row['wr_duel_trait_description'];
+} elseif (!empty($row['wr_duel_trait_id']) && function_exists('bbs_trait_get')) {
+    static $legacy_trait_descriptions = array();
+    $legacy_trait_id = (int)$row['wr_duel_trait_id'];
+    if (!array_key_exists($legacy_trait_id, $legacy_trait_descriptions)) {
+        $legacy_trait = bbs_trait_get($legacy_trait_id, true);
+        $legacy_trait_descriptions[$legacy_trait_id] = isset($legacy_trait['trait_description'])
+            ? (string)$legacy_trait['trait_description']
+            : '';
+    }
+    $trait_description = $legacy_trait_descriptions[$legacy_trait_id];
+}
+$trait_effect_type = isset($row['wr_duel_trait_effect_type']) ? (string)$row['wr_duel_trait_effect_type'] : '';
+$trait_effect_value = isset($row['wr_duel_trait_effect_value']) ? (int)$row['wr_duel_trait_effect_value'] : 0;
+$trait_effect_labels = array(
+    'score_modifier' => '최종 점수 보정',
+    'dice_count_modifier' => '주사위 수 보정',
+    'reroll_lowest' => '가장 낮은 주사위 재굴림',
+    'incoming_damage_modifier' => '받는 피해 보정',
+    'outgoing_damage_modifier' => '가하는 피해 보정',
+);
+if (function_exists('bbs_trait_effect_text')) {
+    $trait_effect_label = bbs_trait_effect_text(
+        $trait_effect_type,
+        $trait_effect_value,
+        isset($row['wr_duel_trait_effect_stat_name']) ? (string)$row['wr_duel_trait_effect_stat_name'] : ''
+    );
+} elseif (isset($trait_effect_labels[$trait_effect_type])) {
+    $trait_effect_label = $trait_effect_labels[$trait_effect_type];
+    if ($trait_effect_type !== 'reroll_lowest') {
+        $trait_effect_label .= ' '.($trait_effect_value > 0 ? '+' : '').$trait_effect_value;
+    }
+} else {
+    $trait_effect_label = $trait_effect_type;
+}
+$trait_effect_stat_name = isset($row['wr_duel_trait_effect_stat_name']) ? (string)$row['wr_duel_trait_effect_stat_name'] : '';
+if (!function_exists('bbs_trait_effect_text') && $trait_effect_stat_name !== '') {
+    $trait_effect_label .= ' · '.$trait_effect_stat_name;
+}
 $outcome = isset($row['wr_duel_result']) ? (string)$row['wr_duel_result'] : '';
 $outcome_label = ($outcome === 'actor_win') ? $actor_name.' 승리' : (($outcome === 'target_win') ? $target_name.' 승리' : (($outcome === 'draw') ? '무승부' : ''));
 $actor_hp_before = isset($row['wr_duel_actor_hp_before']) ? (int)$row['wr_duel_actor_hp_before'] : 0;
@@ -33,6 +82,24 @@ $combatants = array(
 <div class="log-action-box bbs-duel-log">
     <p class="bbs-duel-heading"><strong><?php echo htmlspecialchars($label, ENT_QUOTES, 'UTF-8'); ?></strong>
         <?php if ($target_name !== '') { ?> · 상대: <strong><?php echo htmlspecialchars($target_name, ENT_QUOTES, 'UTF-8'); ?></strong><?php } ?></p>
+    <?php if ($trait_name !== '') {
+        if (function_exists('bbs_trait_icon_url')) {
+            $trait_icon_url = bbs_trait_icon_url($trait_icon);
+        } elseif ($trait_icon !== '' && preg_match('/^https:\/\//i', $trait_icon) && filter_var($trait_icon, FILTER_VALIDATE_URL) !== false) {
+            $trait_icon_url = $trait_icon;
+        } else {
+            $trait_icon_url = $trait_icon !== '' && defined('G5_DATA_URL') ? G5_DATA_URL.'/bbs_trait/'.rawurlencode(basename($trait_icon)) : '';
+        }
+        ?>
+        <p class="bbs-duel-trait">
+            <?php if ($trait_icon_url !== '') { ?><img src="<?php echo htmlspecialchars($trait_icon_url, ENT_QUOTES, 'UTF-8'); ?>" alt=""><?php } ?>
+            <span class="bbs-duel-trait-content">
+                <strong>특성 발현: <?php echo htmlspecialchars($trait_name, ENT_QUOTES, 'UTF-8'); ?></strong>
+                <?php if ($trait_description !== '') { ?><span class="bbs-duel-trait-description"><?php echo nl2br(htmlspecialchars($trait_description, ENT_QUOTES, 'UTF-8')); ?></span><?php } ?>
+                <small><?php echo htmlspecialchars($trait_effect_label, ENT_QUOTES, 'UTF-8'); ?></small>
+            </span>
+        </p>
+    <?php } ?>
     <div class="bbs-duel-combatants">
         <?php foreach ($combatants as $combatant_index => $combatant) {
             $card = $combatant['card'];
@@ -57,6 +124,9 @@ $combatants = array(
                 <?php if ($type === 'duel' && $hp_before > 0) { ?><small class="bbs-duel-hp">HP <?php echo $hp_before; ?> → <?php echo $hp_after; ?></small><?php } ?>
                 <div class="bbs-duel-roll">
                     <span><?php echo htmlspecialchars($stat_name, ENT_QUOTES, 'UTF-8'); ?> (<?php echo count($combatant['rolls']); ?>D2)</span>
+                    <?php if ($is_actor && $actor_dice_modifier !== 0) { ?>
+                        <small class="bbs-duel-trait-detail">주사위 수 <?php echo $actor_dice_base; ?> <?php echo $actor_dice_modifier > 0 ? '+' : '−'; ?> <?php echo abs($actor_dice_modifier); ?> → <?php echo count($combatant['rolls']); ?></small>
+                    <?php } ?>
                     <?php if (!$combatant['rolls']) { ?>
                         <span class="bbs-duel-no-dice">굴릴 주사위가 없습니다.</span>
                     <?php } else { ?>
@@ -67,7 +137,17 @@ $combatants = array(
                             else { ?><span class="dice-num"><?php echo $value; ?></span><?php }
                         } ?></span>
                     <?php } ?>
-                    <strong>= <?php echo (int)$combatant['score']; ?></strong>
+                    <?php if ($is_actor && $actor_reroll_index > 0 && isset($actor_roll_initial[$actor_reroll_index - 1])) {
+                        $before_reroll = (int)$actor_roll_initial[$actor_reroll_index - 1];
+                        $reroll_replaced = $actor_reroll_value > $before_reroll;
+                        ?>
+                        <small class="bbs-duel-trait-detail">최저 주사위 재굴림 (<?php echo $actor_reroll_index; ?>번째): <?php echo $before_reroll; ?> → <?php echo $actor_reroll_value; ?> (<?php echo $reroll_replaced ? '교체' : '유지'; ?>)</small>
+                    <?php } ?>
+                    <?php if ($is_actor && $actor_score_modifier !== 0) { ?>
+                        <strong>= <?php echo array_sum($combatant['rolls']); ?> <?php echo $actor_score_modifier > 0 ? '+' : '−'; ?> <?php echo abs($actor_score_modifier); ?> = <?php echo (int)$combatant['score']; ?></strong>
+                    <?php } else { ?>
+                        <strong>= <?php echo (int)$combatant['score']; ?></strong>
+                    <?php } ?>
                 </div>
             </section>
         <?php } ?>

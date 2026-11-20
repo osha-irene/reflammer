@@ -13,5 +13,10 @@ return array(
         'character_delete_after',
         'member_viewer_info',
     ),
-    'fires' => array('bbs_duel_damage_adjustment'),
+    'fires' => array(
+        'bbs_duel_damage_adjustment',
+        'bbs_duel_trait_form',
+        'bbs_duel_trait_prepare',
+        'bbs_duel_trait_consume',
+    ),
 );

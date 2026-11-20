@@ -4,8 +4,8 @@ if (!defined('_GNUBOARD_')) exit;
 return array(
     'name'           => 'bbs_duel',
     'title'          => '대련·결투',
-    'description'    => 'MMB ACTION에서 대련·결투 상대 지정과 양측 스탯 주사위 판정을 기록합니다.',
-    'version'        => '0.16.0',
+    'description'    => 'MMB ACTION에서 대련·결투 상대, 스탯 판정 및 선택 특성을 기록합니다.',
+    'version'        => '0.19.1',
     'author'         => 'ribo',
     'board_scope'    => true,
     'board_default'  => 'off',
@@ -18,9 +18,6 @@ return array(
         'bbs_view_row_extra',
         'bbs_enqueue_assets',
         'write_after',
-        'character_create_after',
-        'character_delete_after',
-        'member_viewer_info',
     ),
     'admin_menus'    => array(
         'auto' => array(

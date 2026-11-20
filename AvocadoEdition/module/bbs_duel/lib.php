@@ -140,16 +140,21 @@ function bbs_duel_history_insert($data) {
     $fields = array(
         'event_type' => '', 'event_datetime' => G5_TIME_YMDHIS, 'actor_name' => '', 'actor_type' => '', 'actor_id' => 0,
         'target_name' => '', 'target_type' => '', 'target_id' => 0, 'stat_name' => '',
-        'actor_roll' => '', 'actor_dice_sum' => 0, 'actor_modifier' => 0, 'actor_score' => 0,
+        'actor_roll' => '', 'actor_roll_initial' => '', 'actor_reroll_value' => 0, 'actor_reroll_index' => 0,
+        'actor_dice_base' => 0, 'actor_dice_modifier' => 0, 'actor_dice_count' => 0,
+        'actor_dice_sum' => 0, 'actor_modifier' => 0, 'actor_score' => 0,
         'target_roll' => '', 'target_dice_sum' => 0, 'target_modifier' => 0, 'target_score' => 0,
         'winner_name' => '', 'actor_hp_before' => 0, 'actor_hp_after' => 0,
-        'target_hp_before' => 0, 'target_hp_after' => 0, 'event_note' => '', 'source_ref' => null,
+        'target_hp_before' => 0, 'target_hp_after' => 0,
+        'trait_name' => '', 'trait_icon' => '', 'trait_description' => '', 'trait_effect_type' => '', 'trait_effect_value' => 0,
+        'trait_effect_stat_id' => 0, 'trait_effect_stat_name' => '',
+        'event_note' => '', 'source_ref' => null,
     );
     foreach ($fields as $key => $default) if (array_key_exists($key, $data)) $fields[$key] = $data[$key];
     $values = array();
     foreach ($fields as $key => $value) {
         if ($key === 'source_ref' && $value === null) $values[$key] = 'NULL';
-        elseif (in_array($key, array('actor_id','target_id','actor_dice_sum','actor_modifier','actor_score','target_dice_sum','target_modifier','target_score','actor_hp_before','actor_hp_after','target_hp_before','target_hp_after'), true)) $values[$key] = "'".(int)$value."'";
+        elseif (in_array($key, array('actor_id','target_id','actor_reroll_value','actor_reroll_index','actor_dice_base','actor_dice_modifier','actor_dice_count','actor_dice_sum','actor_modifier','actor_score','target_dice_sum','target_modifier','target_score','trait_effect_value','trait_effect_stat_id','actor_hp_before','actor_hp_after','target_hp_before','target_hp_after'), true)) $values[$key] = "'".(int)$value."'";
         else $values[$key] = "'".bbs_duel_escape($value)."'";
     }
     $columns = array(); $sql_values = array();
@@ -187,6 +192,7 @@ function bbs_duel_history_import_battle($row, $source_ref) {
     $target_roll = isset($row['wr_duel_target_roll']) ? (string)$row['wr_duel_target_roll'] : '';
     $actor_score = (int)(isset($row['wr_duel_actor_score']) ? $row['wr_duel_actor_score'] : 0);
     $target_score = (int)(isset($row['wr_duel_target_score']) ? $row['wr_duel_target_score'] : 0);
+    $actor_dice_sum = array_sum(explode(',', $actor_roll));
     $outcome = isset($row['wr_duel_result']) ? (string)$row['wr_duel_result'] : '';
     $winner = $outcome === 'actor_win' ? (string)$row['wr_duel_actor_name'] : ($outcome === 'target_win' ? (string)$row['wr_duel_target_name'] : '');
     return bbs_duel_history_insert(array(
@@ -197,9 +203,24 @@ function bbs_duel_history_import_battle($row, $source_ref) {
         'target_type' => isset($row['wr_duel_target_type']) ? $row['wr_duel_target_type'] : '',
         'target_id' => isset($row['wr_duel_target_id']) ? (int)$row['wr_duel_target_id'] : 0,
         'stat_name' => isset($row['wr_duel_stat_name']) ? $row['wr_duel_stat_name'] : '',
-        'actor_roll' => $actor_roll, 'actor_dice_sum' => $actor_score, 'actor_score' => $actor_score,
+        'actor_roll' => $actor_roll, 'actor_dice_sum' => $actor_dice_sum,
+        'actor_modifier' => isset($row['wr_duel_actor_score_modifier']) ? (int)$row['wr_duel_actor_score_modifier'] : 0,
+        'actor_score' => $actor_score,
+        'actor_roll_initial' => isset($row['wr_duel_actor_roll_initial']) && $row['wr_duel_actor_roll_initial'] !== '' ? $row['wr_duel_actor_roll_initial'] : $actor_roll,
+        'actor_reroll_value' => isset($row['wr_duel_actor_reroll_value']) ? (int)$row['wr_duel_actor_reroll_value'] : 0,
+        'actor_reroll_index' => isset($row['wr_duel_actor_reroll_index']) ? (int)$row['wr_duel_actor_reroll_index'] : 0,
+        'actor_dice_base' => isset($row['wr_duel_actor_dice_base']) ? (int)$row['wr_duel_actor_dice_base'] : 0,
+        'actor_dice_modifier' => isset($row['wr_duel_actor_dice_modifier']) ? (int)$row['wr_duel_actor_dice_modifier'] : 0,
+        'actor_dice_count' => isset($row['wr_duel_actor_dice_count']) ? (int)$row['wr_duel_actor_dice_count'] : 0,
         'target_roll' => $target_roll, 'target_dice_sum' => $target_score, 'target_score' => $target_score,
         'winner_name' => $winner,
+        'trait_name' => isset($row['wr_duel_trait_name']) ? $row['wr_duel_trait_name'] : '',
+        'trait_icon' => isset($row['wr_duel_trait_icon']) ? $row['wr_duel_trait_icon'] : '',
+        'trait_description' => isset($row['wr_duel_trait_description']) ? $row['wr_duel_trait_description'] : '',
+        'trait_effect_type' => isset($row['wr_duel_trait_effect_type']) ? $row['wr_duel_trait_effect_type'] : '',
+        'trait_effect_value' => isset($row['wr_duel_trait_effect_value']) ? (int)$row['wr_duel_trait_effect_value'] : 0,
+        'trait_effect_stat_id' => isset($row['wr_duel_trait_effect_stat_id']) ? (int)$row['wr_duel_trait_effect_stat_id'] : 0,
+        'trait_effect_stat_name' => isset($row['wr_duel_trait_effect_stat_name']) ? $row['wr_duel_trait_effect_stat_name'] : '',
         'actor_hp_before' => isset($row['wr_duel_actor_hp_before']) ? (int)$row['wr_duel_actor_hp_before'] : 0,
         'actor_hp_after' => isset($row['wr_duel_actor_hp_after']) ? (int)$row['wr_duel_actor_hp_after'] : 0,
         'target_hp_before' => isset($row['wr_duel_target_hp_before']) ? (int)$row['wr_duel_target_hp_before'] : 0,

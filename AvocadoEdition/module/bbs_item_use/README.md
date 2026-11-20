@@ -9,10 +9,10 @@
 ## 화면 커스텀
 
 플레이어가 보는 화면의 마크업을 바꿀 때 엽니다. 경로 기준 `module/bbs_item_use/`.  
-전용 CSS 파일은 없습니다. 로그 템플릿은 게시판 스킨에 `template/log.item.tpl.php` 가 있으면 그쪽이 우선입니다.
+댓글 폼의 설명 툴팁·한 줄 배치는 `css/comment.css` 에서 관리합니다. 로그 템플릿은 게시판 스킨에 `template/log.item.tpl.php` 가 있으면 그쪽이 우선입니다.
 
 | 화면 | PHP (마크업) | CSS |
 |------|--------------|-----|
-| 사용·선물 폼 | `bbs/render.php` (`item_form_select`, `item_form_select_comment`) | (게시판/타임라인 스킨) |
+| 사용·선물 폼 | `bbs/render.php` (`item_form_select`, `item_form_select_comment`) | 댓글은 `css/comment.css`, 그 외는 게시판/타임라인 스킨 |
 | 아이템 사용 로그 | `bbs/template/log.item.tpl.php` (또는 스킨 `template/`) | (게시판/타임라인 스킨) |
 | 처리 로직 | `bbs/use.php` | — |

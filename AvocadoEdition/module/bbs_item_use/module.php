@@ -5,7 +5,7 @@ return array(
     'name'           => 'bbs_item_use',
     'title'          => '게시판 아이템 사용',
     'description'    => '글 작성 시 아이템 사용. mmb 원글은 사용/선물, mmb 댓글은 사용만. 타임라인은 사용/선물.',
-    'version'        => '1.0.0',
+    'version'        => '1.0.1',
     'author'         => 'K',
     'board_scope'    => true,
     'board_default'  => 'off',

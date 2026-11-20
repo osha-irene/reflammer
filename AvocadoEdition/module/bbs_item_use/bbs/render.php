@@ -239,8 +239,12 @@ function item_form_select($character, $ctx = array()) {
     $effect_html = function ($box_id, $txt_id) use ($h) {
         return '<div class="mmb-item-effect" id="'.$h($box_id).'" style="display:none;"><span id="'.$h($txt_id).'"></span></div>';
     };
+    $effect_help_html = function ($help_id) use ($h) {
+        return '<button type="button" class="mmb-item-effect-help" id="'.$h($help_id).'" aria-label="아이템 설명" data-tooltip="" hidden>?</button>';
+    };
 
     $bind_js = 'function bindEffect(selId,boxId,txtId){var sel=document.getElementById(selId);var box=document.getElementById(boxId);var txt=document.getElementById(txtId);if(!sel||!box||!txt)return;function upd(){var opt=sel.options[sel.selectedIndex];var eff=opt&&opt.getAttribute("data-effect");if(eff&&eff.trim()){txt.textContent=eff;box.style.display="";}else{box.style.display="none";}}sel.addEventListener("change",upd);upd();}';
+    $bind_help_js = 'function bindEffectHelp(selId,helpId){var sel=document.getElementById(selId);var help=document.getElementById(helpId);if(!sel||!help)return;function upd(){var opt=sel.options[sel.selectedIndex];var eff=opt&&opt.getAttribute("data-effect");if(eff&&eff.trim()){help.setAttribute("data-tooltip",eff);help.setAttribute("aria-label","아이템 설명: "+eff);help.hidden=false;}else{help.setAttribute("data-tooltip","");help.setAttribute("aria-label","아이템 설명");help.hidden=true;}}sel.addEventListener("change",upd);upd();}';
 
     $sync_js = function ($panel_sel) use ($jid, $root_id, $id_use, $id_gift, $id_gift_to) {
         $js = 'var root=document.getElementById('.$jid($root_id).');';
@@ -260,9 +264,9 @@ function item_form_select($character, $ctx = array()) {
         $html .= '<select name="use_item" id="'.$h($id_use).'" class="mmb-item-comment-select">';
         $html .= '<option value="">아이템 선택</option>'.inventory_item_options_html($usable, $ch_id);
         $html .= '</select>';
-        $html .= $effect_html($id_use_eff, $id_use_eff_txt);
-        $html .= '<script>(function(){'.$bind_js;
-        $html .= 'bindEffect('.$jid($id_use).','.$jid($id_use_eff).','.$jid($id_use_eff_txt).');';
+        $html .= $effect_help_html($id_use_eff);
+        $html .= '<script>(function(){'.$bind_help_js;
+        $html .= 'bindEffectHelp('.$jid($id_use).','.$jid($id_use_eff).');';
         $html .= '})();</script>';
         return $html;
     }

@@ -8,7 +8,7 @@ bbs_duel_hp_seed_approved_characters();
 
 mdl_add_action('bbs_enqueue_assets', function ($bo_table) {
     if (!mdl_board_enabled($bo_table, 'bbs_duel', 'write')) return;
-    add_stylesheet('<link rel="stylesheet" href="'.htmlspecialchars(G5_MDL_URL.'/bbs_duel/css/duel.css?v=0.16.0', ENT_QUOTES, 'UTF-8').'">', 100);
+    add_stylesheet('<link rel="stylesheet" href="'.htmlspecialchars(G5_MDL_URL.'/bbs_duel/css/duel.css?v=0.19.1', ENT_QUOTES, 'UTF-8').'">', 100);
 }, 10);
 
 function bbs_duel_form_targets($ctx) {
@@ -48,7 +48,8 @@ function bbs_duel_stat_options_html($stats) {
     $options = '<option value="">판정 스탯 선택</option>';
     foreach (bbs_duel_stat_combinations($stats) as $combo) {
         $token = htmlspecialchars($combo['token'], ENT_QUOTES, 'UTF-8');
-        $options .= '<option value="'.$token.'" data-stat-token="'.$token.'">'.htmlspecialchars($combo['name'], ENT_QUOTES, 'UTF-8').'</option>';
+        $stat_ids = htmlspecialchars(implode(',', $combo['ids']), ENT_QUOTES, 'UTF-8');
+        $options .= '<option value="'.$token.'" data-stat-token="'.$token.'" data-stat-ids="'.$stat_ids.'" data-dice-count="'.max(0, min(100, (int)$combo['value'])).'">'.htmlspecialchars($combo['name'], ENT_QUOTES, 'UTF-8').'</option>';
     }
     return $options;
 }
@@ -75,6 +76,14 @@ mdl_add_filter('bbs_write_form_action_panels', function ($html, $ctx) {
     $target_options = bbs_duel_target_options_html($targets);
     $stat_options = bbs_duel_stat_options_html($stats);
     foreach (array('DUEL_SPAR' => '대련 상대', 'DUEL' => '결투 상대') as $action => $label) {
+        $trait_context = array(
+            'bo_table' => $bo_table,
+            'character_id' => isset($character['ch_id']) ? (int)$character['ch_id'] : 0,
+            'id_prefix' => $action,
+        );
+        $trait_form = function_exists('mdl_apply_filters')
+            ? mdl_apply_filters('bbs_duel_trait_form', '', $trait_context, $action)
+            : '';
         $html .= '<div class="comment-data bbs-duel-action-panel" id="action_'.$action.'">'
             .'<dl><dt>'.htmlspecialchars($label, ENT_QUOTES, 'UTF-8').'</dt><dd>'
             .'<select name="wr_duel_target" aria-label="'.htmlspecialchars($label, ENT_QUOTES, 'UTF-8').'" disabled>'
@@ -82,9 +91,11 @@ mdl_add_filter('bbs_write_form_action_panels', function ($html, $ctx) {
             .' <select name="wr_duel_stat_id" aria-label="판정 스탯" disabled>'.$stat_options.'</select> '
             .'<small>양쪽 모두 선택한 스탯으로 멀린의 주사위를 굴립니다.</small>'
             .($action === 'DUEL' ? '<small>결투 결과에 따라 패자의 HP가 감소할 수 있습니다.</small>' : '')
-            .'</dd></dl></div>';
+            .'</dd></dl>'
+            .$trait_form
+            .'</div>';
     }
-    $html .= '<script>(function(){var f=document.getElementById("fwrite");if(!f)return;var a=f.querySelector("select[name=action]");if(!a)return;var panels={DUEL_SPAR:f.querySelector("#action_DUEL_SPAR"),DUEL:f.querySelector("#action_DUEL")};function syncPanel(k,p){if(!p)return;var on=a.value===k;var target=p.querySelector("select[name=wr_duel_target]");var stat=p.querySelector("select[name=wr_duel_stat_id]");if(!target||!stat)return;if(!on){target.value="";stat.value="";}target.disabled=!on;target.required=on;var selected=target.options[target.selectedIndex];if(on&&selected&&selected.getAttribute("data-incapacitated")==="1"){alert("전투불능 상태인 대상은 선택할 수 없습니다.");target.value="";selected=target.options[target.selectedIndex];}var raw=selected?selected.getAttribute("data-allowed-stats"):"";var allowed=raw?raw.split("|"):[];var selectedAllowed=false;Array.prototype.forEach.call(stat.options,function(item){var token=item.getAttribute("data-stat-token");var show=!token||!allowed.length||allowed.indexOf(token)!==-1;item.disabled=!show;item.hidden=!show;if(token&&item.selected&&show)selectedAllowed=true;});if(stat.value&&!selectedAllowed)stat.value="";stat.disabled=!on||!target.value;stat.required=on&&!!target.value;if(!target.value)stat.value="";}function sync(){Object.keys(panels).forEach(function(k){syncPanel(k,panels[k]);});}Object.keys(panels).forEach(function(k){var p=panels[k];if(p){var target=p.querySelector("select[name=wr_duel_target]");if(target)target.addEventListener("change",sync);}});a.addEventListener("change",sync);sync();})();</script>';
+    $html .= '<script>(function(){var f=document.getElementById("fwrite");if(!f)return;var a=f.querySelector("select[name=action]");if(!a)return;var panels={DUEL_SPAR:f.querySelector("#action_DUEL_SPAR"),DUEL:f.querySelector("#action_DUEL")};function syncPanel(k,p){if(!p)return;var on=a.value===k;var target=p.querySelector("select[name=wr_duel_target]");var stat=p.querySelector("select[name=wr_duel_stat_id]");if(!target||!stat)return;var trait=p.querySelector("select[data-trait-selector]");if(!on){target.value="";stat.value="";if(trait)trait.value="0";}target.disabled=!on;target.required=on;var selected=target.options[target.selectedIndex];if(on&&selected&&selected.getAttribute("data-incapacitated")==="1"){alert("전투불능 상태인 대상은 선택할 수 없습니다.");target.value="";selected=target.options[target.selectedIndex];}var raw=selected?selected.getAttribute("data-allowed-stats"):"";var allowed=raw?raw.split("|"):[];var selectedAllowed=false;Array.prototype.forEach.call(stat.options,function(item){var token=item.getAttribute("data-stat-token");var show=!token||!allowed.length||allowed.indexOf(token)!==-1;item.disabled=!show;item.hidden=!show;if(token&&item.selected&&show)selectedAllowed=true;});if(stat.value&&!selectedAllowed)stat.value="";stat.disabled=!on||!target.value;stat.required=on&&!!target.value;if(!target.value)stat.value="";if(trait){var chosen=stat.options[stat.selectedIndex];var diceCount=chosen?parseInt(chosen.getAttribute("data-dice-count")||"0",10):0;var statIds=chosen?(chosen.getAttribute("data-stat-ids")||"").split(","):[];Array.prototype.forEach.call(trait.options,function(item){if(item.value==="0")return;var unavailable=item.getAttribute("data-unavailable")==="1";var reroll=item.getAttribute("data-effect-type")==="reroll_lowest"&&diceCount<=0;var scopeId=parseInt(item.getAttribute("data-effect-stat-id")||"0",10);var scopeMismatch=scopeId>0&&statIds.indexOf(String(scopeId))===-1;item.disabled=unavailable||reroll||scopeMismatch;if(item.selected&&item.disabled)trait.value="0";});trait.disabled=!on||!target.value||!stat.value;}}function sync(){Object.keys(panels).forEach(function(k){syncPanel(k,panels[k]);});}Object.keys(panels).forEach(function(k){var p=panels[k];if(p){var target=p.querySelector("select[name=wr_duel_target]");var stat=p.querySelector("select[name=wr_duel_stat_id]");if(target)target.addEventListener("change",sync);if(stat)stat.addEventListener("change",sync);}});a.addEventListener("change",sync);sync();})();</script>';
     return $html;
 }, 10);
 
@@ -95,6 +106,11 @@ mdl_add_filter('bbs_custom_action', function ($result, $ctx) {
     $bo_table = isset($ctx['bo_table']) ? $ctx['bo_table'] : '';
     if (!mdl_board_enabled_for_w($bo_table, 'bbs_duel', isset($ctx['w']) ? $ctx['w'] : '')) return $result;
     if (isset($ctx['w']) && $ctx['w'] !== '') return $result;
+    $write_table = isset($ctx['write_table']) ? (string)$ctx['write_table'] : '';
+    if ($write_table === '' || !function_exists('mdl_db_column_exists')
+        || !mdl_db_column_exists($write_table, 'wr_duel_trait_description')) {
+        bbs_duel_fail('대련·결투 데이터베이스 업데이트가 필요합니다. 대련·결투 모듈을 최신 버전으로 업그레이드한 뒤 다시 작성해 주세요.');
+    }
 
     $character = isset($ctx['character']) && is_array($ctx['character']) ? $ctx['character'] : array();
     $member = isset($ctx['member']) && is_array($ctx['member']) ? $ctx['member'] : array();
@@ -124,10 +140,70 @@ mdl_add_filter('bbs_custom_action', function ($result, $ctx) {
     $target_count = bbs_duel_get_target_stat_value($target, $stat);
     if ($target_count === null) bbs_duel_fail('상대의 해당 스탯을 판정에 사용할 수 없습니다.');
 
-    $actor_roll = bbs_duel_roll($stat['value']);
+    if (isset($post['wr_duel_trait_id']) && !is_scalar($post['wr_duel_trait_id'])) {
+        bbs_duel_fail('특성 선택값이 올바르지 않습니다.');
+    }
+    $trait_raw = isset($post['wr_duel_trait_id']) ? (string)$post['wr_duel_trait_id'] : '0';
+    if (!preg_match('/^(0|[1-9][0-9]{0,9})$/', $trait_raw)) bbs_duel_fail('특성 선택값이 올바르지 않습니다.');
+    $trait_id = (int)$trait_raw;
+    $base_dice_count = max(0, min(100, (int)$stat['value']));
+    $trait_context = array(
+        'bo_table' => (string)$bo_table,
+        'character_id' => (int)$character['ch_id'],
+        'trait_id' => $trait_id,
+        'duel_type' => $action,
+        'stat_ids' => $stat['ids'],
+        'base_dice_count' => $base_dice_count,
+    );
+    $trait_state = array(
+        'valid' => $trait_id === 0,
+        'message' => '특성 모듈이 활성화되어 있지 않습니다.',
+        'trait_id' => 0,
+        'effect_type' => '',
+        'effect_value' => 0,
+        'effect_stat_id' => 0,
+        'effect_stat_name' => '',
+        'period_start' => '',
+    );
+    if (function_exists('mdl_apply_filters')) {
+        $trait_state = mdl_apply_filters('bbs_duel_trait_prepare', $trait_state, $trait_context);
+    }
+    if (empty($trait_state['valid'])) {
+        bbs_duel_fail(isset($trait_state['message']) ? (string)$trait_state['message'] : '선택한 특성을 사용할 수 없습니다.');
+    }
+
+    $trait_id = isset($trait_state['trait_id']) ? (int)$trait_state['trait_id'] : 0;
+    $trait_name = isset($trait_state['trait_name']) ? (string)$trait_state['trait_name'] : '';
+    $trait_icon = isset($trait_state['trait_icon']) ? (string)$trait_state['trait_icon'] : '';
+    $trait_description = isset($trait_state['trait_description']) ? (string)$trait_state['trait_description'] : '';
+    $trait_effect = isset($trait_state['effect_type']) ? (string)$trait_state['effect_type'] : '';
+    $trait_value = isset($trait_state['effect_value']) ? (int)$trait_state['effect_value'] : 0;
+    $trait_effect_stat_id = isset($trait_state['effect_stat_id']) ? (int)$trait_state['effect_stat_id'] : 0;
+    $trait_effect_stat_name = isset($trait_state['effect_stat_name']) ? (string)$trait_state['effect_stat_name'] : '';
+    $trait_period_start = isset($trait_state['period_start']) ? (string)$trait_state['period_start'] : '';
+    $actor_dice_modifier = $trait_effect === 'dice_count_modifier' ? $trait_value : 0;
+    $actor_score_modifier = $trait_effect === 'score_modifier' ? $trait_value : 0;
+    $actor_dice_count = max(0, min(100, $base_dice_count + $actor_dice_modifier));
+
+    $actor_roll = bbs_duel_roll($actor_dice_count);
     $target_roll = bbs_duel_roll($target_count);
     if ($actor_roll === false || $target_roll === false) bbs_duel_fail('멀린의 주사위 기능을 사용할 수 없습니다.');
-    $actor_score = array_sum($actor_roll);
+    $actor_roll_initial = implode(',', $actor_roll);
+    $actor_reroll_value = 0;
+    $actor_reroll_index = 0;
+    if ($trait_effect === 'reroll_lowest' && $actor_roll) {
+        $lowest = min($actor_roll);
+        $lowest_index = array_search($lowest, $actor_roll, true);
+        $reroll = bbs_duel_roll(1);
+        if ($reroll === false) bbs_duel_fail('멀린의 주사위 기능을 사용할 수 없습니다.');
+        $actor_reroll_value = isset($reroll[0]) ? (int)$reroll[0] : 0;
+        $actor_reroll_index = $lowest_index === false ? 0 : (int)$lowest_index + 1;
+        if ($lowest_index !== false && isset($reroll[0]) && (int)$reroll[0] > (int)$actor_roll[$lowest_index]) {
+            $actor_roll[$lowest_index] = (int)$reroll[0];
+        }
+    }
+    $actor_dice_sum = array_sum($actor_roll);
+    $actor_score = max(0, $actor_dice_sum + $actor_score_modifier);
     $target_score = array_sum($target_roll);
     $outcome = ($actor_score > $target_score) ? 'actor_win' : (($actor_score < $target_score) ? 'target_win' : 'draw');
     $duel_type = ($action === 'DUEL') ? 'duel' : 'spar';
@@ -144,11 +220,28 @@ mdl_add_filter('bbs_custom_action', function ($result, $ctx) {
         ." , wr_duel_target_id = '".(int)$target['id']."'"
         ." , wr_duel_target_name = '".bbs_duel_escape($target['name'])."'"
         ." , wr_duel_stat_name = '".bbs_duel_escape($stat['name'])."'"
+        ." , wr_duel_stat_ids = '".bbs_duel_escape(implode(',', $stat['ids']))."'"
         ." , wr_duel_actor_name = '".bbs_duel_escape(isset($character['ch_name']) ? $character['ch_name'] : '')."'"
         ." , wr_duel_actor_roll = '".bbs_duel_escape(implode(',', $actor_roll))."'"
+        ." , wr_duel_actor_roll_initial = '".bbs_duel_escape($actor_roll_initial)."'"
+        ." , wr_duel_actor_reroll_value = '".(int)$actor_reroll_value."'"
+        ." , wr_duel_actor_reroll_index = '".(int)$actor_reroll_index."'"
         ." , wr_duel_target_roll = '".bbs_duel_escape(implode(',', $target_roll))."'"
         ." , wr_duel_actor_score = '".(int)$actor_score."'"
         ." , wr_duel_target_score = '".(int)$target_score."'"
+        ." , wr_duel_actor_dice_base = '".(int)$base_dice_count."'"
+        ." , wr_duel_actor_dice_modifier = '".(int)$actor_dice_modifier."'"
+        ." , wr_duel_actor_dice_count = '".(int)$actor_dice_count."'"
+        ." , wr_duel_actor_score_modifier = '".(int)$actor_score_modifier."'"
+        ." , wr_duel_trait_id = '".(int)$trait_id."'"
+        ." , wr_duel_trait_name = '".bbs_duel_escape($trait_name)."'"
+        ." , wr_duel_trait_icon = '".bbs_duel_escape($trait_icon)."'"
+        ." , wr_duel_trait_description = '".bbs_duel_escape($trait_description)."'"
+        ." , wr_duel_trait_effect_type = '".bbs_duel_escape($trait_effect)."'"
+        ." , wr_duel_trait_effect_value = '".(int)$trait_value."'"
+        ." , wr_duel_trait_effect_stat_id = '".(int)$trait_effect_stat_id."'"
+        ." , wr_duel_trait_effect_stat_name = '".bbs_duel_escape($trait_effect_stat_name)."'"
+        ." , wr_duel_trait_period_start = '".bbs_duel_escape($trait_period_start)."'"
         ." , wr_duel_result = '".bbs_duel_escape($outcome)."' ";
     $result['customer_sql'] = rtrim($result['customer_sql'])." , wr_duel_actor_ch_id = '".(int)$character['ch_id']."'"
         ." , wr_duel_actor_hp_before = '".$actor_before."' , wr_duel_actor_hp_after = '".$actor_after."'"
@@ -173,6 +266,28 @@ mdl_add_action('write_after', function ($bo_table, $wr_id, $w) {
     $actor_id = (int)$row['wr_duel_actor_ch_id'];
     $target_id = (int)$row['wr_duel_target_id'];
     $target_type = $row['wr_duel_target_type'] === 'enemy' ? 'enemy' : 'character';
+    $trait_id = isset($row['wr_duel_trait_id']) ? (int)$row['wr_duel_trait_id'] : 0;
+    if ($trait_id > 0) {
+        $consume_context = array(
+            'character_id' => $actor_id,
+            'trait_id' => $trait_id,
+            'period_start' => isset($row['wr_duel_trait_period_start']) ? (string)$row['wr_duel_trait_period_start'] : '',
+            'source_ref' => $source_ref,
+            'bo_table' => $bo_table,
+            'post_id' => $wr_id,
+        );
+        $consume = function_exists('mdl_apply_filters')
+            ? mdl_apply_filters('bbs_duel_trait_consume', array('success' => false, 'message' => '특성 모듈을 사용할 수 없어 전투를 저장할 수 없습니다.'), $consume_context)
+            : array('success' => false, 'message' => '특성 모듈을 사용할 수 없어 전투를 저장할 수 없습니다.');
+        if (empty($consume['success'])) {
+            $GLOBALS['bo_table'] = $bo_table;
+            $GLOBALS['wr_id'] = $wr_id;
+            $GLOBALS['w'] = $w;
+            $GLOBALS['write_table'] = $write_table;
+            bbs_duel_fail(isset($consume['message']) ? (string)$consume['message'] : '특성 사용 횟수를 저장하지 못했습니다.');
+        }
+    }
+
     $actor_before = (int)$row['wr_duel_actor_hp_before'];
     $actor_after = (int)$row['wr_duel_actor_hp_after'];
     $target_before = (int)$row['wr_duel_target_hp_before'];
@@ -186,6 +301,17 @@ mdl_add_action('write_after', function ($bo_table, $wr_id, $w) {
             $enemy = sql_fetch("SELECT de_damage_to_player FROM `".bbs_duel_enemy_table()."` WHERE de_id='{$target_id}' LIMIT 1", false);
             $base_damage = isset($enemy['de_damage_to_player']) ? (int)$enemy['de_damage_to_player'] : bbs_duel_default_damage();
         } else $base_damage = bbs_duel_default_damage();
+        $trait_effect = isset($row['wr_duel_trait_effect_type']) ? (string)$row['wr_duel_trait_effect_type'] : '';
+        $trait_value = isset($row['wr_duel_trait_effect_value']) ? (int)$row['wr_duel_trait_effect_value'] : 0;
+        $trait_scope_id = isset($row['wr_duel_trait_effect_stat_id']) ? (int)$row['wr_duel_trait_effect_stat_id'] : 0;
+        $stat_ids = isset($row['wr_duel_stat_ids']) ? array_map('intval', explode(',', (string)$row['wr_duel_stat_ids'])) : array();
+        $trait_scope_matches = $trait_scope_id < 1 || in_array($trait_scope_id, $stat_ids, true);
+        if ($row['wr_duel_result'] === 'actor_win' && $trait_effect === 'outgoing_damage_modifier' && $trait_scope_matches) {
+            $base_damage += $trait_value;
+        } elseif ($row['wr_duel_result'] === 'target_win' && $trait_effect === 'incoming_damage_modifier') {
+            $base_damage += $trait_value;
+        }
+        $base_damage = max(0, min(1000, $base_damage));
         $damage = bbs_duel_damage_adjust($base_damage, array('winner' => $row['wr_duel_result'] === 'actor_win' ? 'player' : ($target_type === 'enemy' ? 'enemy' : 'player'), 'loser' => $victim_type, 'actor_ch_id' => $actor_id, 'target_type' => $target_type, 'target_id' => $target_id));
         $applied = bbs_duel_hp_apply_damage($victim_type, $victim_id, $damage);
         if ($applied) {
@@ -202,17 +328,40 @@ mdl_add_action('write_after', function ($bo_table, $wr_id, $w) {
     }
 
     $winner = $row['wr_duel_result'] === 'actor_win' ? (string)$row['wr_duel_actor_name'] : ($row['wr_duel_result'] === 'target_win' ? (string)$row['wr_duel_target_name'] : '');
+    $actor_modifier = isset($row['wr_duel_actor_score_modifier']) ? (int)$row['wr_duel_actor_score_modifier'] : 0;
+    $actor_dice_sum = array_sum(function_exists('merlin_dice_parse') ? merlin_dice_parse(isset($row['wr_duel_actor_roll']) ? $row['wr_duel_actor_roll'] : '') : array());
+    $trait_note = '';
+    if ($trait_id > 0) {
+        $effect_text = function_exists('bbs_trait_effect_text')
+            ? bbs_trait_effect_text(isset($row['wr_duel_trait_effect_type']) ? $row['wr_duel_trait_effect_type'] : '', isset($row['wr_duel_trait_effect_value']) ? $row['wr_duel_trait_effect_value'] : 0, isset($row['wr_duel_trait_effect_stat_name']) ? (string)$row['wr_duel_trait_effect_stat_name'] : '')
+            : (string)$row['wr_duel_trait_effect_type'];
+        $trait_note = '특성: '.(string)$row['wr_duel_trait_name'].' ('.$effect_text.')';
+    }
+    if ($actual_damage > 0) $trait_note .= ($trait_note !== '' ? ' · ' : '').'패자 HP 감소';
     bbs_duel_history_insert(array(
         'event_type' => $row['wr_duel_type'], 'event_datetime' => isset($row['wr_datetime']) ? $row['wr_datetime'] : G5_TIME_YMDHIS,
         'actor_name' => (string)$row['wr_duel_actor_name'], 'actor_type' => 'character', 'actor_id' => $actor_id,
         'target_name' => (string)$row['wr_duel_target_name'], 'target_type' => $target_type, 'target_id' => $target_id,
         'stat_name' => (string)$row['wr_duel_stat_name'], 'actor_roll' => (string)$row['wr_duel_actor_roll'],
-        'actor_dice_sum' => (int)$row['wr_duel_actor_score'], 'actor_score' => (int)$row['wr_duel_actor_score'],
+        'actor_roll_initial' => isset($row['wr_duel_actor_roll_initial']) ? (string)$row['wr_duel_actor_roll_initial'] : (string)$row['wr_duel_actor_roll'],
+        'actor_reroll_value' => isset($row['wr_duel_actor_reroll_value']) ? (int)$row['wr_duel_actor_reroll_value'] : 0,
+        'actor_reroll_index' => isset($row['wr_duel_actor_reroll_index']) ? (int)$row['wr_duel_actor_reroll_index'] : 0,
+        'actor_dice_base' => isset($row['wr_duel_actor_dice_base']) ? (int)$row['wr_duel_actor_dice_base'] : 0,
+        'actor_dice_modifier' => isset($row['wr_duel_actor_dice_modifier']) ? (int)$row['wr_duel_actor_dice_modifier'] : 0,
+        'actor_dice_count' => isset($row['wr_duel_actor_dice_count']) ? (int)$row['wr_duel_actor_dice_count'] : 0,
+        'actor_dice_sum' => $actor_dice_sum, 'actor_modifier' => $actor_modifier, 'actor_score' => (int)$row['wr_duel_actor_score'],
         'target_roll' => (string)$row['wr_duel_target_roll'], 'target_dice_sum' => (int)$row['wr_duel_target_score'],
         'target_score' => (int)$row['wr_duel_target_score'], 'winner_name' => $winner,
+        'trait_name' => isset($row['wr_duel_trait_name']) ? (string)$row['wr_duel_trait_name'] : '',
+        'trait_icon' => isset($row['wr_duel_trait_icon']) ? (string)$row['wr_duel_trait_icon'] : '',
+        'trait_description' => isset($row['wr_duel_trait_description']) ? (string)$row['wr_duel_trait_description'] : '',
+        'trait_effect_type' => isset($row['wr_duel_trait_effect_type']) ? (string)$row['wr_duel_trait_effect_type'] : '',
+        'trait_effect_value' => isset($row['wr_duel_trait_effect_value']) ? (int)$row['wr_duel_trait_effect_value'] : 0,
+        'trait_effect_stat_id' => isset($row['wr_duel_trait_effect_stat_id']) ? (int)$row['wr_duel_trait_effect_stat_id'] : 0,
+        'trait_effect_stat_name' => isset($row['wr_duel_trait_effect_stat_name']) ? (string)$row['wr_duel_trait_effect_stat_name'] : '',
         'actor_hp_before' => $actor_before, 'actor_hp_after' => $actor_after,
         'target_hp_before' => $target_before, 'target_hp_after' => $target_after,
-        'event_note' => $actual_damage > 0 ? '패자 HP 감소' : '', 'source_ref' => $source_ref,
+        'event_note' => $trait_note, 'source_ref' => $source_ref,
     ));
 }, 10);
 

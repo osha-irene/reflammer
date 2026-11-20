@@ -68,6 +68,36 @@
     margin: 8px 0;
 }
 
+.bbs-duel-log .bbs-duel-trait {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin: 8px 0;
+}
+
+.bbs-duel-log .bbs-duel-trait img {
+    width: 2em;
+    height: 2em;
+    flex: 0 0 auto;
+    object-fit: cover;
+}
+
+.bbs-duel-log .bbs-duel-trait-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+}
+
+.bbs-duel-log .bbs-duel-trait-description {
+    white-space: normal;
+}
+
+.bbs-duel-log .bbs-duel-trait-detail {
+    width: 100%;
+}
+
 .bbs-duel-log .bbs-duel-roll {
     display: flex;
     flex-wrap: wrap;

@@ -54,6 +54,12 @@ sql_query("CREATE TABLE IF NOT EXISTS `{$history_table}` (
     target_id int(11) unsigned NOT NULL DEFAULT '0',
     stat_name varchar(255) NOT NULL DEFAULT '',
     actor_roll varchar(255) NOT NULL DEFAULT '',
+    actor_roll_initial varchar(255) NOT NULL DEFAULT '',
+    actor_reroll_value tinyint(3) unsigned NOT NULL DEFAULT '0',
+    actor_reroll_index tinyint(3) unsigned NOT NULL DEFAULT '0',
+    actor_dice_base smallint(5) unsigned NOT NULL DEFAULT '0',
+    actor_dice_modifier smallint(6) NOT NULL DEFAULT '0',
+    actor_dice_count smallint(5) unsigned NOT NULL DEFAULT '0',
     actor_dice_sum smallint(5) unsigned NOT NULL DEFAULT '0',
     actor_modifier smallint(6) NOT NULL DEFAULT '0',
     actor_score smallint(5) unsigned NOT NULL DEFAULT '0',
@@ -66,6 +72,13 @@ sql_query("CREATE TABLE IF NOT EXISTS `{$history_table}` (
     actor_hp_after smallint(5) unsigned NOT NULL DEFAULT '0',
     target_hp_before smallint(5) unsigned NOT NULL DEFAULT '0',
     target_hp_after smallint(5) unsigned NOT NULL DEFAULT '0',
+    trait_name varchar(100) NOT NULL DEFAULT '',
+    trait_icon varchar(2048) NOT NULL DEFAULT '',
+    trait_description text NULL,
+    trait_effect_type varchar(40) NOT NULL DEFAULT '',
+    trait_effect_value smallint(6) NOT NULL DEFAULT '0',
+    trait_effect_stat_id int(11) unsigned NOT NULL DEFAULT '0',
+    trait_effect_stat_name varchar(255) NOT NULL DEFAULT '',
     event_note varchar(255) NOT NULL DEFAULT '',
     source_ref varchar(160) NULL DEFAULT NULL,
     PRIMARY KEY (history_id),
@@ -76,6 +89,23 @@ sql_query("CREATE TABLE IF NOT EXISTS `{$history_table}` (
     KEY actor_name (actor_name),
     KEY target_name (target_name)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", false);
+
+mdl_db_add_column($history_table, 'actor_roll_initial', "varchar(255) NOT NULL DEFAULT ''");
+mdl_db_add_column($history_table, 'actor_reroll_value', "tinyint(3) unsigned NOT NULL DEFAULT '0'");
+mdl_db_add_column($history_table, 'actor_reroll_index', "tinyint(3) unsigned NOT NULL DEFAULT '0'");
+mdl_db_add_column($history_table, 'actor_dice_base', "smallint(5) unsigned NOT NULL DEFAULT '0'");
+mdl_db_add_column($history_table, 'actor_dice_modifier', "smallint(6) NOT NULL DEFAULT '0'");
+mdl_db_add_column($history_table, 'actor_dice_count', "smallint(5) unsigned NOT NULL DEFAULT '0'");
+mdl_db_add_column($history_table, 'trait_name', "varchar(100) NOT NULL DEFAULT ''");
+mdl_db_add_column($history_table, 'trait_icon', "varchar(2048) NOT NULL DEFAULT ''");
+mdl_db_add_column($history_table, 'trait_description', "text NULL");
+mdl_db_add_column($history_table, 'trait_effect_type', "varchar(40) NOT NULL DEFAULT ''");
+mdl_db_add_column($history_table, 'trait_effect_value', "smallint(6) NOT NULL DEFAULT '0'");
+mdl_db_add_column($history_table, 'trait_effect_stat_id', "int(11) unsigned NOT NULL DEFAULT '0'");
+mdl_db_add_column($history_table, 'trait_effect_stat_name', "varchar(255) NOT NULL DEFAULT ''");
+if (mdl_db_column_exists($history_table, 'trait_icon')) {
+    mdl_db_sql_query("ALTER TABLE `{$history_table}` MODIFY COLUMN `trait_icon` varchar(2048) NOT NULL DEFAULT ''");
+}
 
 if (function_exists('mdl_setting_get') && mdl_setting_get('bbs_duel', 'player_hp_default', null) === null) {
     mdl_setting_set('bbs_duel', 'player_hp_default', 5);
@@ -153,12 +183,29 @@ mdl_db_add_write_column('wr_duel_target_type', "varchar(12) NOT NULL DEFAULT ''"
 mdl_db_add_write_column('wr_duel_target_id', "int(11) NOT NULL DEFAULT '0'");
 mdl_db_add_write_column('wr_duel_target_name', "varchar(255) NOT NULL DEFAULT ''");
 mdl_db_add_write_column('wr_duel_stat_name', "varchar(255) NOT NULL DEFAULT ''");
+mdl_db_add_write_column('wr_duel_stat_ids', "varchar(64) NOT NULL DEFAULT ''");
 mdl_db_add_write_column('wr_duel_actor_name', "varchar(255) NOT NULL DEFAULT ''");
 mdl_db_add_write_column('wr_duel_actor_ch_id', "int(11) unsigned NOT NULL DEFAULT '0'");
 mdl_db_add_write_column('wr_duel_actor_roll', "varchar(255) NOT NULL DEFAULT ''");
+mdl_db_add_write_column('wr_duel_actor_roll_initial', "varchar(255) NOT NULL DEFAULT ''");
+mdl_db_add_write_column('wr_duel_actor_reroll_value', "tinyint(3) unsigned NOT NULL DEFAULT '0'");
+mdl_db_add_write_column('wr_duel_actor_reroll_index', "tinyint(3) unsigned NOT NULL DEFAULT '0'");
 mdl_db_add_write_column('wr_duel_target_roll', "varchar(255) NOT NULL DEFAULT ''");
-mdl_db_add_write_column('wr_duel_actor_score', "tinyint(3) unsigned NOT NULL DEFAULT '0'");
-mdl_db_add_write_column('wr_duel_target_score', "tinyint(3) unsigned NOT NULL DEFAULT '0'");
+mdl_db_add_write_column('wr_duel_actor_score', "smallint(5) unsigned NOT NULL DEFAULT '0'");
+mdl_db_add_write_column('wr_duel_target_score', "smallint(5) unsigned NOT NULL DEFAULT '0'");
+mdl_db_add_write_column('wr_duel_actor_dice_base', "smallint(5) unsigned NOT NULL DEFAULT '0'");
+mdl_db_add_write_column('wr_duel_actor_dice_modifier', "smallint(6) NOT NULL DEFAULT '0'");
+mdl_db_add_write_column('wr_duel_actor_dice_count', "smallint(5) unsigned NOT NULL DEFAULT '0'");
+mdl_db_add_write_column('wr_duel_actor_score_modifier', "smallint(6) NOT NULL DEFAULT '0'");
+mdl_db_add_write_column('wr_duel_trait_id', "int(11) unsigned NOT NULL DEFAULT '0'");
+mdl_db_add_write_column('wr_duel_trait_name', "varchar(100) NOT NULL DEFAULT ''");
+mdl_db_add_write_column('wr_duel_trait_icon', "varchar(2048) NOT NULL DEFAULT ''");
+mdl_db_add_write_column('wr_duel_trait_description', "text NULL");
+mdl_db_add_write_column('wr_duel_trait_effect_type', "varchar(40) NOT NULL DEFAULT ''");
+mdl_db_add_write_column('wr_duel_trait_effect_value', "smallint(6) NOT NULL DEFAULT '0'");
+mdl_db_add_write_column('wr_duel_trait_effect_stat_id', "int(11) unsigned NOT NULL DEFAULT '0'");
+mdl_db_add_write_column('wr_duel_trait_effect_stat_name', "varchar(255) NOT NULL DEFAULT ''");
+mdl_db_add_write_column('wr_duel_trait_period_start', "varchar(19) NOT NULL DEFAULT ''");
 mdl_db_add_write_column('wr_duel_result', "varchar(16) NOT NULL DEFAULT ''");
 mdl_db_add_write_column('wr_duel_actor_hp_before', "smallint(5) unsigned NOT NULL DEFAULT '0'");
 mdl_db_add_write_column('wr_duel_actor_hp_after', "smallint(5) unsigned NOT NULL DEFAULT '0'");
@@ -169,10 +216,18 @@ mdl_db_add_write_column('wr_duel_hp_damage', "smallint(5) unsigned NOT NULL DEFA
 // 100D2 결과(최대 199자)를 보존할 수 있도록 기존 기록 컬럼을 확장한다.
 mdl_db_each_write_table(function ($write_table) {
     $table = mdl_db_ident($write_table);
-    foreach (array('wr_duel_actor_roll', 'wr_duel_target_roll') as $column) {
+    foreach (array('wr_duel_actor_roll', 'wr_duel_actor_roll_initial', 'wr_duel_target_roll') as $column) {
         if (mdl_db_column_exists($table, $column)) {
             mdl_db_sql_query("ALTER TABLE `{$table}` MODIFY COLUMN `{$column}` varchar(255) NOT NULL DEFAULT ''");
         }
+    }
+    foreach (array('wr_duel_actor_score', 'wr_duel_target_score') as $column) {
+        if (mdl_db_column_exists($table, $column)) {
+            mdl_db_sql_query("ALTER TABLE `{$table}` MODIFY COLUMN `{$column}` smallint(5) unsigned NOT NULL DEFAULT '0'");
+        }
+    }
+    if (mdl_db_column_exists($table, 'wr_duel_trait_icon')) {
+        mdl_db_sql_query("ALTER TABLE `{$table}` MODIFY COLUMN `wr_duel_trait_icon` varchar(2048) NOT NULL DEFAULT ''");
     }
 });
 

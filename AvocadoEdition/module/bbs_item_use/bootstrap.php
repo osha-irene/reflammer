@@ -175,6 +175,9 @@ mdl_add_filter('bbs_comment_form_after_action', function ($html, $ctx) {
 mdl_add_action('bbs_enqueue_assets', function ($bo_table) {
     if (!mdl_board_enabled($bo_table, 'bbs_item_use', 'write')
      && !mdl_board_enabled($bo_table, 'bbs_item_use', 'comment')) return;
+    if (mdl_board_enabled($bo_table, 'bbs_item_use', 'comment')) {
+        add_stylesheet('<link rel="stylesheet" href="'.htmlspecialchars(G5_MDL_URL.'/bbs_item_use/css/comment.css?v=1.0.1', ENT_QUOTES, 'UTF-8').'">', 100);
+    }
     require_once __DIR__ . '/bbs/assets.php';
 
     // 사용 가능 아이템 글로벌 노출 (스킨 호환용)
