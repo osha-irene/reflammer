@@ -1,7 +1,7 @@
 <?php
 if (!defined('_GNUBOARD_')) exit;
 
-/** 현재 캐릭터의 굴림에 사용할 스탯 목록. 상태 화면과 같이 배분 수치(sc_max)를 사용한다. */
+/** 현재 캐릭터의 굴림에 사용할 스탯 목록. 배분 수치(sc_max)를 그대로 사용한다. */
 function merlin_dice_statuses($ch_id)
 {
     global $g5;
@@ -14,8 +14,6 @@ function merlin_dice_statuses($ch_id)
             $st_id = (int)$row['st_id'];
             $state = get_status($ch_id, $st_id);
             $value = (int)$state['has'];
-            // 상태 화면도 미설정/0인 배분값은 해당 스탯의 최소값으로 표시한다.
-            if ($value === 0) $value = (int)$state['min'];
             $statuses[$st_id] = array(
                 'id' => $st_id,
                 'name' => (string)$row['st_name'],
@@ -29,7 +27,7 @@ function merlin_dice_statuses($ch_id)
 
 function merlin_dice_roll($count)
 {
-    $count = max(1, min(100, (int)$count));
+    $count = max(0, min(100, (int)$count));
     $rolls = array();
     for ($i = 0; $i < $count; $i++) $rolls[] = mt_rand(1, 2);
     return $rolls;

@@ -370,7 +370,7 @@ function bbs_duel_get_character_stats($ch_id) {
             'id' => $id,
             'name' => (string)$definition['name'],
             'key' => 's'.(int)$id,
-            'value' => max(1, min(bbs_duel_player_stat_cap(), (int)$status['value'])),
+            'value' => max(0, min(bbs_duel_player_stat_cap(), (int)$status['value'])),
         );
     }
     $cache[$ch_id] = $out;
@@ -405,8 +405,8 @@ function bbs_duel_get_legacy_character_card($name) {
 }
 
 function bbs_duel_roll($count) {
-    if (!function_exists('merlin_dice_roll')) return array();
-    return merlin_dice_roll(max(1, min(100, (int)$count)));
+    if (!function_exists('merlin_dice_roll')) return false;
+    return merlin_dice_roll(max(0, min(100, (int)$count)));
 }
 
 function bbs_duel_get_targets($my_ch_id) {
@@ -492,7 +492,7 @@ function bbs_duel_get_target_stat_value($target, $stat) {
             if (!isset($target['stats'][$key])) return null;
             $value += max(1, min(100, (int)$target['stats'][$key]));
         }
-        return $value > 0 ? $value : null;
+        return $value;
     }
     if (isset($target['kind']) && $target['kind'] === 'character') {
         $stats = bbs_duel_get_character_stats((int)$target['id']);

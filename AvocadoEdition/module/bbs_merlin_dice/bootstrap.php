@@ -85,7 +85,7 @@ mdl_add_filter('bbs_customer_sql', function ($customer_sql, $ctx) {
         $chosen[] = $statuses[$st_id]['name'];
         $count += $statuses[$st_id]['value'];
     }
-    if ($count < 1 || $count > 100) return $customer_sql;
+    if ($count < 0 || $count > 100) return $customer_sql;
 
     $rolls = merlin_dice_roll($count);
     $roll_values = merlin_dice_escape(implode(',', $rolls));
@@ -95,8 +95,8 @@ mdl_add_filter('bbs_customer_sql', function ($customer_sql, $ctx) {
 
 mdl_add_filter('bbs_view_row_extra', function ($html, $row, $ctx) use ($merlin_dice_module_url) {
     $rolls = merlin_dice_parse(isset($row['wr_merlin_dice']) ? $row['wr_merlin_dice'] : '');
-    if (!$rolls) return $html;
     $stat_label = isset($row['wr_merlin_stat']) ? (string)$row['wr_merlin_stat'] : '';
+    if (!$rolls && $stat_label === '') return $html;
     $module_url = $merlin_dice_module_url;
     $view = __DIR__.'/views/row.php';
     ob_start();

@@ -126,7 +126,7 @@ mdl_add_filter('bbs_custom_action', function ($result, $ctx) {
 
     $actor_roll = bbs_duel_roll($stat['value']);
     $target_roll = bbs_duel_roll($target_count);
-    if (!$actor_roll || !$target_roll) bbs_duel_fail('멀린의 주사위 기능을 사용할 수 없습니다.');
+    if ($actor_roll === false || $target_roll === false) bbs_duel_fail('멀린의 주사위 기능을 사용할 수 없습니다.');
     $actor_score = array_sum($actor_roll);
     $target_score = array_sum($target_roll);
     $outcome = ($actor_score > $target_score) ? 'actor_win' : (($actor_score < $target_score) ? 'target_win' : 'draw');
@@ -190,10 +190,13 @@ mdl_add_action('write_after', function ($bo_table, $wr_id, $w) {
         $applied = bbs_duel_hp_apply_damage($victim_type, $victim_id, $damage);
         if ($applied) {
             $actual_damage = (int)$applied['damage'];
-    $actor_hp = bbs_duel_hp_get('character', $actor_id);
-    $target_hp = bbs_duel_hp_get($target_type, $target_id);
-            if ($victim_type === 'character') { $actor_before = (int)$applied['before']; $actor_after = (int)$actor_hp['current']; }
-            else { $target_before = (int)$applied['before']; $target_after = (int)$target_hp['current']; }
+            if ($row['wr_duel_result'] === 'target_win') {
+                $actor_before = (int)$applied['before'];
+                $actor_after = (int)$applied['after'];
+            } else {
+                $target_before = (int)$applied['before'];
+                $target_after = (int)$applied['after'];
+            }
             sql_query("UPDATE `{$write_table}` SET wr_duel_actor_hp_before='{$actor_before}', wr_duel_actor_hp_after='{$actor_after}', wr_duel_target_hp_before='{$target_before}', wr_duel_target_hp_after='{$target_after}', wr_duel_hp_damage='{$actual_damage}' WHERE wr_id='{$wr_id}' LIMIT 1", false);
         }
     }

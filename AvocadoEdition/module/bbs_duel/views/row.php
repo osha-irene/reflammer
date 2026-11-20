@@ -55,22 +55,24 @@ $combatants = array(
                 <?php $is_actor = $combatant_index === 0; $hp_before = $is_actor ? $actor_hp_before : $target_hp_before; $hp_after = $is_actor ? $actor_hp_after : $target_hp_after; ?>
                 <strong class="bbs-duel-name"><?php echo htmlspecialchars($combatant['name'], ENT_QUOTES, 'UTF-8'); ?><?php if ($type === 'duel' && $hp_before > 0 && $hp_after === 0) { ?> (전투불능)<?php } ?></strong>
                 <?php if ($type === 'duel' && $hp_before > 0) { ?><small class="bbs-duel-hp">HP <?php echo $hp_before; ?> → <?php echo $hp_after; ?></small><?php } ?>
-                <?php if ($combatant['rolls']) { ?>
-                    <div class="bbs-duel-roll">
-                        <span><?php echo htmlspecialchars($stat_name, ENT_QUOTES, 'UTF-8'); ?> (<?php echo count($combatant['rolls']); ?>D2)</span>
+                <div class="bbs-duel-roll">
+                    <span><?php echo htmlspecialchars($stat_name, ENT_QUOTES, 'UTF-8'); ?> (<?php echo count($combatant['rolls']); ?>D2)</span>
+                    <?php if (!$combatant['rolls']) { ?>
+                        <span class="bbs-duel-no-dice">굴릴 주사위가 없습니다.</span>
+                    <?php } else { ?>
                         <span class="dice"><?php foreach ($combatant['rolls'] as $value) {
                             $value = (int)$value;
                             $image = ($render_mode === 'image' && function_exists('bbs_dice_image_url_for')) ? bbs_dice_image_url_for($value, $dice_url) : '';
                             if ($image !== '') { ?><img src="<?php echo htmlspecialchars($image, ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo $value; ?>"><?php }
                             else { ?><span class="dice-num"><?php echo $value; ?></span><?php }
                         } ?></span>
-                        <strong>= <?php echo (int)$combatant['score']; ?></strong>
-                    </div>
-                <?php } ?>
+                    <?php } ?>
+                    <strong>= <?php echo (int)$combatant['score']; ?></strong>
+                </div>
             </section>
         <?php } ?>
     </div>
-    <?php if ($outcome_label !== '' && $actor_roll && $target_roll) { ?><p class="bbs-duel-result"><strong><?php echo htmlspecialchars($outcome_label, ENT_QUOTES, 'UTF-8'); ?></strong></p><?php } ?>
+    <?php if ($outcome_label !== '') { ?><p class="bbs-duel-result"><strong><?php echo htmlspecialchars($outcome_label, ENT_QUOTES, 'UTF-8'); ?></strong></p><?php } ?>
     <?php if ($type === 'duel' && $hp_damage > 0) {
         $loser_name = $outcome === 'actor_win' ? $target_name : $actor_name;
         ?><p class="bbs-duel-damage"><?php echo htmlspecialchars($loser_name, ENT_QUOTES, 'UTF-8'); ?> HP -<?php echo $hp_damage; ?></p><?php } ?>
