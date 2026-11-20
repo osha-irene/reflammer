@@ -12,6 +12,11 @@ $actor_score = isset($row['wr_duel_actor_score']) ? (int)$row['wr_duel_actor_sco
 $target_score = isset($row['wr_duel_target_score']) ? (int)$row['wr_duel_target_score'] : 0;
 $outcome = isset($row['wr_duel_result']) ? (string)$row['wr_duel_result'] : '';
 $outcome_label = ($outcome === 'actor_win') ? $actor_name.' 승리' : (($outcome === 'target_win') ? $target_name.' 승리' : (($outcome === 'draw') ? '무승부' : ''));
+$actor_hp_before = isset($row['wr_duel_actor_hp_before']) ? (int)$row['wr_duel_actor_hp_before'] : 0;
+$actor_hp_after = isset($row['wr_duel_actor_hp_after']) ? (int)$row['wr_duel_actor_hp_after'] : 0;
+$target_hp_before = isset($row['wr_duel_target_hp_before']) ? (int)$row['wr_duel_target_hp_before'] : 0;
+$target_hp_after = isset($row['wr_duel_target_hp_after']) ? (int)$row['wr_duel_target_hp_after'] : 0;
+$hp_damage = isset($row['wr_duel_hp_damage']) ? (int)$row['wr_duel_hp_damage'] : 0;
 $dice_url = defined('G5_MDL_URL') ? G5_MDL_URL.'/bbs_dice' : '';
 $render_mode = function_exists('bbs_dice_render_mode') ? bbs_dice_render_mode() : 'number';
 $actor_card = function_exists('bbs_duel_get_character_card') ? bbs_duel_get_character_card(isset($row['wr_duel_actor_ch_id']) ? $row['wr_duel_actor_ch_id'] : 0) : array();
@@ -29,7 +34,7 @@ $combatants = array(
     <p class="bbs-duel-heading"><strong><?php echo htmlspecialchars($label, ENT_QUOTES, 'UTF-8'); ?></strong>
         <?php if ($target_name !== '') { ?> · 상대: <strong><?php echo htmlspecialchars($target_name, ENT_QUOTES, 'UTF-8'); ?></strong><?php } ?></p>
     <div class="bbs-duel-combatants">
-        <?php foreach ($combatants as $combatant) {
+        <?php foreach ($combatants as $combatant_index => $combatant) {
             $card = $combatant['card'];
             $thumb = isset($card['ch_thumb']) ? (string)$card['ch_thumb'] : '';
             if ($thumb !== '' && function_exists('cdn_resolve_url')) $thumb = cdn_resolve_url($thumb);
@@ -47,7 +52,9 @@ $combatants = array(
                     <?php if ($thumb !== '') { ?><img src="<?php echo htmlspecialchars($thumb, ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($combatant['name'], ENT_QUOTES, 'UTF-8'); ?>">
                     <?php } ?>
                 </div>
-                <strong class="bbs-duel-name"><?php echo htmlspecialchars($combatant['name'], ENT_QUOTES, 'UTF-8'); ?></strong>
+                <?php $is_actor = $combatant_index === 0; $hp_before = $is_actor ? $actor_hp_before : $target_hp_before; $hp_after = $is_actor ? $actor_hp_after : $target_hp_after; ?>
+                <strong class="bbs-duel-name"><?php echo htmlspecialchars($combatant['name'], ENT_QUOTES, 'UTF-8'); ?><?php if ($type === 'duel' && $hp_before > 0 && $hp_after === 0) { ?> (전투불능)<?php } ?></strong>
+                <?php if ($type === 'duel' && $hp_before > 0) { ?><small class="bbs-duel-hp">HP <?php echo $hp_before; ?> → <?php echo $hp_after; ?></small><?php } ?>
                 <?php if ($combatant['rolls']) { ?>
                     <div class="bbs-duel-roll">
                         <span><?php echo htmlspecialchars($stat_name, ENT_QUOTES, 'UTF-8'); ?> (<?php echo count($combatant['rolls']); ?>D2)</span>
@@ -63,5 +70,8 @@ $combatants = array(
             </section>
         <?php } ?>
     </div>
-    <?php if ($outcome_label !== '' && $actor_roll && $target_roll) { ?><p class="bbs-duel-result">판정 결과: <strong><?php echo htmlspecialchars($outcome_label, ENT_QUOTES, 'UTF-8'); ?></strong></p><?php } ?>
+    <?php if ($outcome_label !== '' && $actor_roll && $target_roll) { ?><p class="bbs-duel-result"><strong><?php echo htmlspecialchars($outcome_label, ENT_QUOTES, 'UTF-8'); ?></strong></p><?php } ?>
+    <?php if ($type === 'duel' && $hp_damage > 0) {
+        $loser_name = $outcome === 'actor_win' ? $target_name : $actor_name;
+        ?><p class="bbs-duel-damage"><?php echo htmlspecialchars($loser_name, ENT_QUOTES, 'UTF-8'); ?> HP -<?php echo $hp_damage; ?></p><?php } ?>
 </div>

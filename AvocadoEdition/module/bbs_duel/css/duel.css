@@ -1,5 +1,6 @@
 .bbs-duel-log .bbs-duel-heading,
-.bbs-duel-log .bbs-duel-result {
+.bbs-duel-log .bbs-duel-result,
+.bbs-duel-log .bbs-duel-damage {
     text-align: center;
 }
 
@@ -54,6 +55,17 @@
 .bbs-duel-log .bbs-duel-name {
     display: block;
     margin-bottom: 8px;
+}
+
+.bbs-duel-log .bbs-duel-hp,
+.bbs-duel-log .bbs-duel-damage {
+    display: block;
+    margin: 2px 0 8px;
+    opacity: .8;
+}
+
+.bbs-duel-profile-hp {
+    margin: 8px 0;
 }
 
 .bbs-duel-log .bbs-duel-roll {

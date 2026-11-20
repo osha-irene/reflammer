@@ -3,9 +3,12 @@ if (!defined('_GNUBOARD_')) exit;
 
 require_once __DIR__.'/lib.php';
 
+// 모듈이 활성화된 동안 승인 캐릭터의 HP를 기본값 변경 전에 스냅샷한다.
+bbs_duel_hp_seed_approved_characters();
+
 mdl_add_action('bbs_enqueue_assets', function ($bo_table) {
     if (!mdl_board_enabled($bo_table, 'bbs_duel', 'write')) return;
-    add_stylesheet('<link rel="stylesheet" href="'.htmlspecialchars(G5_MDL_URL.'/bbs_duel/css/duel.css?v=0.14.3', ENT_QUOTES, 'UTF-8').'">', 100);
+    add_stylesheet('<link rel="stylesheet" href="'.htmlspecialchars(G5_MDL_URL.'/bbs_duel/css/duel.css?v=0.16.0', ENT_QUOTES, 'UTF-8').'">', 100);
 }, 10);
 
 function bbs_duel_form_targets($ctx) {
@@ -15,6 +18,7 @@ function bbs_duel_form_targets($ctx) {
         || (int)$character['ch_id'] < 1 || !isset($character['ch_state']) || $character['ch_state'] !== '승인'
         || !isset($character['ch_type']) || $character['ch_type'] !== 'main'
         || !isset($character['mb_id']) || $character['mb_id'] !== $member['mb_id']) return array();
+    if (bbs_duel_hp_is_incapacitated('character', (int)$character['ch_id'])) return array();
     return bbs_duel_get_targets((int)$character['ch_id']);
 }
 
@@ -23,7 +27,8 @@ function bbs_duel_target_options_html($targets) {
     if (!empty($targets['character'])) {
         $options .= '<optgroup label="플레이어 캐릭터">';
         foreach ($targets['character'] as $target) {
-            $options .= '<option value="character:'.(int)$target['id'].'">'.htmlspecialchars($target['name'], ENT_QUOTES, 'UTF-8').'</option>';
+            $down = !empty($target['hp']['incapacitated']);
+            $options .= '<option value="character:'.(int)$target['id'].'" data-incapacitated="'.($down ? '1' : '0').'">'.htmlspecialchars($target['name'], ENT_QUOTES, 'UTF-8').($down ? ' (전투불능)' : '').'</option>';
         }
         $options .= '</optgroup>';
     }
@@ -31,7 +36,8 @@ function bbs_duel_target_options_html($targets) {
         $options .= '<optgroup label="에너미">';
         foreach ($targets['enemy'] as $target) {
             $allowed = !empty($target['allowed_stats']) ? implode('|', $target['allowed_stats']) : '';
-            $options .= '<option value="enemy:'.(int)$target['id'].'" data-allowed-stats="'.htmlspecialchars($allowed, ENT_QUOTES, 'UTF-8').'">'.htmlspecialchars($target['name'], ENT_QUOTES, 'UTF-8').'</option>';
+            $down = !empty($target['hp']['incapacitated']);
+            $options .= '<option value="enemy:'.(int)$target['id'].'" data-incapacitated="'.($down ? '1' : '0').'" data-allowed-stats="'.htmlspecialchars($allowed, ENT_QUOTES, 'UTF-8').'">'.htmlspecialchars($target['name'], ENT_QUOTES, 'UTF-8').($down ? ' (전투불능)' : '').'</option>';
         }
         $options .= '</optgroup>';
     }
@@ -78,7 +84,7 @@ mdl_add_filter('bbs_write_form_action_panels', function ($html, $ctx) {
             .($action === 'DUEL' ? '<small>결투 결과에 따라 패자의 HP가 감소할 수 있습니다.</small>' : '')
             .'</dd></dl></div>';
     }
-    $html .= '<script>(function(){var f=document.getElementById("fwrite");if(!f)return;var a=f.querySelector("select[name=action]");if(!a)return;var panels={DUEL_SPAR:f.querySelector("#action_DUEL_SPAR"),DUEL:f.querySelector("#action_DUEL")};function syncPanel(k,p){if(!p)return;var on=a.value===k;var target=p.querySelector("select[name=wr_duel_target]");var stat=p.querySelector("select[name=wr_duel_stat_id]");if(!target||!stat)return;if(!on){target.value="";stat.value="";}target.disabled=!on;target.required=on;var selected=target.options[target.selectedIndex];var raw=selected?selected.getAttribute("data-allowed-stats"):"";var allowed=raw?raw.split("|"):[];var selectedAllowed=false;Array.prototype.forEach.call(stat.options,function(item){var token=item.getAttribute("data-stat-token");var show=!token||!allowed.length||allowed.indexOf(token)!==-1;item.disabled=!show;item.hidden=!show;if(token&&item.selected&&show)selectedAllowed=true;});if(stat.value&&!selectedAllowed)stat.value="";stat.disabled=!on||!target.value;stat.required=on&&!!target.value;if(!target.value)stat.value="";}function sync(){Object.keys(panels).forEach(function(k){syncPanel(k,panels[k]);});}Object.keys(panels).forEach(function(k){var p=panels[k];if(p){var target=p.querySelector("select[name=wr_duel_target]");if(target)target.addEventListener("change",sync);}});a.addEventListener("change",sync);sync();})();</script>';
+    $html .= '<script>(function(){var f=document.getElementById("fwrite");if(!f)return;var a=f.querySelector("select[name=action]");if(!a)return;var panels={DUEL_SPAR:f.querySelector("#action_DUEL_SPAR"),DUEL:f.querySelector("#action_DUEL")};function syncPanel(k,p){if(!p)return;var on=a.value===k;var target=p.querySelector("select[name=wr_duel_target]");var stat=p.querySelector("select[name=wr_duel_stat_id]");if(!target||!stat)return;if(!on){target.value="";stat.value="";}target.disabled=!on;target.required=on;var selected=target.options[target.selectedIndex];if(on&&selected&&selected.getAttribute("data-incapacitated")==="1"){alert("전투불능 상태인 대상은 선택할 수 없습니다.");target.value="";selected=target.options[target.selectedIndex];}var raw=selected?selected.getAttribute("data-allowed-stats"):"";var allowed=raw?raw.split("|"):[];var selectedAllowed=false;Array.prototype.forEach.call(stat.options,function(item){var token=item.getAttribute("data-stat-token");var show=!token||!allowed.length||allowed.indexOf(token)!==-1;item.disabled=!show;item.hidden=!show;if(token&&item.selected&&show)selectedAllowed=true;});if(stat.value&&!selectedAllowed)stat.value="";stat.disabled=!on||!target.value;stat.required=on&&!!target.value;if(!target.value)stat.value="";}function sync(){Object.keys(panels).forEach(function(k){syncPanel(k,panels[k]);});}Object.keys(panels).forEach(function(k){var p=panels[k];if(p){var target=p.querySelector("select[name=wr_duel_target]");if(target)target.addEventListener("change",sync);}});a.addEventListener("change",sync);sync();})();</script>';
     return $html;
 }, 10);
 
@@ -97,6 +103,7 @@ mdl_add_filter('bbs_custom_action', function ($result, $ctx) {
         || !isset($character['mb_id']) || $character['mb_id'] !== $member['mb_id']) {
         bbs_duel_fail('승인된 본인 캐릭터로만 대련·결투 글을 작성할 수 있습니다.');
     }
+    if (bbs_duel_hp_is_incapacitated('character', (int)$character['ch_id'])) bbs_duel_fail('전투불능 상태에서는 대련·결투를 시작할 수 없습니다.');
 
     $post = isset($ctx['post']) && is_array($ctx['post']) ? $ctx['post'] : array();
     $actor_stats = bbs_duel_get_character_stats((int)$character['ch_id']);
@@ -124,6 +131,12 @@ mdl_add_filter('bbs_custom_action', function ($result, $ctx) {
     $target_score = array_sum($target_roll);
     $outcome = ($actor_score > $target_score) ? 'actor_win' : (($actor_score < $target_score) ? 'target_win' : 'draw');
     $duel_type = ($action === 'DUEL') ? 'duel' : 'spar';
+    $actor_hp = bbs_duel_hp_ensure_character((int)$character['ch_id']);
+    $target_hp = !empty($target['hp']) ? $target['hp'] : array();
+    $actor_before = isset($actor_hp['current']) ? (int)$actor_hp['current'] : 0;
+    $target_before = isset($target_hp['current']) ? (int)$target_hp['current'] : 0;
+    $actor_after = $actor_before;
+    $target_after = $target_before;
 
     $result['handled'] = true;
     $result['customer_sql'] = " , wr_duel_type = '".bbs_duel_escape($duel_type)."'"
@@ -137,7 +150,82 @@ mdl_add_filter('bbs_custom_action', function ($result, $ctx) {
         ." , wr_duel_actor_score = '".(int)$actor_score."'"
         ." , wr_duel_target_score = '".(int)$target_score."'"
         ." , wr_duel_result = '".bbs_duel_escape($outcome)."' ";
+    $result['customer_sql'] = rtrim($result['customer_sql'])." , wr_duel_actor_ch_id = '".(int)$character['ch_id']."'"
+        ." , wr_duel_actor_hp_before = '".$actor_before."' , wr_duel_actor_hp_after = '".$actor_after."'"
+        ." , wr_duel_target_hp_before = '".$target_before."' , wr_duel_target_hp_after = '".$target_after."'"
+        ." , wr_duel_hp_damage = '0' ";
     return $result;
+}, 10);
+
+mdl_add_action('write_after', function ($bo_table, $wr_id, $w) {
+    global $g5;
+    if ($w !== '' || !mdl_board_enabled($bo_table, 'bbs_duel', 'write')) return;
+    $write_table = (isset($g5['write_prefix']) ? $g5['write_prefix'] : G5_TABLE_PREFIX.'write_').$bo_table;
+    $wr_id = (int)$wr_id;
+    if ($wr_id < 1 || !preg_match('/^[a-zA-Z0-9_]+$/', $write_table)) return;
+    $row = sql_fetch("SELECT * FROM `{$write_table}` WHERE wr_id='{$wr_id}' LIMIT 1", false);
+    if (empty($row['wr_duel_type']) || !in_array($row['wr_duel_type'], array('duel', 'spar'), true)
+        || !in_array($row['wr_duel_result'], array('actor_win', 'target_win', 'draw'), true)) return;
+    $source_ref = 'bbs|'.$bo_table.'|'.$wr_id;
+    $history = sql_fetch("SELECT history_id FROM `".bbs_duel_history_table()."` WHERE source_ref='".bbs_duel_escape($source_ref)."' LIMIT 1", false);
+    if (!empty($history['history_id'])) return;
+
+    $actor_id = (int)$row['wr_duel_actor_ch_id'];
+    $target_id = (int)$row['wr_duel_target_id'];
+    $target_type = $row['wr_duel_target_type'] === 'enemy' ? 'enemy' : 'character';
+    $actor_before = (int)$row['wr_duel_actor_hp_before'];
+    $actor_after = (int)$row['wr_duel_actor_hp_after'];
+    $target_before = (int)$row['wr_duel_target_hp_before'];
+    $target_after = (int)$row['wr_duel_target_hp_after'];
+    $actual_damage = 0;
+
+    if ($row['wr_duel_type'] === 'duel' && $row['wr_duel_result'] !== 'draw') {
+        $victim_type = $row['wr_duel_result'] === 'actor_win' ? $target_type : 'character';
+        $victim_id = $row['wr_duel_result'] === 'actor_win' ? $target_id : $actor_id;
+        if ($target_type === 'enemy' && $row['wr_duel_result'] === 'target_win') {
+            $enemy = sql_fetch("SELECT de_damage_to_player FROM `".bbs_duel_enemy_table()."` WHERE de_id='{$target_id}' LIMIT 1", false);
+            $base_damage = isset($enemy['de_damage_to_player']) ? (int)$enemy['de_damage_to_player'] : bbs_duel_default_damage();
+        } else $base_damage = bbs_duel_default_damage();
+        $damage = bbs_duel_damage_adjust($base_damage, array('winner' => $row['wr_duel_result'] === 'actor_win' ? 'player' : ($target_type === 'enemy' ? 'enemy' : 'player'), 'loser' => $victim_type, 'actor_ch_id' => $actor_id, 'target_type' => $target_type, 'target_id' => $target_id));
+        $applied = bbs_duel_hp_apply_damage($victim_type, $victim_id, $damage);
+        if ($applied) {
+            $actual_damage = (int)$applied['damage'];
+    $actor_hp = bbs_duel_hp_get('character', $actor_id);
+    $target_hp = bbs_duel_hp_get($target_type, $target_id);
+            if ($victim_type === 'character') { $actor_before = (int)$applied['before']; $actor_after = (int)$actor_hp['current']; }
+            else { $target_before = (int)$applied['before']; $target_after = (int)$target_hp['current']; }
+            sql_query("UPDATE `{$write_table}` SET wr_duel_actor_hp_before='{$actor_before}', wr_duel_actor_hp_after='{$actor_after}', wr_duel_target_hp_before='{$target_before}', wr_duel_target_hp_after='{$target_after}', wr_duel_hp_damage='{$actual_damage}' WHERE wr_id='{$wr_id}' LIMIT 1", false);
+        }
+    }
+
+    $winner = $row['wr_duel_result'] === 'actor_win' ? (string)$row['wr_duel_actor_name'] : ($row['wr_duel_result'] === 'target_win' ? (string)$row['wr_duel_target_name'] : '');
+    bbs_duel_history_insert(array(
+        'event_type' => $row['wr_duel_type'], 'event_datetime' => isset($row['wr_datetime']) ? $row['wr_datetime'] : G5_TIME_YMDHIS,
+        'actor_name' => (string)$row['wr_duel_actor_name'], 'actor_type' => 'character', 'actor_id' => $actor_id,
+        'target_name' => (string)$row['wr_duel_target_name'], 'target_type' => $target_type, 'target_id' => $target_id,
+        'stat_name' => (string)$row['wr_duel_stat_name'], 'actor_roll' => (string)$row['wr_duel_actor_roll'],
+        'actor_dice_sum' => (int)$row['wr_duel_actor_score'], 'actor_score' => (int)$row['wr_duel_actor_score'],
+        'target_roll' => (string)$row['wr_duel_target_roll'], 'target_dice_sum' => (int)$row['wr_duel_target_score'],
+        'target_score' => (int)$row['wr_duel_target_score'], 'winner_name' => $winner,
+        'actor_hp_before' => $actor_before, 'actor_hp_after' => $actor_after,
+        'target_hp_before' => $target_before, 'target_hp_after' => $target_after,
+        'event_note' => $actual_damage > 0 ? '패자 HP 감소' : '', 'source_ref' => $source_ref,
+    ));
+}, 10);
+
+mdl_add_action('character_create_after', function ($ch_id, $ctx = array()) {
+    bbs_duel_hp_ensure_character((int)$ch_id);
+}, 10);
+mdl_add_action('character_delete_after', function ($ch_id, $ctx = array()) {
+    bbs_duel_hp_delete('character', (int)$ch_id);
+}, 10);
+mdl_add_filter('member_viewer_info', function ($html, $ctx) {
+    $character = isset($ctx['ch']) && is_array($ctx['ch']) ? $ctx['ch'] : array();
+    $ch_id = isset($character['ch_id']) ? (int)$character['ch_id'] : (isset($ctx['ch_id']) ? (int)$ctx['ch_id'] : 0);
+    if ($ch_id < 1 || (isset($character['ch_state']) && $character['ch_state'] !== '승인') || (isset($character['ch_type']) && !in_array($character['ch_type'], array('main', 'sub'), true))) return $html;
+    $hp = bbs_duel_hp_ensure_character($ch_id);
+    if (!$hp) return $html;
+    return $html.'<p class="bbs-duel-profile-hp">HP '.(int)$hp['current'].' / '.(int)$hp['max'].(!empty($hp['incapacitated']) ? ' · 전투불능' : '').'</p>';
 }, 10);
 
 mdl_add_filter('bbs_view_row_extra', function ($html, $row, $ctx) {

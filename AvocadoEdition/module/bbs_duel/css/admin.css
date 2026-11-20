@@ -11,7 +11,7 @@
     margin: 0;
     padding: 0;
     font-size: 16px;
-    line-height: 52px;
+    line-height: 38px;
     white-space: nowrap;
 }
 
@@ -21,14 +21,14 @@
 
 .bbs-duel-enemy-form .frm_input {
     box-sizing: border-box;
-    height: 52px;
+    height: 38px;
     margin: 0;
     font-size: 16px;
 }
 
 .bbs-duel-enemy-form input[type="number"].frm_input {
-    height: 52px !important;
-    min-height: 52px !important;
+    height: 38px !important;
+    min-height: 38px !important;
     padding-top: 0 !important;
     padding-bottom: 0 !important;
     line-height: normal !important;
@@ -50,7 +50,7 @@
     margin: 0;
     padding: 0;
     font-size: 14px;
-    line-height: 52px;
+    line-height: 38px;
     white-space: nowrap;
 }
 
@@ -61,7 +61,11 @@
 .bbs-duel-stat-input {
     box-sizing: border-box;
     width: 64px;
+    height: 32px;
+    min-height: 32px;
     margin: 0 auto;
+    padding-top: 0;
+    padding-bottom: 0;
     text-align: center;
 }
 
@@ -97,6 +101,47 @@
 
 .bbs-duel-enemy-form .btn_submit {
     box-sizing: border-box;
-    height: 52px;
+    height: 38px;
     margin: 0;
+}
+
+.bbs-duel-history-filter {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+}
+
+.bbs-duel-history-filter .frm_input {
+    box-sizing: border-box;
+    max-width: 170px;
+}
+
+.bbs-duel-history-table {
+    width: 100%;
+    table-layout: fixed;
+}
+
+.bbs-duel-history-table th,
+.bbs-duel-history-table td {
+    vertical-align: middle;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.bbs-duel-history-pagination {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin: 16px 0;
+}
+
+.bbs-duel-history-pagination a {
+    padding: 6px 10px;
+}
+
+.bbs-duel-history-pagination a.selected {
+    font-weight: bold;
+    text-decoration: underline;
 }

@@ -52,8 +52,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $message = '이미 등록된 에너미 이름입니다.';
             } else {
                 $stats_json = bbs_duel_escape(json_encode($stats));
-                sql_query("INSERT INTO `{$table}` SET de_name='{$name_e}', de_order='".(int)$order_raw."', de_stats='{$stats_json}', de_datetime='".G5_TIME_YMDHIS."'", false);
+                $hp_max_raw = isset($_POST['de_hp_max']) ? (string)$_POST['de_hp_max'] : '5';
+                $damage_raw = isset($_POST['de_damage_to_player']) ? (string)$_POST['de_damage_to_player'] : '1';
+                if (!preg_match('/^[1-9][0-9]{0,3}$/', $hp_max_raw) || (int)$hp_max_raw > 1000 || !preg_match('/^[0-9]{1,4}$/', $damage_raw) || (int)$damage_raw > 1000) {
+                    $message = '에너미 최대 HP는 1~1000, 대플레이어 피해량은 0~1000 사이의 정수로 입력해 주세요.';
+                } else {
+                sql_query("INSERT INTO `{$table}` SET de_name='{$name_e}', de_order='".(int)$order_raw."', de_stats='{$stats_json}', de_hp_max='".(int)$hp_max_raw."', de_damage_to_player='".(int)$damage_raw."', de_datetime='".G5_TIME_YMDHIS."'", false);
+                $new_enemy = sql_fetch("SELECT de_id FROM `{$table}` WHERE de_name='{$name_e}' LIMIT 1", false);
+                if (!empty($new_enemy['de_id'])) bbs_duel_hp_ensure_enemy((int)$new_enemy['de_id'], (int)$hp_max_raw);
                 $message = '에너미를 추가했습니다.';
+                }
             }
         }
     } elseif ($mode === 'bulk_update') {
@@ -101,22 +109,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $valid = false;
                 break;
             }
+            $hp_max_raw = isset($values['de_hp_max']) ? (string)$values['de_hp_max'] : '';
+            $damage_raw = isset($values['de_damage_to_player']) ? (string)$values['de_damage_to_player'] : '';
+            if (!preg_match('/^[1-9][0-9]{0,3}$/', $hp_max_raw) || (int)$hp_max_raw > 1000 || !preg_match('/^[0-9]{1,4}$/', $damage_raw) || (int)$damage_raw > 1000) { $valid = false; break; }
             $exists = sql_fetch("SELECT de_id FROM {$table} WHERE de_id='".(int)$id."' LIMIT 1", false);
             if (empty($exists['de_id'])) {
                 $valid = false;
                 break;
             }
-            $updates[(int)$id] = array((int)$order_raw, json_encode($stats), $allowed_stats);
+            $updates[(int)$id] = array((int)$order_raw, json_encode($stats), $allowed_stats, (int)$hp_max_raw, (int)$damage_raw);
         }
         if (!$valid) {
             $message = (!$single_id && !$ids)
                 ? '전체 저장할 에너미를 먼저 체크해 주세요.'
                 : ($single_id > 0
-                ? '수정할 에너미와 순서·스탯·허용 판정 스탯 값을 확인해 주세요.'
+                ? '수정할 에너미와 순서·스탯·HP·피해량 값을 확인해 주세요.'
                 : '체크된 에너미의 값을 확인해 주세요. 판정 제한은 관리자 스탯 이름과 두 스탯 조합을 |로 구분해 입력할 수 있습니다.');
         } else {
             foreach ($updates as $id => $values) {
-                sql_query("UPDATE `{$table}` SET de_order='{$values[0]}', de_stats='".bbs_duel_escape($values[1])."', de_allowed_stats='".bbs_duel_escape($values[2])."' WHERE de_id='{$id}' LIMIT 1", false);
+                sql_query("UPDATE `{$table}` SET de_order='{$values[0]}', de_stats='".bbs_duel_escape($values[1])."', de_allowed_stats='".bbs_duel_escape($values[2])."', de_hp_max='{$values[3]}', de_damage_to_player='{$values[4]}' WHERE de_id='{$id}' LIMIT 1", false);
+                bbs_duel_hp_ensure_enemy($id, $values[3]);
+                bbs_duel_hp_set_max('enemy', $id, $values[3]);
             }
             $message = $single_id > 0 ? '에너미 정보를 수정했습니다.' : count($updates).'명의 에너미 정보를 저장했습니다.';
         }
@@ -124,6 +137,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $id = max(0, (int)(isset($_POST['de_id']) ? $_POST['de_id'] : 0));
         if ($id > 0) {
             sql_query("DELETE FROM `{$table}` WHERE de_id='{$id}' LIMIT 1", false);
+            bbs_duel_hp_delete('enemy', $id);
             $message = '에너미를 삭제했습니다. 기존 게시글의 상대 표시는 보존됩니다.';
         }
     }
@@ -131,10 +145,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $next_order_row = sql_fetch("SELECT COALESCE(MAX(de_order), 0) + 1 AS next_order FROM `{$table}`", false);
 $next_order = max(1, (int)(isset($next_order_row['next_order']) ? $next_order_row['next_order'] : 1));
-$result = sql_query("SELECT de_id, de_name, de_order, de_sense, de_insight, de_courage, de_stats, de_allowed_stats, de_datetime FROM `{$table}` ORDER BY de_order ASC, de_id ASC", false);
+$result = sql_query("SELECT de_id, de_name, de_order, de_sense, de_insight, de_courage, de_stats, de_allowed_stats, de_hp_max, de_damage_to_player, de_datetime FROM `{$table}` ORDER BY de_order ASC, de_id ASC", false);
 $status_count = count($status_lineup);
-$stat_col_width = $status_count ? 18 / $status_count : 0;
-$empty_colspan = $status_count + 6;
+$stat_col_width = $status_count ? 17 / $status_count : 0;
+$empty_colspan = $status_count + 9;
 ?>
 <div class="local_desc01 local_desc"><p>에너미는 NPC 캐릭터와 별도로 관리되는 전투 대상입니다. 아래 스탯 칸은 /adm/에 등록된 스탯 라인업과 같은 순서로 표시됩니다.</p></div>
 <p class="bbs-duel-stat-guide">에너미 스탯은 /adm/에 등록된 스탯 이름과 순서대로 입력합니다. 판정 제한은 등록된 스탯명 또는 스탯 두 개의 조합을 |로 구분하세요. 예: 스탯2|스탯3|스탯2+스탯3. 비워 두면 모든 판정을 허용합니다.</p>
@@ -154,6 +168,8 @@ $empty_colspan = $status_count + 6;
     <input type="hidden" name="mode" value="add">
     <label for="de_name">에너미 이름</label>
     <input type="text" name="de_name" id="de_name" maxlength="100" required class="frm_input bbs-duel-name-input">
+    <span class="bbs-duel-stat-field"><label for="de_hp_max_new">최대 HP</label><input type="number" name="de_hp_max" id="de_hp_max_new" min="1" max="1000" step="1" value="5" required class="frm_input"></span>
+    <span class="bbs-duel-stat-field"><label for="de_damage_new">대플레이어 피해</label><input type="number" name="de_damage_to_player" id="de_damage_new" min="0" max="1000" step="1" value="1" required class="frm_input"></span>
     <span class="bbs-duel-stat-field"><label for="de_order_new">순서</label><input type="number" name="de_order" id="de_order_new" min="1" max="99999" step="1" value="<?php echo $next_order; ?>" required class="frm_input"></span>
     <?php foreach ($status_lineup as $status_id => $definition) { ?>
     <span class="bbs-duel-stat-field"><label for="de_stat_<?php echo (int)$status_id; ?>"><?php echo htmlspecialchars($definition['name'], ENT_QUOTES, 'UTF-8'); ?></label><input type="number" name="de_stats[<?php echo (int)$status_id; ?>]" id="de_stat_<?php echo (int)$status_id; ?>" min="1" max="100" step="1" value="1" required class="frm_input"></span>
@@ -164,8 +180,8 @@ $empty_colspan = $status_count + 6;
 <div class="tbl_head01 tbl_wrap">
     <table>
         <caption>에너미 목록</caption>
-        <colgroup><col style="width:3%"><col style="width:6%"><col style="width:16%"><?php foreach ($status_lineup as $definition) { ?><col style="width:<?php echo number_format($stat_col_width, 2, '.', ''); ?>%"><?php } ?><col style="width:25%"><col style="width:15%"><col style="width:17%"></colgroup>
-        <thead><tr><th scope="col"><input type="checkbox" id="enemy_select_all" aria-label="전체 에너미 선택"></th><th scope="col">순서</th><th scope="col">이름</th><?php foreach ($status_lineup as $definition) { ?><th scope="col"><?php echo htmlspecialchars($definition['name'], ENT_QUOTES, 'UTF-8'); ?></th><?php } ?><th scope="col">허용 판정 스탯</th><th scope="col">등록일</th><th scope="col">관리</th></tr></thead>
+        <colgroup><col style="width:3%"><col style="width:5%"><col style="width:12%"><?php foreach ($status_lineup as $definition) { ?><col style="width:<?php echo number_format($stat_col_width, 2, '.', ''); ?>%"><?php } ?><col style="width:8%"><col style="width:8%"><col style="width:7%"><col style="width:18%"><col style="width:12%"><col style="width:10%"></colgroup>
+        <thead><tr><th scope="col"><input type="checkbox" id="enemy_select_all" aria-label="전체 에너미 선택"></th><th scope="col">순서</th><th scope="col">이름</th><?php foreach ($status_lineup as $definition) { ?><th scope="col"><?php echo htmlspecialchars($definition['name'], ENT_QUOTES, 'UTF-8'); ?></th><?php } ?><th scope="col">최대 HP</th><th scope="col">현재 HP</th><th scope="col">대플레이어 피해</th><th scope="col">허용 판정 스탯</th><th scope="col">등록일</th><th scope="col">관리</th></tr></thead>
         <tbody>
         <?php $count = 0; while ($result && $row = sql_fetch_array($result)) { $count++; ?>
             <?php $enemy_stats = bbs_duel_enemy_stat_values(isset($row['de_stats']) ? $row['de_stats'] : '', $row); ?>
@@ -176,6 +192,10 @@ $empty_colspan = $status_count + 6;
                 <?php foreach ($status_lineup as $status_id => $definition) { $stat_key = 's'.(int)$status_id; ?>
                 <td><input type="number" name="enemies[<?php echo (int)$row['de_id']; ?>][stats][<?php echo (int)$status_id; ?>]" min="1" max="100" step="1" value="<?php echo isset($enemy_stats[$stat_key]) ? (int)$enemy_stats[$stat_key] : 1; ?>" form="enemy_bulk_update" aria-label="<?php echo htmlspecialchars($row['de_name'], ENT_QUOTES, 'UTF-8'); ?> <?php echo htmlspecialchars($definition['name'], ENT_QUOTES, 'UTF-8'); ?>" class="frm_input bbs-duel-stat-input"></td>
                 <?php } ?>
+                <?php $hp = bbs_duel_hp_ensure_enemy((int)$row['de_id'], (int)$row['de_hp_max']); ?>
+                <td><input type="number" name="enemies[<?php echo (int)$row['de_id']; ?>][de_hp_max]" min="1" max="1000" step="1" value="<?php echo (int)$row['de_hp_max']; ?>" form="enemy_bulk_update" aria-label="<?php echo htmlspecialchars($row['de_name'], ENT_QUOTES, 'UTF-8'); ?> 최대 HP" class="frm_input bbs-duel-stat-input"></td>
+                <td><?php echo (int)$hp['current']; ?> / <?php echo (int)$hp['max']; ?></td>
+                <td><input type="number" name="enemies[<?php echo (int)$row['de_id']; ?>][de_damage_to_player]" min="0" max="1000" step="1" value="<?php echo (int)$row['de_damage_to_player']; ?>" form="enemy_bulk_update" aria-label="<?php echo htmlspecialchars($row['de_name'], ENT_QUOTES, 'UTF-8'); ?> 대플레이어 피해량" class="frm_input bbs-duel-stat-input"></td>
                 <td><input type="text" name="enemies[<?php echo (int)$row['de_id']; ?>][allowed_stats]" value="<?php echo htmlspecialchars(bbs_duel_enemy_stat_input_value(isset($row['de_allowed_stats']) ? $row['de_allowed_stats'] : ''), ENT_QUOTES, 'UTF-8'); ?>" placeholder="전체 허용" form="enemy_bulk_update" aria-label="<?php echo htmlspecialchars($row['de_name'], ENT_QUOTES, 'UTF-8'); ?> 허용 판정 스탯" class="frm_input bbs-duel-stat-limit-input"></td>
                 <td><?php echo htmlspecialchars($row['de_datetime'], ENT_QUOTES, 'UTF-8'); ?></td>
                 <td class="bbs-duel-manage">
