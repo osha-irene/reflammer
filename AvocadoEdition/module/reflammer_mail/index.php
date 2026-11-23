@@ -62,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $error = '보낼 부엉이를 선택하세요.';
         } elseif ((int)$owl['mo_cost'] > $point_balance) {
             $particle = function_exists('j') ? j($config['cf_money'], '이') : '이';
-            $error = $config['cf_money'].$particle.' 부족합니다. ('.number_format((int)$owl['mo_cost']).$config['cf_money_pice'].' 필요)';
+            $error = $config['cf_money'].$particle.' 부족합니다. ('.cf_money_format((int)$owl['mo_cost']).' 필요)';
         } else {
             $attachments = reflammer_mail_collect_attachments($ch_id, $attach_ids);
 
@@ -123,7 +123,7 @@ include_once('../../head.php');
    <a class="<?php echo $action === 'sent' ? 'is-active' : ''; ?>" href="<?php echo reflammer_mail_e($base.'?action=sent'); ?>"><i class="fa fa-paper-plane" aria-hidden="true"></i> 보낸편지함</a>
    <a class="<?php echo $action === 'write' ? 'is-active' : ''; ?>" href="<?php echo reflammer_mail_e($base.'?action=write'); ?>"><i class="fa fa-pencil" aria-hidden="true"></i> 편지 쓰기</a>
   </nav>
-  <div class="rm-point"><?php echo $config['cf_money']; ?> <?php echo number_format((int)(isset($member['mb_point']) ? $member['mb_point'] : 0)); ?><?php echo $config['cf_money_pice']; ?></div>
+  <div class="rm-point"><?php echo cf_money_format((int)(isset($member['mb_point']) ? $member['mb_point'] : 0)); ?></div>
  </header>
  <?php if ($error !== '') echo '<p class="rm-error">'.reflammer_mail_e($error).'</p>'; ?>
 
@@ -153,7 +153,7 @@ include_once('../../head.php');
      <option value="">선택</option>
      <?php foreach ($owls as $owl) { ?>
       <option value="<?php echo (int)$owl['mo_id']; ?>">
-       <?php echo reflammer_mail_e($owl['mo_name']); ?> — 배달 <?php echo (int)$owl['mo_hours']; ?>시간 · <?php echo number_format((int)$owl['mo_cost']); ?><?php echo $config['cf_money_pice']; ?>
+       <?php echo reflammer_mail_e($owl['mo_name']); ?> — 배달 <?php echo (int)$owl['mo_hours']; ?>시간 · <?php echo cf_money_format((int)$owl['mo_cost']); ?>
       </option>
      <?php } ?>
     </select>

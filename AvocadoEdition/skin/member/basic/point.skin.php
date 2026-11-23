@@ -31,10 +31,10 @@ add_stylesheet('<link rel="stylesheet" href="'.$member_skin_url.'/style.css">', 
         for ($i=0; $row=sql_fetch_array($result); $i++) {
             $point1 = $point2 = 0;
             if ($row['po_point'] > 0) {
-                $point1 = '+' .number_format($row['po_point']);
+                $point1 = '+' .cf_money_format($row['po_point']);
                 $sum_point1 += $row['po_point'];
             } else {
-                $point2 = number_format($row['po_point']);
+                $point2 = cf_money_format($row['po_point']);
                 $sum_point2 += $row['po_point'];
             }
 
@@ -53,22 +53,17 @@ add_stylesheet('<link rel="stylesheet" href="'.$member_skin_url.'/style.css">', 
 
         if ($i == 0)
             echo '<tr><td colspan="5" class="empty_table">자료가 없습니다.</td></tr>';
-        else {
-            if ($sum_point1 > 0)
-                $sum_point1 = "+" . number_format($sum_point1);
-            $sum_point2 = number_format($sum_point2);
-        }
         ?>
         </tbody>
         <tfoot>
         <tr>
             <th scope="row" colspan="3">소계</th>
-            <td><?php echo $sum_point1; ?></td>
-            <td><?php echo $sum_point2; ?></td>
+            <td><?php echo $sum_point1 > 0 ? '+'.cf_money_format($sum_point1) : cf_money_format($sum_point1); ?></td>
+            <td><?php echo cf_money_format($sum_point2); ?></td>
         </tr>
         <tr>
             <th scope="row" colspan="3">보유포인트</th>
-            <td colspan="2"><?php echo number_format($member['mb_point']); ?></td>
+            <td colspan="2"><?php echo cf_money_format($member['mb_point']); ?></td>
         </tr>
         </tfoot>
         </table>

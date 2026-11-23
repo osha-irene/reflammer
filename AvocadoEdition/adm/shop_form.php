@@ -233,7 +233,7 @@ if (!isset($fr_date) || empty($fr_date)) {
                     <th scope="row" rowspan="2"><?php echo $config['cf_money']; ?> 설정</th>
                     <td class="bo-right">필요 <?php echo $config['cf_money']; ?></td>
                     <td>
-                        <input type="text" name="sh_money" value="<?php echo isset($shop['sh_money']) ? $shop['sh_money'] : ''; ?>" size="15"> <?php echo $config['cf_money_pice']; ?>
+                        <input type="text" name="sh_money" value="<?php echo isset($shop['sh_money']) ? $shop['sh_money'] : ''; ?>" size="15"> <small>(현재 값 기준 <?php echo cf_money_format(isset($shop['sh_money']) ? $shop['sh_money'] : 0); ?>)</small>
                     </td>
                 </tr>
                 <tr>

@@ -228,7 +228,7 @@ $mv_has_profile = ($mv_voice !== '' || $mv_name !== '' || !empty($mv_meta_parts)
 			INVENTORY
 		<?php  if($article['ad_use_money']) { // 소지금 사용시 현재 보유 중인 소지금 출력 ?>
 			<span class="mv-sec-meta">
-				<em class="txt-point"><?php echo $mb['mb_point']?></em><?php echo $config['cf_money_pice']?>
+				<em class="txt-point"><?php echo cf_money_format($mb['mb_point'])?></em>
 			</span>
 		<?php  } ?>
 		</h3>

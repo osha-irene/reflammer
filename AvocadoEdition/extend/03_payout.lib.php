@@ -159,11 +159,10 @@ if (!function_exists('payout_grant_money')) {
         $ch = sql_fetch("SELECT ch_id, ch_name, mb_id FROM `{$g5['character_table']}` WHERE ch_id = '{$ch_id}'");
         if (empty($ch['mb_id'])) return array('ok'=>false, 'message'=>'캐릭터 소유자 없음');
         if (!function_exists('insert_point')) return array('ok'=>false, 'message'=>'insert_point 미정의');
-        $unit = isset($config['cf_money_pice']) ? $config['cf_money_pice'] : '';
-        $content = '[정산] ['.$ch['ch_name'].'] '.$amount.$unit;
+        $content = '[정산] ['.$ch['ch_name'].'] '.cf_money_format($amount);
         if ($memo !== '') $content .= ' — '.$memo;
         insert_point($ch['mb_id'], $amount, $content);
-        return array('ok'=>true, 'message'=>"화폐 {$amount}{$unit}");
+        return array('ok'=>true, 'message'=>'화폐 '.cf_money_format($amount));
     }
 }
 

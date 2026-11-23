@@ -18,7 +18,7 @@ add_stylesheet('<link rel="stylesheet" href="'.$member_skin_url.'/style.css">', 
         </tr>
         <tr>
             <th scope="row">포인트</th>
-            <td><?php echo number_format($mb['mb_point']) ?></td>
+            <td><?php echo cf_money_format($mb['mb_point']) ?></td>
         </tr>
         <?php if ($mb_homepage) {  ?>
         <tr>

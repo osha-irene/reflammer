@@ -42,7 +42,8 @@ $result = sql_query($sql);
 			<tr>
 				<th>전달<?php echo $config['cf_money']?></th>
 				<td>
-					<input type="text" name="po_point" id="po_point" size="10"/> <?php echo $config['cf_money_pice']?>
+					<input type="text" name="po_point" id="po_point" size="10" oninput="var p=document.getElementById('po_point_preview'); if(p) p.textContent=cf_money_format_js(this.value);"/>
+					<small id="po_point_preview" style="color:#666;"></small>
 				</td>
 			</tr>
 		</tbody>
@@ -52,6 +53,23 @@ $result = sql_query($sql);
 		<button type="submit" class="ui-btn point">전송</button>
 	</div>
 </form>
+<script>
+// extend/00_money.lib.php 의 cf_money_format() 과 같은 환산(1갈레온=17시클, 1시클=29넛).
+function cf_money_format_js(v) {
+	v = parseInt(v, 10) || 0;
+	var sign = v < 0 ? '-' : '';
+	v = Math.abs(v);
+	var g = Math.floor(v / 493);
+	var r = v % 493;
+	var s = Math.floor(r / 29);
+	var k = r % 29;
+	var parts = [];
+	if (g > 0) parts.push(g + '갈레온');
+	if (s > 0) parts.push(s + '시클');
+	if (k > 0 || parts.length === 0) parts.push(k + '넛');
+	return sign + parts.join(' ');
+}
+</script>
 
 <hr class="padding" />
 
@@ -74,10 +92,10 @@ $result = sql_query($sql);
 		for ($i=0; $row=sql_fetch_array($result); $i++) {
 			$point1 = $point2 = 0;
 			if ($row['po_point'] > 0) {
-				$point1 = number_format($row['po_point']).$config['cf_money_pice'];
+				$point1 = cf_money_format($row['po_point']);
 				$sum_point1 += $row['po_point'];
 			} else {
-				$point2 = number_format($row['po_point'] * -1).$config['cf_money_pice'];
+				$point2 = cf_money_format($row['po_point'] * -1);
 				$sum_point2 += $row['po_point'];
 			}
 
@@ -95,21 +113,16 @@ $result = sql_query($sql);
 
 		if ($i == 0)
 			echo '<tr><td colspan="3" class="no-data">자료가 없습니다.</td></tr>';
-		else {
-			if ($sum_point1 > 0)
-				$sum_point1 = number_format($sum_point1);
-			$sum_point2 = number_format($sum_point2 * -1);
-		}
 		?>
 
 		<tr>
 			<th scope="row">소계</th>
-			<td class="txt-right"><?php echo $sum_point1; ?><?php echo $config['cf_money_pice']?></td>
-			<td class="txt-right"><?php echo $sum_point2; ?><?php echo $config['cf_money_pice']?></td>
+			<td class="txt-right"><?php echo cf_money_format($sum_point1); ?></td>
+			<td class="txt-right"><?php echo cf_money_format($sum_point2 * -1); ?></td>
 		</tr>
 		<tr>
 			<th scope="row">보유 금액</th>
-			<td colspan="2"  class="txt-right"><?php echo number_format($member['mb_point']); ?><?php echo $config['cf_money_pice']?></td>
+			<td colspan="2"  class="txt-right"><?php echo cf_money_format($member['mb_point']); ?></td>
 		</tr>
 	</tbody>
 </table>

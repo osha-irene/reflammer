@@ -140,7 +140,7 @@ if($character['ch_id'] && $character['ch_state'] == '승인') {
 			if($use_point) {
 				// 소지금 차감
 				$insert_point = $use_point * -1;
-				insert_point($member['mb_id'], $insert_point, $item['it_name'].' 구매 ( '.$use_point.$config['cf_money_pice'].' 소모 )', 'shop', time(), '구매');
+				insert_point($member['mb_id'], $insert_point, $item['it_name'].' 구매 ( '.cf_money_format($use_point).' 소모 )', 'shop', time(), '구매');
 			}
 			if($use_exp_point) {
 				// 경험치 차감

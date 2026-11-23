@@ -47,7 +47,7 @@ if ($w == '') {
     if ($is_member) {
         $tmp_point = ($member['mb_point'] > 0) ? $member['mb_point'] : 0;
         if ($tmp_point + $board['bo_write_point'] < 0 && !$is_admin) {
-            alert('보유하신 포인트('.number_format($member['mb_point']).')가 없거나 모자라서 글쓰기('.number_format($board['bo_write_point']).')가 불가합니다.\\n\\n포인트를 적립하신 후 다시 글쓰기 해 주십시오.');
+            alert('보유하신 포인트('.cf_money_format($member['mb_point']).')가 없거나 모자라서 글쓰기('.cf_money_format($board['bo_write_point']).')가 불가합니다.\\n\\n포인트를 적립하신 후 다시 글쓰기 해 주십시오.');
         }
     }
 
@@ -99,7 +99,7 @@ if ($w == '') {
 
     $tmp_point = isset($member['mb_point']) ? $member['mb_point'] : 0;
     if ($tmp_point + $board['bo_write_point'] < 0 && !$is_admin)
-        alert('보유하신 포인트('.number_format($member['mb_point']).')가 없거나 모자라서 글답변('.number_format($board['bo_comment_point']).')가 불가합니다.\\n\\n포인트를 적립하신 후 다시 글답변 해 주십시오.');
+        alert('보유하신 포인트('.cf_money_format($member['mb_point']).')가 없거나 모자라서 글답변('.cf_money_format($board['bo_comment_point']).')가 불가합니다.\\n\\n포인트를 적립하신 후 다시 글답변 해 주십시오.');
 
     //if (preg_match("/[^0-9]{0,1}{$wr_id}[\r]{0,1}/",$board['bo_notice']))
     if (in_array((int)$wr_id, $notice_array))

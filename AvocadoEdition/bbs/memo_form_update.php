@@ -34,7 +34,7 @@ if ($error_msg && !$is_admin)
         $point = 0;
         if ($point) {
             if ($member['mb_point'] - $point < 0) {
-                alert('보유하신 포인트('.number_format($member['mb_point']).'점)가 모자라서 쪽지를 보낼 수 없습니다.');
+                alert('보유하신 포인트('.cf_money_format($member['mb_point']).')가 모자라서 쪽지를 보낼 수 없습니다.');
             }
         }
     }

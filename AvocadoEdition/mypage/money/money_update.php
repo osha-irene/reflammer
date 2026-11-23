@@ -20,15 +20,15 @@ if($point > 0) {
 
 	$recv_id = $re_ch['mb_id'];
 
-	insert_point($recv_id, $point, "[받음] ".$member['mb_name'].'님 ('.$point.' '.$config['cf_money_pice'].' )', 'money', time(), '입금');
-	insert_point($member['mb_id'], ($point * -1), "[보냄] ".$recv_name.'님 (-'.$point.' '.$config['cf_money_pice'].' )', 'money', time(), '출금');
+	insert_point($recv_id, $point, "[받음] ".$member['mb_name'].'님 ('.cf_money_format($point).' )', 'money', time(), '입금');
+	insert_point($member['mb_id'], ($point * -1), "[보냄] ".$recv_name.'님 (-'.cf_money_format($point).' )', 'money', time(), '출금');
 
-	$memo_content = $member['mb_name']."님이 ".$point.$config['cf_money_pice']." 보냈습니다.";
+	$memo_content = $member['mb_name']."님이 ".cf_money_format($point)." 보냈습니다.";
 
 	// 쪽지 보내기
 	send_memo($member['mb_id'], $recv_id, $memo_content);
 
-	alert($recv_name."님께 ".$point.$config['cf_money']." 보냈습니다.");
+	alert($recv_name."님께 ".cf_money_format($point)." 보냈습니다.");
 } else {
 	alert("오류로 인해 보내지 못하였습니다.");
 }

@@ -62,7 +62,8 @@ $_calc_all_presets = ($is_admin && function_exists('payout_preset_list')) ? payo
 							</label>
 						</div>
 						<div style="margin:4px 0;">
-							<label><?php echo $config['cf_money']; ?>: <input type="number" name="calc_req_money" value="0" min="0" style="width:100px;"></label>
+							<label><?php echo $config['cf_money']; ?>: <input type="number" name="calc_req_money" id="calc_req_money" value="0" min="0" style="width:100px;" oninput="var p=document.getElementById('calc_req_money_preview'); if(p) p.textContent=cf_money_format_js(this.value);"></label>
+							<small id="calc_req_money_preview" style="color:#666;"></small>
 							<label style="margin-left:10px;"><?php echo $config['cf_exp_name']; ?>: <input type="number" name="calc_req_exp" value="0" min="0" style="width:100px;"></label>
 						</div>
 						<p class="frm_info" style="margin:4px 0 0; color:#666; font-size:12px;">운영자가 승인하면 정산됩니다.</p>
@@ -203,6 +204,7 @@ $_calc_all_presets = ($is_admin && function_exists('payout_preset_list')) ? payo
 							</div>
 							<div style="margin:4px 0;">
 								<label>신청 <?php echo $config['cf_money']?>: <input type="number" name="extra_money" value="<?php echo isset($_pay_req['money'])?(int)$_pay_req['money']:0; ?>" style="width:100px;"></label>
+								<small style="color:#666;">(<?php echo cf_money_format(isset($_pay_req['money']) ? (int)$_pay_req['money'] : 0); ?>)</small>
 								<label style="margin-left:10px;">신청  <?php echo $config['cf_exp_name']?>: <input type="number" name="extra_exp" value="<?php echo isset($_pay_req['exp'])?(int)$_pay_req['exp']:0; ?>" style="width:100px;"></label>
 							</div>
 							<div style="margin:4px 0;">
@@ -266,6 +268,22 @@ $_calc_all_presets = ($is_admin && function_exists('payout_preset_list')) ? payo
 var avo_mb_id = "<?php echo $member['mb_id']?>";
 var avo_board_skin_path = "<?php echo $board_skin_path?>";
 var avo_board_skin_url = "<?php echo $board_skin_url?>";
+
+// extend/00_money.lib.php 의 cf_money_format() 과 같은 환산(1갈레온=17시클, 1시클=29넛).
+function cf_money_format_js(v) {
+	v = parseInt(v, 10) || 0;
+	var sign = v < 0 ? '-' : '';
+	v = Math.abs(v);
+	var g = Math.floor(v / 493);
+	var r = v % 493;
+	var s = Math.floor(r / 29);
+	var k = r % 29;
+	var parts = [];
+	if (g > 0) parts.push(g + '갈레온');
+	if (s > 0) parts.push(s + '시클');
+	if (k > 0 || parts.length === 0) parts.push(k + '넛');
+	return sign + parts.join(' ');
+}
 
 function calc_payout_submit(f){
 	if (!confirm('지급을 실행합니다. 계속하시겠습니까?')) return false;

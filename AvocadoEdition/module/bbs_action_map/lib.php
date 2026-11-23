@@ -546,11 +546,11 @@ function bbs_action_map_process_move($re_ma_id, $character, $member = array()) {
             $m_re_type = 'G';
             $money = (int)$me['me_get_money'];
             $pending['money'] = $money;
-            $unit = !empty($config['cf_money']) ? $config['cf_money'] : '화폐';
+            $amount_text = cf_money_format(abs($money));
             if ($money < 0) {
-                $event_msg = ((-1) * $money).$unit.bbs_action_map_j($unit, '을').' 잃었다.';
+                $event_msg = $amount_text.bbs_action_map_j($amount_text, '을').' 잃었다.';
             } else {
-                $event_msg = $money.$unit.bbs_action_map_j($unit, '을').' 획득했다!';
+                $event_msg = $amount_text.bbs_action_map_j($amount_text, '을').' 획득했다!';
             }
         } elseif ($type === '이동') {
             $m_re_type = 'W';

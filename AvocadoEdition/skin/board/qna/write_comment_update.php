@@ -75,7 +75,7 @@ if ($w == "c") // 코멘트 입력
     // 코멘트쓰기 포인트설정시 회원의 포인트가 음수인 경우 코멘트를 쓰지 못하던 버그를 수정 (곱슬최씨님)
     $tmp_point = ($member['mb_point'] > 0) ? $member['mb_point'] : 0;
     if ($tmp_point + $board['bo_comment_point'] < 0 && !$is_admin)
-        alert("보유하신 포인트(".number_format($member['mb_point']).")가 없거나 모자라서 코멘트쓰기(".number_format($board['bo_comment_point']).")가 불가합니다.\\n\\n포인트를 적립하신 후 다시 코멘트를 써 주십시오.");
+        alert("보유하신 포인트(".cf_money_format($member['mb_point']).")가 없거나 모자라서 코멘트쓰기(".cf_money_format($board['bo_comment_point']).")가 불가합니다.\\n\\n포인트를 적립하신 후 다시 코멘트를 써 주십시오.");
 
     // 코멘트 답변
     if ($comment_id) 

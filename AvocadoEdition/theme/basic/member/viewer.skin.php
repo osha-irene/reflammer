@@ -187,7 +187,7 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_CSS_URL.'/member.css">', 0);
 			INVENTORY
 		<? if($article['ad_use_money']) { // 소지금 사용시 현재 보유 중인 소지금 출력 ?>
 			<span style="float:right;">
-				<em class="txt-point"><?=$mb['mb_point']?></em><?=$config['cf_money_pice']?>
+				<em class="txt-point"><?=cf_money_format($mb['mb_point'])?></em>
 			</span>
 		<? } ?>
 		</h3>

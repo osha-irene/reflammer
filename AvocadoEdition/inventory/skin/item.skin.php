@@ -11,7 +11,7 @@ if (!defined('_GNUBOARD_')) exit; // 개별 페이지 접근 불가
 <div class="text">
 	<p class="title">
 		<?php echo $in['it_name']?>
-		<span><?php echo number_format($in['it_sell'])?><?php echo $config['cf_money_pice']?></span>
+		<span><?php echo cf_money_format($in['it_sell'])?></span>
 	</p>
 	<div class="item-content-box">
 		<div class="default">

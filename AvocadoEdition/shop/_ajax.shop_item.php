@@ -9,7 +9,7 @@ if($item['sh_id']) {
 	$add_str = "";
 
 	if($item['sh_money'] && $item['sh_use_money']) { 
-		$money .= $add_str.$item['sh_money'].' '.$config['cf_money_pice'];
+		$money .= $add_str.cf_money_format($item['sh_money']);
 		$add_str = ", ";
 	}
 

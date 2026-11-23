@@ -104,10 +104,10 @@ $colspan = 8;
 	전체 <?php echo number_format($total_count) ?> 건
 	<?php
 	if (isset($mb['mb_id']) && $mb['mb_id']) {
-		echo '&nbsp;(' . $mb['mb_id'] .' 님 '.$config['cf_money'].' 합계 : ' . number_format($mb['mb_point']) . '점)';
+		echo '&nbsp;(' . $mb['mb_id'] .' 님 화폐 합계 : ' . cf_money_format($mb['mb_point']) . ')';
 	} else {
 		$row2 = sql_fetch(" select sum(po_point) as sum_point from {$g5['point_table']} ");
-		echo '&nbsp;(전체 합계 '.number_format($row2['sum_point']).'점)';
+		echo '&nbsp;(전체 합계 '.cf_money_format($row2['sum_point']).')';
 	}
 	?>
 </div>
@@ -181,8 +181,8 @@ $colspan = 8;
 		<td><?php echo get_text($row2['mb_name']); ?></td>
 		<td class="txt-left"><?php echo $link1 ?><?php echo $row['po_content'] ?><?php echo $link2 ?></td>
 		<td><?php echo $row['po_datetime'] ?></td>
-		<td><?php echo number_format($row['po_point']) ?></td>
-		<td><?php echo number_format($row['po_mb_point']) ?></td>
+		<td><?php echo cf_money_format($row['po_point']) ?></td>
+		<td><?php echo cf_money_format($row['po_mb_point']) ?></td>
 	</tr>
 
 	<?php

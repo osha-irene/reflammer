@@ -10,7 +10,7 @@ function outlogin($skin_dir='basic')
 		$nick  = get_text(cut_str($member['mb_nick'], $config['cf_cut_name']));
 	}
 	if (array_key_exists('mb_point', $member)) {
-		$point = number_format($member['mb_point']);
+		$point = cf_money_format($member['mb_point']);
 	}
 
 	$outlogin_skin_path = G5_SKIN_PATH.'/outlogin/'.$skin_dir;

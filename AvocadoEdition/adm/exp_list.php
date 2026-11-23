@@ -173,7 +173,7 @@ $frm_submit = '<div class="btn_confirm01 btn_confirm">
 		전체 <?php echo number_format($total_count) ?> 건
 		<?php
 		if (isset($mb['mb_id']) && $mb['mb_id']) {
-			echo '&nbsp;(' . $mb['mb_id'] .' 님 골드 합계 : ' . number_format($mb['mb_point']) . '점)';
+			echo '&nbsp;(' . $mb['mb_id'] .' 님 골드 합계 : ' . cf_money_format($mb['mb_point']) . ')';
 		} else {
 			$row2 = sql_fetch(" select sum(ex_point) as sum_point from {$g5['exp_table']} ");
 			echo '&nbsp;(전체 합계 '.number_format($row2['sum_point']).'점)';

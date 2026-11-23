@@ -24,7 +24,7 @@ if (!$file['bf_file'])
 
 // JavaScript 불가일 때
 if($js != 'on' && $board['bo_download_point'] < 0) {
-    $msg = $file['bf_source'].' 파일을 다운로드 하시면 포인트가 차감('.number_format($board['bo_download_point']).'점)됩니다.\\n포인트는 게시물당 한번만 차감되며 다음에 다시 다운로드 하셔도 중복하여 차감하지 않습니다.\\n그래도 다운로드 하시겠습니까?';
+    $msg = $file['bf_source'].' 파일을 다운로드 하시면 포인트가 차감('.cf_money_format($board['bo_download_point']).')됩니다.\\n포인트는 게시물당 한번만 차감되며 다음에 다시 다운로드 하셔도 중복하여 차감하지 않습니다.\\n그래도 다운로드 하시겠습니까?';
     $url1 = G5_BBS_URL.'/download.php?'.clean_query_string($_SERVER['QUERY_STRING']).'&amp;js=on';
     $url2 = clean_xss_tags($_SERVER['HTTP_REFERER']);
 
@@ -61,7 +61,7 @@ if (!get_session($ss_name))
     {
         // 다운로드 포인트가 음수이고 회원의 포인트가 0 이거나 작다면
         if ($member['mb_point'] + $board['bo_download_point'] < 0)
-            alert('보유하신 포인트('.number_format($member['mb_point']).')가 없거나 모자라서 다운로드('.number_format($board['bo_download_point']).')가 불가합니다.\\n\\n포인트를 적립하신 후 다시 다운로드 해 주십시오.');
+            alert('보유하신 포인트('.cf_money_format($member['mb_point']).')가 없거나 모자라서 다운로드('.cf_money_format($board['bo_download_point']).')가 불가합니다.\\n\\n포인트를 적립하신 후 다시 다운로드 해 주십시오.');
 
         // 게시물당 한번만 차감하도록 수정
         insert_point($member['mb_id'], $board['bo_download_point'], "{$board['bo_subject']} $wr_id 파일 다운로드", $bo_table, $wr_id, "다운로드");

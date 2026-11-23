@@ -692,7 +692,7 @@ $frm_submit .= '</div>';
         </tr>
         <tr>
             <th scope="row"><label for="bo_read_point">글읽기 포인트</label></th>
-            <td><input type="text" name="bo_read_point" value="<?php echo isset($board['bo_read_point']) ? $board['bo_read_point'] : 0; ?>" id="bo_read_point" required class="required frm_input" size="5"></td>
+            <td><input type="text" name="bo_read_point" value="<?php echo isset($board['bo_read_point']) ? $board['bo_read_point'] : 0; ?>" id="bo_read_point" required class="required frm_input" size="5"> <small>(<?php echo cf_money_format(isset($board['bo_read_point']) ? (int)$board['bo_read_point'] : 0); ?>)</small></td>
             <td class="td_grpset">
                 <input type="checkbox" name="chk_grp_read_point" value="1" id="chk_grp_read_point"><label for="chk_grp_read_point">그룹적용</label>
                 <input type="checkbox" name="chk_all_read_point" value="1" id="chk_all_read_point"><label for="chk_all_read_point">전체적용</label>
@@ -700,7 +700,7 @@ $frm_submit .= '</div>';
         </tr>
         <tr>
             <th scope="row"><label for="bo_write_point">글쓰기 포인트</label></th>
-            <td><input type="text" name="bo_write_point" value="<?php echo isset($board['bo_write_point']) ? $board['bo_write_point'] : 0; ?>" id="bo_write_point" required class="required frm_input" size="5"></td>
+            <td><input type="text" name="bo_write_point" value="<?php echo isset($board['bo_write_point']) ? $board['bo_write_point'] : 0; ?>" id="bo_write_point" required class="required frm_input" size="5"> <small>(<?php echo cf_money_format(isset($board['bo_write_point']) ? (int)$board['bo_write_point'] : 0); ?>)</small></td>
             <td class="td_grpset">
                 <input type="checkbox" name="chk_grp_write_point" value="1" id="chk_grp_write_point"><label for="chk_grp_write_point">그룹적용</label>
                 <input type="checkbox" name="chk_all_write_point" value="1" id="chk_all_write_point"><label for="chk_all_write_point">전체적용</label>
@@ -708,7 +708,7 @@ $frm_submit .= '</div>';
         </tr>
         <tr>
             <th scope="row"><label for="bo_comment_point">댓글쓰기 포인트</label></th>
-            <td><input type="text" name="bo_comment_point" value="<?php echo isset($board['bo_comment_point']) ? $board['bo_comment_point'] : 0; ?>" id="bo_comment_point" required class="required frm_input" size="5"></td>
+            <td><input type="text" name="bo_comment_point" value="<?php echo isset($board['bo_comment_point']) ? $board['bo_comment_point'] : 0; ?>" id="bo_comment_point" required class="required frm_input" size="5"> <small>(<?php echo cf_money_format(isset($board['bo_comment_point']) ? (int)$board['bo_comment_point'] : 0); ?>)</small></td>
             <td class="td_grpset">
                 <input type="checkbox" name="chk_grp_comment_point" value="1" id="chk_grp_comment_point"><label for="chk_grp_comment_point">그룹적용</label>
                 <input type="checkbox" name="chk_all_comment_point" value="1" id="chk_all_comment_point"><label for="chk_all_comment_point">전체적용</label>
