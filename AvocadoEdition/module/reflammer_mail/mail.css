@@ -1,0 +1,55 @@
+/* 이 모듈은 사이트의 디자인 프리셋(테마)과 무관하게 항상 읽히도록
+   배경뿐 아니라 글자색까지 전부 이 파일 안에서 명시한다 (펜시브 위키와 동일한 방식).
+   상속된 글자색에 맞서지 않기 위해 셀렉터마다 color 를 직접 지정한다. */
+.rm-shell { max-width: 880px; margin: 0 auto; padding: 16px; color: #2a2320; }
+.rm-shell a { text-decoration: none; }
+.rm-shell small { color: #7a6f5c; }
+
+.rm-header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+.rm-header p { margin: 0; font-size: 11px; letter-spacing: .1em; color: #8a7a60; }
+.rm-header h1 { margin: 2px 0 0; font-size: 22px; color: #2a2320; }
+.rm-header nav { display: flex; gap: 8px; flex-wrap: wrap; }
+.rm-header nav a { padding: 6px 12px; border: 1px solid #d8cdb4; border-radius: 6px; background: #fffdf8; color: #2a2320; }
+.rm-header nav a.is-active { background: #6b4f23; color: #fffdf8; border-color: #6b4f23; }
+.rm-point { font-size: 13px; color: #6b4f23; font-weight: 600; }
+
+.rm-error { color: #8a1f11; background: #fdecea; border: 1px solid #f5c6cb; padding: 8px 12px; border-radius: 6px; margin-bottom: 12px; }
+
+.rm-card { background: #fffdf8; border: 1px solid #e6ddc9; border-radius: 8px; padding: 16px; margin-bottom: 16px; color: #2a2320; }
+.rm-card h2 { margin-top: 0; font-size: 18px; color: #2a2320; }
+
+.rm-form label { display: block; margin-bottom: 14px; font-size: 13px; color: #2a2320; }
+.rm-form input[type=text], .rm-form input[type=number], .rm-form textarea, .rm-form select {
+    width: 100%; margin-top: 4px; padding: 8px; border: 1px solid #c9bd9f; border-radius: 4px;
+    box-sizing: border-box; background: #ffffff; color: #2a2320;
+}
+.rm-form input[disabled] { background: #f0ebe0; color: #9c9186; }
+.rm-form .rm-checkbox { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: #2a2320; }
+
+.rm-attach { border: 1px solid #e6ddc9; border-radius: 6px; padding: 10px; margin-bottom: 14px; background: #fbf7ee; }
+.rm-attach legend { font-size: 13px; color: #2a2320; padding: 0; }
+.rm-attach label { display: block; font-size: 13px; padding: 2px 0; color: #2a2320; }
+
+.rm-button { display: inline-block; padding: 8px 18px; border-radius: 6px; background: #2a2320; color: #fffdf8; border: none; cursor: pointer; font-size: 13px; }
+.rm-button.rm-muted { background: #9c9186; color: #fffdf8; }
+
+.rm-list { display: flex; flex-direction: column; gap: 8px; }
+.rm-row { display: grid; grid-template-columns: 2fr 1.4fr 1.2fr; gap: 8px; padding: 10px 12px; border: 1px solid #e6ddc9; border-radius: 6px; background: #fffdf8; color: #2a2320; align-items: center; }
+.rm-row:hover { background: #f5efe0; }
+.rm-row-subject { color: #2a2320; }
+.rm-row-meta, .rm-row-status { font-size: 12px; color: #7a6f5c; }
+
+.rm-badge { display: inline-block; font-size: 10px; background: #b4651f; color: #fffdf8; border-radius: 4px; padding: 1px 5px; margin-left: 4px; }
+
+.rm-empty, .rm-empty-owl { color: #7a6f5c; font-size: 13px; }
+.rm-meta { font-size: 13px; color: #7a6f5c; }
+.rm-pending { background: #fff8e1; border: 1px solid #ffe082; color: #6b5900; padding: 10px 12px; border-radius: 6px; }
+.rm-content { white-space: pre-line; line-height: 1.6; padding: 12px 0; color: #2a2320; }
+.rm-attachments { margin-top: 10px; padding: 10px 12px; background: #fbf7ee; border: 1px solid #e6ddc9; border-radius: 6px; color: #2a2320; }
+.rm-attachments h3 { margin: 0 0 6px; font-size: 13px; color: #2a2320; }
+.rm-view-actions { display: flex; gap: 8px; margin-top: 12px; }
+.rm-view-actions form { margin: 0; }
+
+@media (max-width: 640px) {
+  .rm-row { grid-template-columns: 1fr; }
+}
