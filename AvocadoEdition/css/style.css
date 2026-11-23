@@ -217,9 +217,7 @@ html.single .bgm-player {display:none !important;}
 ********************************************/
 body {
 	background-color: var(--d-background-1, #05070f);
-	background-image:
-		linear-gradient(180deg, rgba(5, 9, 20, .45) 0%, rgba(5, 9, 20, .55) 45%, rgba(5, 9, 20, .85) 100%),
-		var(--d-background-img, url('../img/bg.jpg'));
+	background-image: var(--d-background-body-image);
 	background-repeat: var(--d-background-2, no-repeat);
 	background-position: var(--d-background-3, center bottom);
 	background-size: var(--d-background-4, cover);

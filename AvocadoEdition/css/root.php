@@ -43,6 +43,8 @@ $layout_vals = array(
     'menu_height'     => 0,
     'use_header'      => '',
 );
+$background_has_image = false;
+$background_has_color = false;
 
 $res = sql_query("SELECT cs_name, cs_value, cs_etc_1, cs_etc_2, cs_etc_3, cs_etc_4, cs_etc_5, cs_etc_6, cs_etc_7, cs_etc_8, cs_etc_9, cs_etc_10 FROM `{$css_table}` WHERE pd_id = '{$pd_id}'", false);
 
@@ -50,6 +52,11 @@ if ($res) {
     while ($row = sql_fetch_array($res)) {
         $name = preg_replace('/[^a-zA-Z0-9_-]/', '', (string)$row['cs_name']);
         if ($name === '') continue;
+
+        if ($name === 'background') {
+            $background_has_image = trim((string)$row['cs_value']) !== '';
+            $background_has_color = trim((string)$row['cs_etc_1']) !== '';
+        }
 
         // 레이아웃 분기 값 캡처
         if (array_key_exists($name, $layout_vals)) {
@@ -102,6 +109,12 @@ if ($res) {
         }
     }
 }
+
+// Keep the default sky image unless the admin explicitly chose a color-only background.
+$body_background_image = ($background_has_color && !$background_has_image)
+    ? 'none'
+    : "linear-gradient(180deg, rgba(5, 9, 20, .45) 0%, rgba(5, 9, 20, .55) 45%, rgba(5, 9, 20, .85) 100%), var(--d-background-img, url('../img/bg.jpg'))";
+$out .= "    --d-background-body-image: {$body_background_image};\n";
 
 $out .= "}\n";
 
