@@ -28,19 +28,63 @@ $is_favorite = $is_favorite['cnt'] > 0 ? true : false;
 $image_url = '';
 $image_width = 0;
 $image_height = 0;
+$mmb_image_type = $list_item['wr_type'];
+$mmb_explicit_url = '';
 
-if($list_item['wr_type'] == 'UPLOAD') {
+$mmb_thumbnail_enabled = function_exists('mdl_board_enabled')
+	&& mdl_board_enabled($bo_table, 'bbs_mmb_thumbnail', 'write');
+
+if ($mmb_thumbnail_enabled) {
+	// 이 기능을 켠 게시판은 실제 첨부 이미지가 URL보다 우선한다.
+	$thumb = get_mmb_image($bo_table, $list_item['wr_id']);
+	if ($thumb && !empty($thumb['src'])) {
+		$image_url = '<img src="'.htmlspecialchars($thumb['src'], ENT_QUOTES, 'UTF-8').'" />';
+		$image_width = (int)$thumb['width'];
+		$image_height = (int)$thumb['height'];
+		$mmb_image_type = 'UPLOAD';
+	} else {
+		$explicit_url = function_exists('bbs_mmb_thumbnail_clean_url')
+			? bbs_mmb_thumbnail_clean_url(isset($list_item['wr_url']) ? $list_item['wr_url'] : '')
+			: '';
+		if ($explicit_url !== '') {
+			$mmb_explicit_url = $explicit_url;
+			$image_url = '<img src="'.htmlspecialchars($explicit_url, ENT_QUOTES, 'UTF-8').'" />';
+			$image_width = (int)$list_item['wr_width'];
+			$image_height = (int)$list_item['wr_height'];
+			$mmb_image_type = 'URL';
+		} else {
+			$mmb_image_type = 'AUTO';
+		}
+	}
+} else if($list_item['wr_type'] == 'UPLOAD') {
 	// Upload 형태로 로그를 등록 하였을 때
 	$thumb = get_mmb_image($bo_table, $list_item['wr_id']);
-	$image_url = '<img src="'.$thumb['src'].'" />';
-	$image_width = $thumb['width'];
-	$image_height = $thumb['height'];
-} else if($list_item['wr_type'] == 'URL') {
+	if ($thumb && !empty($thumb['src'])) {
+		$image_url = '<img src="'.$thumb['src'].'" />';
+		$image_width = $thumb['width'];
+		$image_height = $thumb['height'];
+	}
+} else if($list_item['wr_type'] == 'URL' && !empty($list_item['wr_url'])) {
 	// URL 형태로 로그를 등록 하였을 때
 	$image_url = '<img src="'.$list_item['wr_url'].'" />';
 	$image_width = $list_item['wr_width'];
 	$image_height = $list_item['wr_height'];
 }
+
+if ($image_url === ''
+	&& function_exists('bbs_mmb_thumbnail_post_url')
+	&& in_array($mmb_image_type, array('', 'AUTO', 'UPLOAD', 'URL'), true)) {
+	$thumbnail_url = bbs_mmb_thumbnail_post_url(
+		$bo_table,
+		$list_item,
+		$mmb_thumbnail_enabled || $mmb_image_type === 'AUTO'
+	);
+	if ($thumbnail_url !== '') {
+		$image_url = '<img src="'.htmlspecialchars($thumbnail_url, ENT_QUOTES, 'UTF-8').'" alt="" style="display:block;max-width:100%;height:auto;margin:0 auto;">';
+		$mmb_image_type = 'AUTO';
+	}
+}
+
 // 그 외(모듈이 추가한 wr_type)는 list_log_img.tpl.php 의 모듈 훅이 출력을 담당한다.
 //   단, 갤러리 레이아웃(data_width / bo_gallery_height 접기)을 위해 저장된
 //   wr_width/wr_height 를 대표 이미지 크기로 사용한다.
@@ -70,7 +114,7 @@ if($is_viewer) {
 	if($board['bo_gallery_height'] && ($image_height >= $board['bo_gallery_height'] || $list_item['wr_plip'] == '1')) {
 		if(G5_IS_MOBILE) {
 			$log_class .= "ui-slide-mobile";
-			if($list_item['wr_type'] == 'UPLOAD') {
+			if($mmb_image_type == 'UPLOAD') {
 				$thumb = get_list_thumbnail($bo_table, $list_item['wr_id'], $image_width, 200, true, true);
 				$ori = explode("/", $thumb['ori']);
 				$ori = $ori[count($ori) -1];
@@ -79,9 +123,13 @@ if($is_viewer) {
 				$image_url .= '</a>';
 				$image_width = $thumb['width'];
 				$image_height = $thumb['height'];
-			} else if($list_item['wr_type'] == 'URL') {
-				$image_url = '<a href="'.$list_item['wr_url'].'" target="_blank" class="view_image">';
-				$image_url .= '<img src="'.$list_item['wr_url'].'" alt="'.$content.'" '.$attr.'>';
+			} else if($mmb_image_type == 'URL') {
+				$view_url = $mmb_thumbnail_enabled ? $mmb_explicit_url : $list_item['wr_url'];
+				$view_url_attr = $mmb_thumbnail_enabled
+					? htmlspecialchars($view_url, ENT_QUOTES, 'UTF-8')
+					: $view_url;
+				$image_url = '<a href="'.$view_url_attr.'" target="_blank" class="view_image">';
+				$image_url .= '<img src="'.$view_url_attr.'" alt="'.$content.'" '.$attr.'>';
 				$image_url .= '</a>';
 			}
 		} else {

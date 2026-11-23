@@ -146,6 +146,15 @@ $owner_behind = $owner_behind['cs_etc_3'];
 			$write['wr_subject'] = '--|UPLOADING|--';
 
 			$upload_action_url = G5_BBS_URL."/write_update.php";
+			$mmb_quick_form_ctx = array(
+				'bo_table'  => $bo_table,
+				'w'         => '',
+				'wr_id'     => 0,
+				'write'     => $write,
+				'character' => $character,
+				'board'     => $board,
+				'quick'     => true,
+			);
 	?>
 		<div class="ui-mmb-list-write">
 			<form name="fwrite" id="fwrite" action="<?php echo $upload_action_url ?>" onsubmit="return fwrite_submit(this);" method="post" enctype="multipart/form-data" autocomplete="off">
@@ -176,15 +185,17 @@ $owner_behind = $owner_behind['cs_etc_3'];
 					<select name="wr_type" onchange="fn_log_type(this.value);">
 						<option value="UPLOAD" <?php echo $write['wr_type'] == "UPLOAD" ? "selected" : ""?>>UPLOAD</option>
 						<option value="URL" <?php echo $write['wr_type'] == "URL" ? "selected" : ""?>>URL</option>
+						<?php if (function_exists('mdl_apply_filters')) echo mdl_apply_filters('bbs_write_form_wr_type_options', '', $mmb_quick_form_ctx); ?>
 					</select>
 					
 					<fieldset>
-						<div id="add_UPLOAD" <?php echo $write['wr_type'] == "URL" ? "style='display: none;'" : ""?>>
+						<div id="add_UPLOAD" <?php echo ($write['wr_type'] == "URL" || $write['wr_type'] == "AUTO") ? "style='display: none;'" : ""?>>
 							<input type="file" id="wr_file" name="bf_file[]" title="로그등록 :  용량 <?php echo $upload_max_filesize ?> 이하만 업로드 가능" class="frm_file frm_input view_image_area" />
 						</div>
 						<div id="add_URL" <?php echo $write['wr_type'] != "URL" ? "style='display: none;'" : ""?>>
 							<input type="text" name="wr_url" value="<?php echo $write['wr_url']?>" title="이미지 링크를 가져와 주시길 바랍니다." id="wr_url" class="frm_input view_image_area" placeholder="이미지 링크 입력"/>
 						</div>
+						<?php if (function_exists('mdl_apply_filters')) echo mdl_apply_filters('bbs_write_form_wr_type_panels', '', $mmb_quick_form_ctx); ?>
 					</fieldset>
 					<button type="submit" id="btn_submit" accesskey="s" class="ui-btn">업로드</button>
 				</div>
