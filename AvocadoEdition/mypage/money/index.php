@@ -42,8 +42,7 @@ $result = sql_query($sql);
 			<tr>
 				<th>전달<?php echo $config['cf_money']?></th>
 				<td>
-					<input type="text" name="po_point" id="po_point" size="10" oninput="var p=document.getElementById('po_point_preview'); if(p) p.textContent=cf_money_format_js(this.value);"/>
-					<small id="po_point_preview" style="color:#666;"></small>
+					<?php echo cf_money_input('po_point', 0, array('id' => 'po_point')); ?>
 				</td>
 			</tr>
 		</tbody>
@@ -53,23 +52,6 @@ $result = sql_query($sql);
 		<button type="submit" class="ui-btn point">전송</button>
 	</div>
 </form>
-<script>
-// extend/00_money.lib.php 의 cf_money_format() 과 같은 환산(1갈레온=17시클, 1시클=29넛).
-function cf_money_format_js(v) {
-	v = parseInt(v, 10) || 0;
-	var sign = v < 0 ? '-' : '';
-	v = Math.abs(v);
-	var g = Math.floor(v / 493);
-	var r = v % 493;
-	var s = Math.floor(r / 29);
-	var k = r % 29;
-	var parts = [];
-	if (g > 0) parts.push(g + '갈레온');
-	if (s > 0) parts.push(s + '시클');
-	if (k > 0 || parts.length === 0) parts.push(k + '넛');
-	return sign + parts.join(' ');
-}
-</script>
 
 <hr class="padding" />
 

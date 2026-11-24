@@ -50,8 +50,7 @@ $_presets = function_exists('payout_preset_list') ? payout_preset_list(false) : 
                 <?php } ?>
             </select>
             <span style="margin-left:14px;">
-                <label><?php echo $config['cf_money']; ?>: <input type="number" name="extra_money" value="<?php echo isset($_calc_request['money'])?(int)$_calc_request['money']:0; ?>" style="width:100px;"></label>
-                <small style="color:#666;">(<?php echo cf_money_format(isset($_calc_request['money']) ? (int)$_calc_request['money'] : 0); ?>)</small>
+                <label><?php echo $config['cf_money']; ?>: <?php echo cf_money_input('extra_money', isset($_calc_request['money']) ? (int)$_calc_request['money'] : 0, array('id' => 'extra_money')); ?></label>
                 <label style="margin-left:10px;"><?php echo $config['cf_exp_name']; ?>: <input type="number" name="extra_exp" value="<?php echo isset($_calc_request['exp'])?(int)$_calc_request['exp']:0; ?>" style="width:100px;"></label>
             </span>
         </div>

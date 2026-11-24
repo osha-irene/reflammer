@@ -63,7 +63,7 @@ while ($rs && $row = sql_fetch_array($rs)) $owls[] = $row;
     <p><label>이름 <input class="frm_input" type="text" name="mo_name" maxlength="60" required value="<?php echo reflammer_mail_e(isset($edit['mo_name']) ? $edit['mo_name'] : ''); ?>"></label></p>
     <p><label>설명 <input class="frm_input" type="text" name="mo_desc" maxlength="255" value="<?php echo reflammer_mail_e(isset($edit['mo_desc']) ? $edit['mo_desc'] : ''); ?>"></label></p>
     <p><label>배달 시간(시간) <input class="frm_input" type="number" name="mo_hours" min="0" value="<?php echo (int)(isset($edit['mo_hours']) ? $edit['mo_hours'] : 0); ?>"></label></p>
-    <p><label>비용(넛 단위 정수) <input class="frm_input" type="number" name="mo_cost" min="0" value="<?php echo (int)(isset($edit['mo_cost']) ? $edit['mo_cost'] : 0); ?>"></label> <small>(현재 값 기준 <?php echo cf_money_format(isset($edit['mo_cost']) ? (int)$edit['mo_cost'] : 0); ?>)</small></p>
+    <p><label>비용 <?php echo cf_money_input('mo_cost', isset($edit['mo_cost']) ? (int)$edit['mo_cost'] : 0, array('id' => 'mo_cost')); ?></label></p>
     <p><label>정렬 순서 <input class="frm_input" type="number" name="mo_order" value="<?php echo (int)(isset($edit['mo_order']) ? $edit['mo_order'] : 0); ?>"></label></p>
     <p><label><input type="checkbox" name="mo_active" value="1" <?php echo (empty($edit) || !empty($edit['mo_active'])) ? 'checked' : ''; ?>> 사용(작성 화면에 노출)</label></p>
     <button type="submit" class="btn_submit"><?php echo $edit ? '수정' : '추가'; ?></button>

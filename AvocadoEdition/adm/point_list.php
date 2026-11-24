@@ -74,7 +74,7 @@ $colspan = 8;
 <?php echo get_admin_token_field(); ?>
 <input type="hidden" name="money_cfg_update" value="1">
 <p class="adm-panel-help">사이트에서 사용할 <strong>화폐의 이름과 단위</strong>를 지정합니다. (예: 포인트 / 점)</p>
-<p class="adm-panel-help" style="color:#a66;">실제 금액 표시는 갈레온/시클/넛 3단계 환산(1갈레온=17시클=493넛)으로 고정되어 있어, 여기서 이름·단위를 바꿔도 금액 표시 방식에는 반영되지 않습니다. "화폐가 부족합니다" 같은 일반 명칭 문구에만 쓰입니다.</p>
+<p class="adm-panel-help" style="color:#a66;">실제 금액 표시는 갈레온/시클/크넛 3단계 환산(1갈레온=17시클=493크넛)으로 고정되어 있어, 여기서 이름·단위를 바꿔도 금액 표시 방식에는 반영되지 않습니다. "화폐가 부족합니다" 같은 일반 명칭 문구에만 쓰입니다.</p>
 <div class="adm-opt-grid">
 	<label class="adm-opt-label" for="cf_money">화폐 명칭</label>
 	<div>
@@ -90,8 +90,7 @@ $colspan = 8;
 	</div>
 	<label class="adm-opt-label" for="cf_login_point">로그인 시 획득</label>
 	<div>
-		<input type="number" name="cf_login_point" id="cf_login_point" value="<?php echo (int)($config['cf_login_point'] ?? 0); ?>" size="6" class="frm_input" oninput="var p=document.getElementById('cf_login_point_preview'); if(p) p.textContent=cf_money_format_js(this.value);"> <span class="red" style="font-size:11px;">(1일 1회)</span>
-		<small id="cf_login_point_preview" style="color:#666; margin-left:6px;"><?php echo cf_money_format((int)($config['cf_login_point'] ?? 0)); ?></small>
+		<?php echo cf_money_input('cf_login_point', (int)($config['cf_login_point'] ?? 0), array('id' => 'cf_login_point')); ?> <span class="red" style="font-size:11px;">(1일 1회)</span>
 	</div>
 </div>
 <div class="adm-panel-actions">
@@ -247,8 +246,8 @@ $colspan = 8;
 					<td><input type="text" name="po_content" id="po_content" required class="required frm_input" size="80"></td>
 				</tr>
 				<tr>
-					<th scope="row"><label for="po_point"><?php echo $config['cf_money']?><strong class="sound_only">필수</strong></label></th>
-					<td><input type="text" name="po_point" id="po_point" required class="required frm_input"></td>
+					<th scope="row"><label for="po_point_g"><?php echo $config['cf_money']?><strong class="sound_only">필수</strong></label></th>
+					<td><?php echo cf_money_input('po_point', 0, array('id' => 'po_point', 'signed' => true)); ?></td>
 				</tr>
 			</tbody>
 		</table>
@@ -263,22 +262,6 @@ $colspan = 8;
 </section>
 
 <script>
-// extend/00_money.lib.php 의 cf_money_format() 과 같은 환산(1갈레온=17시클, 1시클=29넛).
-function cf_money_format_js(v) {
-	v = parseInt(v, 10) || 0;
-	var sign = v < 0 ? '-' : '';
-	v = Math.abs(v);
-	var g = Math.floor(v / 493);
-	var r = v % 493;
-	var s = Math.floor(r / 29);
-	var k = r % 29;
-	var parts = [];
-	if (g > 0) parts.push(g + '갈레온');
-	if (s > 0) parts.push(s + '시클');
-	if (k > 0 || parts.length === 0) parts.push(k + '넛');
-	return sign + parts.join(' ');
-}
-
 function fpointlist_submit(f)
 {
 	if (!is_checked("chk[]")) {

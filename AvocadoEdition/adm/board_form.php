@@ -691,24 +691,24 @@ $frm_submit .= '</div>';
             </td>
         </tr>
         <tr>
-            <th scope="row"><label for="bo_read_point">글읽기 포인트</label></th>
-            <td><input type="text" name="bo_read_point" value="<?php echo isset($board['bo_read_point']) ? $board['bo_read_point'] : 0; ?>" id="bo_read_point" required class="required frm_input" size="5"> <small>(<?php echo cf_money_format(isset($board['bo_read_point']) ? (int)$board['bo_read_point'] : 0); ?>)</small></td>
+            <th scope="row"><label for="bo_read_point_g">글읽기 포인트</label></th>
+            <td><?php echo cf_money_input('bo_read_point', isset($board['bo_read_point']) ? (int)$board['bo_read_point'] : 0, array('id' => 'bo_read_point', 'signed' => true)); ?></td>
             <td class="td_grpset">
                 <input type="checkbox" name="chk_grp_read_point" value="1" id="chk_grp_read_point"><label for="chk_grp_read_point">그룹적용</label>
                 <input type="checkbox" name="chk_all_read_point" value="1" id="chk_all_read_point"><label for="chk_all_read_point">전체적용</label>
             </td>
         </tr>
         <tr>
-            <th scope="row"><label for="bo_write_point">글쓰기 포인트</label></th>
-            <td><input type="text" name="bo_write_point" value="<?php echo isset($board['bo_write_point']) ? $board['bo_write_point'] : 0; ?>" id="bo_write_point" required class="required frm_input" size="5"> <small>(<?php echo cf_money_format(isset($board['bo_write_point']) ? (int)$board['bo_write_point'] : 0); ?>)</small></td>
+            <th scope="row"><label for="bo_write_point_g">글쓰기 포인트</label></th>
+            <td><?php echo cf_money_input('bo_write_point', isset($board['bo_write_point']) ? (int)$board['bo_write_point'] : 0, array('id' => 'bo_write_point', 'signed' => true)); ?></td>
             <td class="td_grpset">
                 <input type="checkbox" name="chk_grp_write_point" value="1" id="chk_grp_write_point"><label for="chk_grp_write_point">그룹적용</label>
                 <input type="checkbox" name="chk_all_write_point" value="1" id="chk_all_write_point"><label for="chk_all_write_point">전체적용</label>
             </td>
         </tr>
         <tr>
-            <th scope="row"><label for="bo_comment_point">댓글쓰기 포인트</label></th>
-            <td><input type="text" name="bo_comment_point" value="<?php echo isset($board['bo_comment_point']) ? $board['bo_comment_point'] : 0; ?>" id="bo_comment_point" required class="required frm_input" size="5"> <small>(<?php echo cf_money_format(isset($board['bo_comment_point']) ? (int)$board['bo_comment_point'] : 0); ?>)</small></td>
+            <th scope="row"><label for="bo_comment_point_g">댓글쓰기 포인트</label></th>
+            <td><?php echo cf_money_input('bo_comment_point', isset($board['bo_comment_point']) ? (int)$board['bo_comment_point'] : 0, array('id' => 'bo_comment_point', 'signed' => true)); ?></td>
             <td class="td_grpset">
                 <input type="checkbox" name="chk_grp_comment_point" value="1" id="chk_grp_comment_point"><label for="chk_grp_comment_point">그룹적용</label>
                 <input type="checkbox" name="chk_all_comment_point" value="1" id="chk_all_comment_point"><label for="chk_all_comment_point">전체적용</label>
@@ -988,15 +988,13 @@ function board_copy(bo_table) {
 
 function set_point(f) {
     if (f.chk_grp_point.checked) {
-        f.bo_read_point.value = 0;
-        f.bo_write_point.value = 0;
-        f.bo_comment_point.value = 0;
-        f.bo_download_point.value = 0;
+        cfMoneySet('bo_read_point', 0);
+        cfMoneySet('bo_write_point', 0);
+        cfMoneySet('bo_comment_point', 0);
     } else {
-        f.bo_read_point.value     = f.bo_read_point.defaultValue;
-        f.bo_write_point.value    = f.bo_write_point.defaultValue;
-        f.bo_comment_point.value  = f.bo_comment_point.defaultValue;
-        f.bo_download_point.value = f.bo_download_point.defaultValue;
+        cfMoneySet('bo_read_point', <?php echo (int)(isset($board['bo_read_point']) ? $board['bo_read_point'] : 0); ?>);
+        cfMoneySet('bo_write_point', <?php echo (int)(isset($board['bo_write_point']) ? $board['bo_write_point'] : 0); ?>);
+        cfMoneySet('bo_comment_point', <?php echo (int)(isset($board['bo_comment_point']) ? $board['bo_comment_point'] : 0); ?>);
     }
 }
 

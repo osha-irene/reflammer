@@ -284,7 +284,7 @@ $frm_submit .= '</div>'.PHP_EOL;
                     <tr>
                         <td>가격</td>
                         <td>
-                            <input type="text" name="it_sell" value="<?php echo isset($item['it_sell']) ? $item['it_sell'] : ''; ?>" id="it_sell" size="10">
+                            <?php echo cf_money_input('it_sell', isset($item['it_sell']) ? (int)$item['it_sell'] : 0, array('id' => 'it_sell')); ?>
                         </td>
                     </tr>
                     <tr>
