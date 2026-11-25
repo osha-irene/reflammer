@@ -208,6 +208,7 @@ $mv_has_profile = ($mv_voice !== '' || $mv_name !== '' || !empty($mv_meta_parts)
 
 	<?php if ($has_bag) { ?>
 	<div class="tab-box" id="mv_bag_area"<?php echo $mv_tab === 'bag' ? '' : ' style="display:none;"'; ?>>
+		<?php echo $viewer_bag; // member_viewer_bag ?>
 
 <?php  if($article['ad_use_title']) { // 타이틀 설정 ?>
 	<h3>
@@ -236,8 +237,6 @@ $mv_has_profile = ($mv_voice !== '' || $mv_name !== '' || !empty($mv_meta_parts)
 			<?php  include(function_exists('theme_dir_file') ? theme_dir_file('inventory/list.inc.php') : (G5_PATH."/inventory/list.inc.php")); ?>
 		</div>
 	<?php  } ?>
-
-		<?php echo $viewer_bag; // member_viewer_bag ?>
 
 	</div><!-- // mv_bag_area -->
 	<?php } ?>

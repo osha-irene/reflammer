@@ -4,8 +4,8 @@ if (!defined('_GNUBOARD_')) exit;
 return array(
     'name'        => 'reflammer_mail',
     'title'       => '편지',
-    'description' => '캐릭터 간 편지를 부엉이로 배달합니다. 부엉이 종류별 배달 시간, 아이템 첨부, 익명 발송을 지원합니다.',
-    'version'     => '1.1.0',
+    'description' => '캐릭터 간 편지를 배달하고 우체국에서 공개합니다. 부엉이 이미지와 펫 전달, 배달 시간, 아이템 첨부, 익명 발송을 지원합니다.',
+    'version'     => '1.8.2',
     'author'      => 'reflammer',
     'view_url'    => G5_MDL_URL.'/reflammer_mail/index.php',
     'admin_menus' => array(

@@ -55,13 +55,13 @@ $rs = sql_query("SELECT * FROM `{$letter_table}` WHERE {$where} ORDER BY ml_id D
 <div class="tbl_head01 tbl_wrap">
     <table>
         <caption>편지 내역 (총 <?php echo $total; ?>건)</caption>
-        <thead><tr><th>ID</th><th>발신</th><th>수신</th><th>제목</th><th>부엉이</th><th>상태</th><th>발송일</th><th>관리</th></tr></thead>
+        <thead><tr><th>ID</th><th>발신 (실제 / 명목)</th><th>수신 (실제 / 명목)</th><th>제목</th><th>부엉이</th><th>상태</th><th>발송일</th><th>관리</th></tr></thead>
         <tbody>
         <?php $n = 0; while ($rs && $row = sql_fetch_array($rs)) { $n++; ?>
             <tr>
                 <td><?php echo (int)$row['ml_id']; ?></td>
-                <td><?php echo reflammer_mail_e($row['se_ch_name']); ?> (<?php echo reflammer_mail_e($row['se_mb_id']); ?>)<?php if ($row['ml_anonymous']) echo ' <span class="rm-badge">익명발송</span>'; ?></td>
-                <td><?php echo reflammer_mail_e($row['re_ch_name']); ?><?php if ($row['ml_random']) echo ' <span class="rm-badge">무작위발송</span>'; ?></td>
+                <td><?php echo reflammer_mail_e($row['se_ch_name']); ?> (<?php echo reflammer_mail_e($row['se_mb_id']); ?>)<br><small>명목: <?php echo array_key_exists('ml_nominal_sender', $row) && $row['ml_nominal_sender'] !== null ? (trim((string)$row['ml_nominal_sender']) !== '' ? reflammer_mail_e($row['ml_nominal_sender']) : '익명') : reflammer_mail_e($row['se_ch_name']); ?></small><?php if ($row['ml_anonymous']) echo ' <span class="ui-btn small">익명발송</span>'; ?></td>
+                <td><?php echo reflammer_mail_e($row['re_ch_name']); ?><br><small>명목: <?php echo array_key_exists('ml_nominal_recipient', $row) && $row['ml_nominal_recipient'] !== null ? (trim((string)$row['ml_nominal_recipient']) !== '' ? reflammer_mail_e($row['ml_nominal_recipient']) : '익명') : reflammer_mail_e($row['re_ch_name']); ?></small><?php if ($row['ml_random']) echo ' <span class="ui-btn small">무작위발송</span>'; ?></td>
                 <td title="<?php echo reflammer_mail_e($row['ml_content']); ?>"><?php echo reflammer_mail_e($row['ml_subject']); ?></td>
                 <td><?php echo reflammer_mail_e($row['mo_name']); ?></td>
                 <td><?php echo $row['ml_status'] === 'delivered' ? '도착' : '배달 중'; ?></td>
