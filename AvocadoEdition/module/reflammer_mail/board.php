@@ -31,6 +31,7 @@ if ($letter_id > 0) {
         if (!empty($recipient_owner['mb_id']) && $recipient_owner['mb_id'] === $member['mb_id']) {
             $read_at = sql_real_escape_string(G5_TIME_YMDHIS);
             sql_query("UPDATE `{$letter_table}` SET ml_read_datetime='{$read_at}' WHERE ml_id='{$letter_id}' AND ml_read_datetime IS NULL", false);
+            $letter['ml_read_datetime'] = $read_at;
         }
     }
 }
@@ -62,18 +63,22 @@ include_once('../../mypage/_head.php');
    <h2>To. <?php echo reflammer_mail_public_recipient_label($letter); ?></h2>
    <p class="rm-public-status">편지가 도착했습니다</p>
    <?php $public_sender = reflammer_mail_public_sender_label($letter); if ($public_sender !== ''): ?><p class="rm-meta">From. <?php echo $public_sender; ?></p><?php endif; ?>
-   <div class="rm-content"><?php echo nl2br(reflammer_mail_e($letter['ml_content'])); ?></div>
-   <?php if (!empty($letter['ml_pet_name'])): ?><p>(<?php echo reflammer_mail_e($letter['ml_pet_name']); ?>으로 추정되는 녀석이 편지를 가져다주었다.)</p><?php endif; ?>
-   <?php
-     $item_table = reflammer_mail_table('item');
-     $attachments = sql_query("SELECT it_name FROM `{$item_table}` WHERE ml_id='{$letter_id}' ORDER BY mi_id ASC", false);
-     $attachment_rows = array();
-     while ($attachments && $attachment = sql_fetch_array($attachments)) $attachment_rows[] = $attachment;
-   ?>
-   <?php if (!empty($attachment_rows)): ?>
-    <div class="rm-attachments"><h3>첨부 아이템</h3><ul>
-     <?php foreach ($attachment_rows as $attachment): ?><li><?php echo reflammer_mail_e($attachment['it_name']); ?></li><?php endforeach; ?>
-    </ul></div>
+   <?php if (!empty($letter['ml_read_datetime'])): ?>
+    <div class="rm-content"><?php echo nl2br(reflammer_mail_e($letter['ml_content'])); ?></div>
+    <?php if (!empty($letter['ml_pet_name'])): ?><p>(<?php echo reflammer_mail_e($letter['ml_pet_name']); ?>으로 추정되는 녀석이 편지를 가져다주었다.)</p><?php endif; ?>
+    <?php
+      $item_table = reflammer_mail_table('item');
+      $attachments = sql_query("SELECT it_name FROM `{$item_table}` WHERE ml_id='{$letter_id}' ORDER BY mi_id ASC", false);
+      $attachment_rows = array();
+      while ($attachments && $attachment = sql_fetch_array($attachments)) $attachment_rows[] = $attachment;
+    ?>
+    <?php if (!empty($attachment_rows)): ?>
+     <div class="rm-attachments"><h3>첨부 아이템</h3><ul>
+      <?php foreach ($attachment_rows as $attachment): ?><li><?php echo reflammer_mail_e($attachment['it_name']); ?></li><?php endforeach; ?>
+     </ul></div>
+    <?php endif; ?>
+   <?php else: ?>
+    <p class="rm-public-hidden">수신자가 편지를 열람하면 내용이 공개됩니다.</p>
    <?php endif; ?>
   <?php endif; ?>
   <div class="rm-view-actions"><a class="ui-btn" href="<?php echo reflammer_mail_e($board_url); ?>">우체국으로</a></div>
@@ -95,7 +100,7 @@ include_once('../../mypage/_head.php');
   <?php if ($total < 1): ?><p class="no-data">공개된 편지가 없습니다.</p><?php else: ?>
    <div class="rm-public-list">
    <?php while ($rows && ($row = sql_fetch_array($rows))): $companion = reflammer_mail_public_companion($row); ?>
-    <article class="rm-public-card <?php echo $row['ml_status'] === 'in_transit' ? 'is-pending' : 'is-delivered'; ?>">
+    <article class="rm-public-card <?php echo ($row['ml_status'] === 'in_transit' || empty($row['ml_read_datetime'])) ? 'is-pending' : 'is-delivered'; ?>">
      <a href="<?php echo reflammer_mail_e($board_url.'?id='.(int)$row['ml_id']); ?>">
       <?php if ($companion['image'] !== ''): ?><span class="rm-public-card-image"><img src="<?php echo reflammer_mail_e($companion['image']); ?>" alt="<?php echo reflammer_mail_e($companion['name']); ?>" width="72" height="72"></span><?php endif; ?>
       <span class="rm-public-card-copy">
@@ -103,6 +108,8 @@ include_once('../../mypage/_head.php');
        <span class="rm-public-status">전달자: <?php echo reflammer_mail_e($companion['name']); ?></span>
        <?php if ($row['ml_status'] === 'in_transit'): ?>
         <span class="rm-public-status">부엉이가 날아가고 있습니다 · <?php echo reflammer_mail_e(reflammer_mail_remaining_text($row['ml_due_datetime'])); ?></span>
+       <?php elseif (empty($row['ml_read_datetime'])): ?>
+        <span class="rm-public-status">수신자 열람 대기 중 · 내용 비공개</span>
        <?php else: ?>
         <span class="rm-public-excerpt"><?php echo reflammer_mail_e(mb_strlen((string)$row['ml_content'], 'UTF-8') > 120 ? mb_substr((string)$row['ml_content'], 0, 120, 'UTF-8').'…' : $row['ml_content']); ?></span>
         <?php $public_sender = reflammer_mail_public_sender_label($row); if ($public_sender !== ''): ?><span class="rm-public-sender">From. <?php echo $public_sender; ?></span><?php endif; ?>

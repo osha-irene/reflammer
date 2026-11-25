@@ -48,6 +48,10 @@
 .rm-meta { font-size: 13px; color: #7a6f5c; margin: 0 0 14px; overflow-wrap: anywhere; }
 .rm-pending { background: #fff8e1; border: 1px solid #ffe082; color: #6b5900; padding: 10px 12px; border-radius: 6px; line-height: 1.7; }
 .rm-content { white-space: pre-line; line-height: 1.8; padding: 12px 0; color: #2a2320; overflow-wrap: anywhere; }
+.rm-shell .rm-card > .rm-meta { font-size: 15px; }
+.rm-shell .rm-card > .rm-content { font-size: 16px; }
+.rm-letter-companion { display: flex; width: max-content; flex-direction: column; align-items: flex-start; gap: 6px; margin: 12px 0; }
+.rm-letter-companion img { display: block; }
 .rm-attachments { margin-top: 14px; padding: 10px 12px; background: #fbf7ee; border: 1px solid #e6ddc9; border-radius: 6px; color: #2a2320; }
 .rm-attachments h3 { margin: 0 0 8px; font-size: 13px; color: #2a2320; }
 .rm-view-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
@@ -70,13 +74,17 @@
 .rm-public-card-image { flex: 0 0 72px; }
 .rm-public-card-image img, .rm-public-companion img { display: block; width: 72px; height: 72px; object-fit: cover; border-radius: 50%; }
 .rm-public-card-copy { display: flex; flex: 1; min-width: 0; flex-direction: column; gap: 5px; }
-.rm-public-recipient { font-size: 15px; }
-.rm-public-status, .rm-public-sender { color: #7a6f5c; font-size: 13px; }
+.rm-public-recipient { font-size: 17px; }
+.rm-public-status { color: #7a6f5c; font-size: 13px; }
+.rm-public-sender { color: #7a6f5c; font-size: 15px; }
 .rm-public-companion { display: flex; align-items: center; gap: 10px; margin: 12px 0; }
 .rm-public-companion img { flex: 0 0 72px; }
-.rm-public-excerpt { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rm-public-excerpt { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 16px; }
 .rm-public-card time { flex: 0 0 auto; color: #7a6f5c; font-size: 12px; }
-.rm-public-detail .rm-content { margin-top: 8px; }
+.rm-public-detail h2 { font-size: 20px; }
+.rm-public-detail .rm-meta { font-size: 15px; }
+.rm-public-detail .rm-content { margin-top: 8px; font-size: 16px; }
+.rm-public-hidden { margin: 20px 0; opacity: .7; }
 
 @media (max-width: 640px) {
   .rm-shell { padding: 12px; }
