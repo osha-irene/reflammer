@@ -431,7 +431,7 @@ include_once('../../mypage/_head.php');
    <tbody>
    <?php $n = 0; while ($rs && $row = sql_fetch_array($rs)) { $n++; ?>
     <tr>
-     <td><a href="<?php echo reflammer_mail_e($base.'?action=view&id='.$row['ml_id']); ?>"><?php echo reflammer_mail_e($row['ml_subject']); ?></a></td>
+     <td><a href="<?php echo reflammer_mail_e($base.'?action=view&id='.$row['ml_id']); ?>"><?php echo $row['ml_status'] === 'in_transit' ? '아직 우편이 도착하지 않았습니다.' : reflammer_mail_e($row['ml_subject']); ?></a></td>
      <td>From. <?php echo reflammer_mail_sender_label($row, !empty($row['ml_anonymous'])); ?></td>
      <td>
       <?php if ($row['ml_status'] === 'in_transit') { ?>
