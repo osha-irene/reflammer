@@ -2,10 +2,27 @@
     Header set Cache-Control "no-store, no-cache, must-revalidate, max-age=0"
     Header set Pragma "no-cache"
     Header set Expires "0"
+
+    # Keep dynamic responses private, but let browsers reuse public static assets.
+    <FilesMatch "\.(css|js|mjs|jpg|jpeg|png|gif|webp|svg|ico|woff|woff2|ttf|otf)$">
+        Header set Cache-Control "public, max-age=600"
+        Header unset Pragma
+        Header unset Expires
+    </FilesMatch>
 </IfModule>
 
 <IfModule mod_expires.c>
-    ExpiresActive Off
+    ExpiresActive On
+    ExpiresByType text/css "access plus 10 minutes"
+    ExpiresByType application/javascript "access plus 10 minutes"
+    ExpiresByType text/javascript "access plus 10 minutes"
+    ExpiresByType image/jpeg "access plus 10 minutes"
+    ExpiresByType image/png "access plus 10 minutes"
+    ExpiresByType image/gif "access plus 10 minutes"
+    ExpiresByType image/webp "access plus 10 minutes"
+    ExpiresByType image/svg+xml "access plus 10 minutes"
+    ExpiresByType image/x-icon "access plus 10 minutes"
+    ExpiresByType font/woff2 "access plus 10 minutes"
 </IfModule>
 
 FileETag None

@@ -120,6 +120,30 @@ function reflammer_mail_tick($mailbox_mb_id = '') {
     if ($ran) return;
     $ran = true;
 
+    // Ordinary page views can arrive in pairs (for example, the outer home page
+    // and its main iframe). Coalesce global delivery sweeps for 15 seconds while
+    // keeping an explicit mailbox visit immediate.
+    $tick_lock = false;
+    $mailbox_mb_id = trim((string)$mailbox_mb_id);
+    if ($mailbox_mb_id === '' && function_exists('flock')) {
+        $tick_lock_path = G5_DATA_PATH.'/cache/reflammer_mail_tick.lock';
+        $tick_lock_handle = @fopen($tick_lock_path, 'c+');
+        if ($tick_lock_handle) {
+            if (!@flock($tick_lock_handle, LOCK_EX | LOCK_NB)) {
+                fclose($tick_lock_handle);
+                return;
+            }
+            rewind($tick_lock_handle);
+            $last_tick = (int)trim((string)stream_get_contents($tick_lock_handle));
+            if ($last_tick > 0 && $last_tick > time() - 15) {
+                flock($tick_lock_handle, LOCK_UN);
+                fclose($tick_lock_handle);
+                return;
+            }
+            $tick_lock = true;
+        }
+    }
+
     global $g5, $config;
     reflammer_mail_ensure_call_type();
     $letter_table = reflammer_mail_table('letter');
@@ -160,7 +184,6 @@ function reflammer_mail_tick($mailbox_mb_id = '') {
     }
 
     // 편지 기능 방문은 읽음이 아니지만, 미확인 편지의 자동 읽음 대기 기간은 갱신한다.
-    $mailbox_mb_id = trim((string)$mailbox_mb_id);
     if ($mailbox_mb_id !== '') {
         $mailbox_mb_id_sql = sql_real_escape_string($mailbox_mb_id);
         sql_query("UPDATE `{$letter_table}` AS letter
@@ -176,6 +199,15 @@ function reflammer_mail_tick($mailbox_mb_id = '') {
         SET ml_read_datetime=DATE_ADD(COALESCE(ml_re_last_visit, ml_due_datetime), INTERVAL 14 DAY)
         WHERE ml_status='delivered' AND ml_read_datetime IS NULL
           AND COALESCE(ml_re_last_visit, ml_due_datetime) <= DATE_SUB('{$now}', INTERVAL 14 DAY)", false);
+
+    if ($tick_lock) {
+        ftruncate($tick_lock_handle, 0);
+        rewind($tick_lock_handle);
+        fwrite($tick_lock_handle, (string)time());
+        fflush($tick_lock_handle);
+        flock($tick_lock_handle, LOCK_UN);
+        fclose($tick_lock_handle);
+    }
 }
 
 function reflammer_mail_remaining_text($due_datetime) {
