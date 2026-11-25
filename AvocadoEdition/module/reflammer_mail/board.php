@@ -18,6 +18,21 @@ reflammer_mail_tick();
 $letter_table = reflammer_mail_table('letter');
 $board_url = G5_MDL_URL.'/reflammer_mail/board.php';
 $letter_id = (int)($_GET['id'] ?? 0);
+$search = trim((string)($_GET['q'] ?? ''));
+$search_field = (string)($_GET['field'] ?? 'sender');
+$search_columns = array('sender' => 'se_ch_name', 'recipient' => 're_ch_name', 'content' => 'ml_content');
+if (!isset($search_columns[$search_field])) $search_field = 'sender';
+$search_where = '';
+if ($search !== '') {
+    $search_sql = sql_real_escape_string($search);
+    $search_like = '%'.$search_sql.'%';
+    $search_column = $search_columns[$search_field];
+    if ($search_field === 'content') {
+        $search_where = " WHERE ml_status='delivered' AND ml_read_datetime IS NOT NULL AND {$search_column} LIKE '{$search_like}'";
+    } else {
+        $search_where = " WHERE {$search_column} LIKE '{$search_like}'";
+    }
+}
 $page = max(1, (int)($_GET['page'] ?? 1));
 $per_page = 10;
 $letter = array();
@@ -87,17 +102,18 @@ include_once('../../mypage/_head.php');
  <section class="rm-card"><p class="rm-empty">편지를 찾을 수 없습니다.</p><a class="ui-btn" href="<?php echo reflammer_mail_e($board_url); ?>">우체국으로</a></section>
  <?php else: ?>
  <?php
-   $count_row = sql_fetch("SELECT COUNT(*) AS cnt FROM `{$letter_table}`", false);
+   $count_row = sql_fetch("SELECT COUNT(*) AS cnt FROM `{$letter_table}`{$search_where}", false);
    $total = (int)($count_row['cnt'] ?? 0);
    $total_pages = max(1, (int)ceil($total / $per_page));
    if ($page > $total_pages) $page = $total_pages;
    $offset = ($page - 1) * $per_page;
-   $rows = sql_query("SELECT * FROM `{$letter_table}` ORDER BY ml_sent_datetime DESC, ml_id DESC LIMIT {$offset},{$per_page}", false);
+   $rows = sql_query("SELECT * FROM `{$letter_table}`{$search_where} ORDER BY ml_sent_datetime DESC, ml_id DESC LIMIT {$offset},{$per_page}", false);
+   $paging_url = $board_url.'?'.($search !== '' ? 'q='.rawurlencode($search).'&field='.rawurlencode($search_field).'&' : '').'page=';
  ?>
  <section class="rm-card">
   <h2>우체국</h2>
   <p class="rm-empty">배달 중인 편지는 받는 이름과 전달자, 도착 예정 시간만 보입니다. 편지 내용은 도착 후 공개됩니다.</p>
-  <?php if ($total < 1): ?><p class="no-data">공개된 편지가 없습니다.</p><?php else: ?>
+  <?php if ($total < 1): ?><p class="no-data"><?php echo $search !== '' ? '검색 결과가 없습니다.' : '공개된 편지가 없습니다.'; ?></p><?php else: ?>
    <div class="rm-public-list">
    <?php while ($rows && ($row = sql_fetch_array($rows))): $companion = reflammer_mail_public_companion($row); ?>
     <article class="rm-public-card <?php echo ($row['ml_status'] === 'in_transit' || empty($row['ml_read_datetime'])) ? 'is-pending' : 'is-delivered'; ?>">
@@ -120,8 +136,18 @@ include_once('../../mypage/_head.php');
     </article>
    <?php endwhile; ?>
    </div>
-   <?php if ($total_pages > 1) echo get_paging(5, $page, $total_pages, $board_url.'?page='); ?>
+   <?php if ($total_pages > 1) echo get_paging(5, $page, $total_pages, $paging_url); ?>
   <?php endif; ?>
+  <form class="rm-board-search" method="get" action="<?php echo reflammer_mail_e($board_url); ?>">
+   <select name="field" aria-label="검색 기준">
+    <option value="sender" <?php echo $search_field === 'sender' ? 'selected' : ''; ?>>실제 보내는 이</option>
+    <option value="recipient" <?php echo $search_field === 'recipient' ? 'selected' : ''; ?>>실제 받는 이</option>
+    <option value="content" <?php echo $search_field === 'content' ? 'selected' : ''; ?>>편지 내용</option>
+   </select>
+   <input type="search" id="rm-board-search" name="q" value="<?php echo reflammer_mail_e($search); ?>" placeholder="검색어를 입력하세요">
+   <button type="submit" class="ui-btn point">검색</button>
+   <?php if ($search !== ''): ?><a class="ui-btn" href="<?php echo reflammer_mail_e($board_url); ?>">초기화</a><?php endif; ?>
+  </form>
  </section>
  <?php endif; ?>
 </main>

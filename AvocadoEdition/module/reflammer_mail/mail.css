@@ -85,6 +85,10 @@
 .rm-public-detail .rm-meta { font-size: 15px; }
 .rm-public-detail .rm-content { margin-top: 8px; font-size: 16px; }
 .rm-public-hidden { margin: 20px 0; opacity: .7; }
+.rm-board-search { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; margin-top: 20px; padding-top: 16px; border-top: 1px solid #e6ddc9; text-align: center; }
+.rm-board-search label { flex: 0 0 100%; font-weight: 600; }
+.rm-board-search select { flex: 0 1 40%; width: 40%; min-width: 0; height: 52px; min-height: 52px; padding: 10px 12px; border: 1px solid #c9bd9f; border-radius: 4px; box-sizing: border-box; background: #fff; color: inherit; font-size: 16px; line-height: 1.5; }
+.rm-board-search input[type="search"] { flex: 0 1 40%; width: 40%; min-width: 180px; height: 52px; min-height: 52px; padding: 10px 12px; border: 1px solid #c9bd9f; border-radius: 4px; box-sizing: border-box; font-size: 16px; line-height: 1.5; }
 
 @media (max-width: 640px) {
   .rm-shell { padding: 12px; }
