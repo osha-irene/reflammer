@@ -113,7 +113,7 @@ function reflammer_mail_notify_delivery($ml_id) {
     sql_query('COMMIT', false);
 }
 
-// 도착 시각이 지난 편지의 배달·알림과 14일 자동 읽음을 요청이 들어올 때 처리한다.
+// 도착 시각이 지난 편지의 배달과 알림을 요청이 들어올 때 처리한다.
 // cron 이 없으므로 실제 처리는 다음 사이트 요청에서 실행되지만, 상태 시각은 예정 시각 기준이다.
 function reflammer_mail_tick($mailbox_mb_id = '') {
     static $ran = false;
@@ -182,23 +182,6 @@ function reflammer_mail_tick($mailbox_mb_id = '') {
     while ($pending_notices && $pending = sql_fetch_array($pending_notices)) {
         reflammer_mail_notify_delivery((int)$pending['ml_id']);
     }
-
-    // 편지 기능 방문은 읽음이 아니지만, 미확인 편지의 자동 읽음 대기 기간은 갱신한다.
-    if ($mailbox_mb_id !== '') {
-        $mailbox_mb_id_sql = sql_real_escape_string($mailbox_mb_id);
-        sql_query("UPDATE `{$letter_table}` AS letter
-            INNER JOIN `{$g5['character_table']}` AS character_row ON character_row.ch_id=letter.re_ch_id
-            SET letter.ml_re_last_visit='{$now}'
-            WHERE character_row.mb_id='{$mailbox_mb_id_sql}'
-              AND letter.ml_status='delivered' AND letter.ml_read_datetime IS NULL
-              AND letter.ml_due_datetime <= '{$now}'", false);
-    }
-
-    // 도착 후 14일 동안 편지 기능을 열지 않은 편지는 자동 읽음 처리한다.
-    sql_query("UPDATE `{$letter_table}`
-        SET ml_read_datetime=DATE_ADD(COALESCE(ml_re_last_visit, ml_due_datetime), INTERVAL 14 DAY)
-        WHERE ml_status='delivered' AND ml_read_datetime IS NULL
-          AND COALESCE(ml_re_last_visit, ml_due_datetime) <= DATE_SUB('{$now}', INTERVAL 14 DAY)", false);
 
     if ($tick_lock) {
         ftruncate($tick_lock_handle, 0);
